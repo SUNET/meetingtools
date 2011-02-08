@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% load datehumanize %}
+{% load roomurl %}
+{% block widgets %}
+    $("#rooms").accordion({
+   		header: 'h3',
+        active: false,
+        event: "click", 
+   		collapsible: true,
+   		navigation: true,
+   		animated: true
+   	});
+{% endblock %}
+{% block content %}
+	<h1>Your Rooms</h1>
+	{% if rooms %}
+	<div id="rooms">
+		{% for r in rooms %}
+		<div id="{{r.id}}">
+		   <h3 class="listheader">{{r.name}}</h3>
+		   <div>
+		   	<p>Created by {{r.creator}} {{r.timecreated|datehumanize}}.</p>
+		   	<p>Meeting room URL: <a href="{{r|roomurl}}">{{r|roomurl}}</a></p>
+		   	<div class="buttons">
+		   		<ul>
+		   			<li><div class="button"><a href="/room/{{r.id}}/modify">Modify Room</a></li>
+		   			<li><div class="button"><a href="/room/{{r.id}}/delete">Delete Room</a></li>
+		   		</ul>
+		   	</div>
+		   </div>
+		</div>
+		{% endfor %}
+	</div>
+	{% else %}
+	<p>You don't have any rooms listed right now...</p>
+	{% endif %}
+	<br/>
+	<div class="buttons">
+		<ul>
+		   <li><div class="button"><a href="/room/create">Create a new room</a></div></li>
+		   <!-- li><div class="button"><a href="/room/import">Modify an existing room</a></div></li -->
+		</ul>
+	</div>
+{% endblock %}

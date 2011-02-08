@@ -1,6 +1,7 @@
 # Django settings for meetingtools project.
 
 import meetingtools.site_logging
+import os
 
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
@@ -9,7 +10,9 @@ ADMINS = (
     # ('Your Name', 'your_email@domain.com'),
 )
 
-BASE_DIR = '..'
+BASE_DIR = '.'
+
+BASE_URL = "http://localhost:8000"
 
 MANAGERS = ADMINS
 
@@ -24,6 +27,7 @@ DATABASES = {
     }
 }
 
+GRACE = 10
 
 # Local time zone for this installation. Choices can be found here:
 # http://en.wikipedia.org/wiki/List_of_tz_zones_by_name
@@ -67,7 +71,6 @@ MIDDLEWARE_CLASSES = (
     'django.middleware.common.CommonMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
-    'coip.middleware.UserMappingMiddleware',
     'django.contrib.auth.middleware.RemoteUserMiddleware'
 )
 
@@ -92,5 +95,10 @@ INSTALLED_APPS = (
     'django.contrib.sites',
     'django.contrib.admin',
     'django.contrib.humanize',
-    'django_extensions'
+    'django_extensions',
+    'meetingtools.extensions',
+    'meetingtools.apps.auth',
+    'meetingtools.apps.room',
+    'meetingtools.apps.cluster',
+    'meetingtools.apps.userprofile',
 )

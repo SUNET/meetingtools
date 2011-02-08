@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% load datehumanize %}
+{% block widgets %}
+{% endblock %}
+{% block content %}
+	<h3>{{room.name}}</h3>
+	<table border="0">
+		<tr>
+			<td>Name</td>
+			<td>{{room.name}}</td>
+		</tr>
+		<tr>
+			<td>URL</td>
+			<td><a href="/go/{{r.id}}">{% url meetingtools.apps.room.views.go room.id %}</a></td>
+		</tr>
+		<tr>
+			<td>Current users</td>
+			<td>{{nusers}}</td>
+		</tr>
+		<tr>
+			<td>Self cleaning</td>
+			<td>{{room.self_cleaning}}</td>
+		</tr>
+		<tr>
+			<td>Permission</td>
+			<td>{{permission}}</td>
+		</tr>
+	</table>
+{% endblock %}
