@@ -9,6 +9,7 @@ import datetime
 from django.views.decorators.cache import never_cache
 import logging
 from meetingtools.apps.userprofile.models import UserProfile
+from meetingtools.multiresponse import redirect_to
 
 def meta(request,attr):
     v = request.META.get(attr)
@@ -72,10 +73,10 @@ def accounts_login_federated(request):
             
         next = request.session.get("after_login_redirect", None)
         if next is not None:
-            return HttpResponseRedirect(next)
+            return redirect_to(next)
     else:
         pass
-    return HttpResponseRedirect("/")
+    return redirect_to("/")
 
 @never_cache
 def logout(request):
