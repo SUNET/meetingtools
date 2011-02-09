@@ -18,6 +18,7 @@ from meetingtools.utils import session
 import time
 from meetingtools.settings import GRACE
 from django.utils.datetime_safe import datetime
+from django.http import HttpResponseRedirect
 
 def _acc_for_user(user):
     (local,domain) = user.username.split('@')
@@ -249,5 +250,5 @@ def goto(request,room):
     
     r = client.request('sco-info',{'sco-id':room.sco_id})
     urlpath = r.et.findtext('.//sco/url-path')
-    return redirect_to(room.acc.url+urlpath)
+    return HttpResponseRedirect(room.acc.url+urlpath) #in this case we want the absolute URL
     
