@@ -53,9 +53,10 @@ USE_I18N = True
 USE_L10N = True
 
 MEDIA_ROOT = "%s/site-media" % BASE_DIR
-ADMIN_MEDIA_ROOT = "/usr/lib/pymodules/python2.5/django/contrib/admin/media"
-MEDIA_URL = '/site-media/'
-ADMIN_MEDIA_PREFIX = '/admin-media/'
+ADMIN_MEDIA_ROOT = "%s/admin-media" % BASE_DIR
+MEDIA_URL = '%s/site-media/' % PREFIX_URL
+ADMIN_MEDIA_PREFIX = '%/admin-media/' % PREFIX_URL
+
 
 LOGIN_URL = "%s/accounts/login/" % PREFIX_URL
 LOGOUT_URL = "%s/accounts/logout/" % PREFIX_URL
