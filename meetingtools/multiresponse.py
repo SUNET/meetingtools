@@ -3,9 +3,11 @@ import re
 import rfc822
 from django.conf import settings
 from django.shortcuts import render_to_response
-from django.http import HttpResponse, HttpResponseForbidden
+from django.http import HttpResponse, HttpResponseForbidden,\
+    HttpResponseRedirect
 from django.utils import simplejson
 from django.template import loader
+from meetingtools.settings import PREFIX_URL
 
 default_suffix_mapping = {"\.htm(l?)$": "text/html",
                           "\.json$": "application/json",
@@ -60,3 +62,6 @@ def respond_to(request, template_mapping, dict={}, suffix_mapping=default_suffix
         response = render_to_response(template,make_response_dict(request,dict))
         response['Content-Type'] = "%s; charset=%s" % (content_type, settings.DEFAULT_CHARSET)
     return response
+
+def redirect_to(path):
+    return HttpResponseRedirect("%s%s" % (PREFIX_URL,path))

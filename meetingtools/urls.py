@@ -5,10 +5,11 @@ from django.contrib import admin
 from django.http import HttpResponseRedirect
 from django.contrib.auth.views import login, logout
 from meetingtools.settings import ADMIN_MEDIA_ROOT, MEDIA_ROOT
+from meetingtools.multiresponse import redirect_to
 admin.autodiscover()
 
 def welcome(request):
-    return HttpResponseRedirect('/rooms')
+    return redirect_to('/rooms')
 
 urlpatterns = patterns('',
     (r'^$',welcome),

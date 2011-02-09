@@ -4,8 +4,7 @@ Created on Jan 31, 2011
 @author: leifj
 '''
 from meetingtools.apps.room.models import Room, ACCluster
-from django.http import HttpResponseRedirect
-from meetingtools.multiresponse import respond_to
+from meetingtools.multiresponse import respond_to, redirect_to
 from meetingtools.apps.room.forms import UpdateRoomForm, DeleteRoomForm
 from django.shortcuts import get_object_or_404
 from meetingtools.ac import ac_api_client, api
@@ -153,7 +152,7 @@ def update(request,id=None):
             params['sco-source-id'] = r.et.find(".//sco").get('sco-source-id')
             room = form.save()
             room = _import_room(params['sco-id'],params['name'],params['source-sco-id'],params['url-path'],request.user,acc)
-            return HttpResponseRedirect("/rooms#%d" % room.id)
+            return redirect_to("/rooms#%d" % room.id)
     else:
         form = UpdateRoomForm(instance=room)
         _init_update_form(request, form, acc, my_meetings_sco_id)
@@ -219,7 +218,7 @@ def delete(request,id):
             api = ac_api_client(request,room.acc)
             api.request('sco-delete',{'sco-id':room.sco_id},raise_error=True)
             room.delete()
-            return HttpResponseRedirect("/rooms")
+            return redirect_to("/rooms")
     else:
         form = DeleteRoomForm()
         
@@ -250,5 +249,5 @@ def goto(request,room):
     
     r = client.request('sco-info',{'sco-id':room.sco_id})
     urlpath = r.et.findtext('.//sco/url-path')
-    return HttpResponseRedirect(room.acc.url+urlpath)
+    return redirect_to(room.acc.url+urlpath)
     

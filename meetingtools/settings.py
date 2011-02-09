@@ -12,8 +12,8 @@ ADMINS = (
 
 BASE_DIR = '.'
 
-BASE_URL = "http://localhost:8000"
-
+PREFIX_URL = ""
+BASE_URL = "http://localhost:8000%s" % PREFIX_URL
 MANAGERS = ADMINS
 
 DATABASES = {
