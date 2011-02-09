@@ -1,6 +1,8 @@
 {% extends "base.html" %}
+{% load prefix %}
 {% load datehumanize %}
 {% load roomurl %}
+{% load prefix %}
 {% block widgets %}
     $("#rooms").accordion({
    		header: 'h3',
@@ -23,8 +25,8 @@
 		   	<p>Meeting room URL: <a href="{{r|roomurl}}">{{r|roomurl}}</a></p>
 		   	<div class="buttons">
 		   		<ul>
-		   			<li><div class="button"><a href="/room/{{r.id}}/modify">Modify Room</a></li>
-		   			<li><div class="button"><a href="/room/{{r.id}}/delete">Delete Room</a></li>
+		   			<li><div class="button"><a href="{% prefix %}/room/{{r.id}}/modify">Modify Room</a></li>
+		   			<li><div class="button"><a href="{% prefix %}/room/{{r.id}}/delete">Delete Room</a></li>
 		   		</ul>
 		   	</div>
 		   </div>
@@ -37,8 +39,7 @@
 	<br/>
 	<div class="buttons">
 		<ul>
-		   <li><div class="button"><a href="/room/create">Create a new room</a></div></li>
-		   <!-- li><div class="button"><a href="/room/import">Modify an existing room</a></div></li -->
+		   <li><div class="button"><a href="{% prefix %}/room/create">Create a new room</a></div></li>
 		</ul>
 	</div>
 {% endblock %}
