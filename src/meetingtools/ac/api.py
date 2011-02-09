@@ -9,6 +9,8 @@ import httplib2
 from urllib import quote
 import logging
 from pprint import pformat
+import os
+import tempfile
 
 class ACPException(Exception):
     def __init__(self, value):
@@ -58,7 +60,7 @@ class ACPClient():
                 u.append(kv)
         url = url + "&" + "&".join(u)
     
-        h = httplib2.Http(".cache");
+        h = httplib2.Http(tempfile.gettempdir()+os.sep+".cache");
         logging.debug(url)
         resp, content = h.request(url, "GET")
         logging.debug(pformat(resp))
