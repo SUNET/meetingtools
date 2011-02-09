@@ -29,6 +29,7 @@ def make_response_dict(request,d={}):
  
     if request.user.is_authenticated():
         d['user'] = request.user
+        d['prefix'] = PREFIX_URL
 
     return d
 
