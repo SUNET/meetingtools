@@ -21,6 +21,7 @@ class Room(models.Model):
     self_cleaning = BooleanField(verbose_name="Clean-up when empty?")
     sco_id = IntegerField(verbose_name="Adobe Connect Room",blank=False)
     source_sco_id = IntegerField(verbose_name="Template",blank=True,null=True)
+    folder_sco_id = IntegerField(verbose_name="Adobe Connect Room Folder",editable=False)
     timecreated = models.DateTimeField(auto_now_add=True)
     lastupdated = models.DateTimeField(auto_now=True)
     lastvisited = models.DateTimeField(blank=True,null=True)
@@ -28,3 +29,8 @@ class Room(models.Model):
     def __unicode__(self):
         return "%s (sco_id=%d,source_sco_id=%d)" % (self.name,self.sco_id,self.source_sco_id)
     
+    def lastvisit(self):
+        if not self.lastvisited:
+            return 0
+        else:
+            return self.lastvisited

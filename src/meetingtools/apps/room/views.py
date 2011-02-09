@@ -113,13 +113,32 @@ def view(request,id):
                        'nusers': _nusers(session_info)
                        })
 
-def _init_update_form(request,form,acc,my_meetings_sco_id):  
+def _init_update_form(request,form,acc,my_meetings_sco_id):
     form.fields['participants'].widget.choices = [('','-- anyone --')]+[(g,g) for g in groups(request)]
     form.fields['presenters'].widget.choices = [('','-- nobody --')]+[(g,g) for g in groups(request)]
     form.fields['hosts'].widget.choices = [('','-- nobody --')]+[(g,g) for g in groups(request)]
     form.fields['source_sco_id'].widget.choices = [('','-- select template --')]+[r for r in _user_templates(request,acc,my_meetings_sco_id)]
 
-@login_required   
+@login_required
+def _update_room(request, room):
+    api = ac_api_client(request, room.acc)
+    params = {'type':'meeting', 
+              'name':room.name, 
+              'folder-id': room.folder_sco_id, 
+              'source-sco-id': room.source_sco_id, 
+              'url-path':room.urlpath}
+    
+    if room.sco_id:
+        params['sco-id'] = room.sco_id
+    r = api.request('sco-update', params, raise_error=True)
+    
+    room.sco_id = r.et.find(".//sco").get('sco-id')
+    room.source_sco_id = r.et.find(".//sco").get('sco-source-id')
+    room.save()
+    #room = _import_room(params['sco-id'], params['name'], params['source-sco-id'], params['url-path'], request.user, acc)
+    return room
+
+@login_required
 def update(request,id=None):
     if id:
         room = get_object_or_404(Room,pk=id)
@@ -129,48 +148,36 @@ def update(request,id=None):
         update = True
     else:
         acc = _acc_for_user(request.user)
-        room = Room(creator=request.user,acc=acc)
+        my_meetings_sco_id = _user_meeting_folder(request,acc)
+        room = Room(creator=request.user,acc=acc,folder_sco_id=my_meetings_sco_id)
         what = "Create"
         title = "Create a new room"
         update = False
     
-    my_meetings_sco_id = _user_meeting_folder(request,acc)
-    
     if request.method == 'POST':
         form = UpdateRoomForm(request.POST,instance=room)
-        _init_update_form(request, form, acc, my_meetings_sco_id)
+        _init_update_form(request, form, acc, room.folder_sco_id)
         if form.is_valid():
-            api = ac_api_client(request,acc)
-            params = {'type':'meeting','name':room.name,'folder-id':my_meetings_sco_id,'sco-id':room.sco_id,'source-sco-id':room.source_sco_id,'url-path':room.urlpath}
-            if form.cleaned_data.has_key('source_sco_id'):
-                params['source-sco-id'] = form.cleaned_data['source_sco_id']
-                
-            if form.cleaned_data.has_key('urlpath'):
-                params['url-path'] = form.cleaned_data['urlpath']
-            
-            r = api.request('sco-update',params,raise_error=True)
-            params['sco-id'] = r.et.find(".//sco").get('sco-id')
-            params['sco-source-id'] = r.et.find(".//sco").get('sco-source-id')
             room = form.save()
-            room = _import_room(params['sco-id'],params['name'],params['source-sco-id'],params['url-path'],request.user,acc)
+            room = _update_room(request, room)
             return redirect_to("/rooms#%d" % room.id)
     else:
         form = UpdateRoomForm(instance=room)
-        _init_update_form(request, form, acc, my_meetings_sco_id)
+        _init_update_form(request, form, acc, room.folder_sco_id)
         if update:
             form.fields['urlpath'].widget.attrs['readonly'] = True
         
     return respond_to(request,{'text/html':'edit.html'},{'form':form,'formtitle': title,'submitname':'%s Room' % what})
 
-def _import_room(sco_id,name,source_sco_id,urlpath,user,acc):
+def _import_room(request,acc,sco_id,source_sco_id,folder_sco_id,name,urlpath):
     modified = False
-    room,created = Room.objects.get_or_create(sco_id=sco_id,acc=acc,creator=user)
+    room,created = Room.objects.get_or_create(sco_id=sco_id,acc=acc,creator=request.user,folder_sco_id=folder_sco_id)
     
     if room.name != name:
         room.name = name
         modified = True
     
-    if not room.sco_id and sco_id:
+    if room.sco_id != sco_id:
         room.sco_id = sco_id
         modified = True
     
@@ -199,7 +206,7 @@ def list(request):
     
     ar = []
     for (sco_id,name,source_sco_id,urlpath) in user_rooms:
-        room = _import_room(sco_id,name,source_sco_id,urlpath,request.user,acc)
+        room = _import_room(request,acc,sco_id,source_sco_id,my_meetings_sco_id,name,urlpath)
         ar.append(int(sco_id))
     
     #logging.debug(pformat(ar))
@@ -225,8 +232,11 @@ def delete(request,id):
         
     return respond_to(request,{'text/html':'edit.html'},{'form':form,'formtitle': 'Delete %s' % room.name,'submitname':'Delete Room'})      
 
-def _clean(room):
-    pass
+def _clean(request,room):
+    api = ac_api_client(request, room.acc)
+    api.request('sco-delete',{'sco-id':room.sco_id},raise_error=True)
+    room.sco_id = None
+    return _update_room(request, room)
 
 def go_by_id(request,id):
     room = get_object_or_404(Room,pk=id)
@@ -237,18 +247,18 @@ def go_by_path(request,path):
     return goto(request,room)
         
 def goto(request,room):
-    client = ac_api_client(request, room.acc)
-    session_info = client.request('report-meeting-sessions',{'sco-id':room.sco_id})
+    api = ac_api_client(request, room.acc)
+    session_info = api.request('report-meeting-sessions',{'sco-id':room.sco_id})
     
     now = time.time()
     if room.self_cleaning:
-        if (_nusers(session_info) == 0) and (abs(room.lastvisited - now) > GRACE):
-            _clean(room)
+        if (_nusers(session_info) == 0) and (abs(room.lastvisit() - now) > GRACE):
+           room = _clean(request,room)
     
     room.lastvisited = datetime.now()
     room.save()
     
-    r = client.request('sco-info',{'sco-id':room.sco_id})
+    r = api.request('sco-info',{'sco-id':room.sco_id})
     urlpath = r.et.findtext('.//sco/url-path')
     return HttpResponseRedirect(room.acc.url+urlpath) #in this case we want the absolute URL
     
