@@ -28,7 +28,7 @@ def _acc_for_user(user):
         for regex in acc.domain_match.split():
             if re.match(regex,domain):
                 return acc
-    return None
+    raise "I don't know which cluster you belong to..."
 
 def _user_meeting_folder(request,acc):
     if not session(request,'my_meetings_sco_id'):
