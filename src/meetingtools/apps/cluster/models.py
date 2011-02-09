@@ -14,3 +14,6 @@ class ACCluster(models.Model):
     password = CharField(max_length=128)
     name = CharField(max_length=128,blank=True,unique=True)
     domain_match = TextField()
+    
+    def __unicode__(self):
+        return self.url
