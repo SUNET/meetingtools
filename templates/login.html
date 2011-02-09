@@ -1,8 +1,9 @@
 {% extends "base.html" %}
+{% load "prefix" %}
 {% block headline %}Login{% endblock %}
 {% block title %}SUNET Meeting Tools{% endblock %}
 {% block content %}
 <h2>Welcome!</h2>
 <p class="ui-state-highlight ui-corner-all">This is a technology preview of the SUNET Meeting Tools. Contact Johnny or Marcus for more info!</p>
-<div class="button"><a href="/accounts/login-federated">Login</a></div>
+<div class="button"><a href="{% prefix %}/accounts/login-federated">Login</a></div>
 {% endblock %}

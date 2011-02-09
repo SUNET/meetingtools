@@ -6,7 +6,7 @@
 }
 html, body {
 	height: 100%;
-	background: url(/site-media/img/header.jpg) center top repeat-x;
+	background: url(../img/header.jpg) center top repeat-x;
 	width: 100%;
 }
 .wrapper {
@@ -28,7 +28,7 @@ html, body {
 		display: block;
 		height: 145px;
 		width: 81px;
-		background: url(/site-media/img/logo.jpg) center no-repeat;
+		background: url(../img/logo.jpg) center no-repeat;
 	}
 .footer, .push {
 	height: 4em;
