@@ -55,7 +55,7 @@ USE_L10N = True
 MEDIA_ROOT = "%s/site-media" % BASE_DIR
 ADMIN_MEDIA_ROOT = "%s/admin-media" % BASE_DIR
 MEDIA_URL = '%s/site-media/' % PREFIX_URL
-ADMIN_MEDIA_PREFIX = '%/admin-media/' % PREFIX_URL
+ADMIN_MEDIA_PREFIX = '%s/admin-media/' % PREFIX_URL
 
 
 LOGIN_URL = "%s/accounts/login/" % PREFIX_URL
