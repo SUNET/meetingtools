@@ -158,8 +158,8 @@ def update(request,id=None):
         form = UpdateRoomForm(request.POST,instance=room)
         _init_update_form(request, form, acc, room.folder_sco_id)
         if form.is_valid():
-            room = form.save()
             room = _update_room(request, room)
+            room = form.save()
             return redirect_to("/rooms#%d" % room.id)
     else:
         form = UpdateRoomForm(instance=room)
@@ -173,11 +173,14 @@ def _import_room(request,acc,sco_id,source_sco_id,folder_sco_id,name,urlpath):
     modified = False
     room,created = Room.objects.get_or_create(sco_id=sco_id,acc=acc,creator=request.user,folder_sco_id=folder_sco_id)
     
-    if room.name != name:
+    logging.debug(pformat(room))
+    logging.debug(room.id)
+    
+    if room.name != name and name:
         room.name = name
         modified = True
     
-    if room.sco_id != sco_id:
+    if room.sco_id != sco_id and sco_id:
         room.sco_id = sco_id
         modified = True
     
@@ -185,16 +188,24 @@ def _import_room(request,acc,sco_id,source_sco_id,folder_sco_id,name,urlpath):
         room.source_sco_id = source_sco_id
         modified = True
         
-    if room.urlpath != urlpath:
-        room.urlpath = urlpath.strip('/')
+    if urlpath:
+        urlpath = urlpath.strip('/')
+        
+    if room.urlpath != urlpath and urlpath:
+        room.urlpath = urlpath
         modified = True
         
-    if '/' in room.urlpath:
-        room.urlpath = urlpath.strip('/')
-        modified = True
+    #if '/' in room.urlpath:
+    #    room.urlpath = urlpath.strip('/')
+    #    modified = True
+    
+    logging.debug(pformat(room))
         
     if modified:
+        logging.debug(room.id)
         room.save()
+    
+    
     
     return room
 
@@ -206,6 +217,7 @@ def list(request):
     
     ar = []
     for (sco_id,name,source_sco_id,urlpath) in user_rooms:
+        logging.debug("%s %s %s %s" % (sco_id,name,source_sco_id,urlpath))
         room = _import_room(request,acc,sco_id,source_sco_id,my_meetings_sco_id,name,urlpath)
         ar.append(int(sco_id))
     
@@ -253,7 +265,7 @@ def goto(request,room):
     now = time.time()
     if room.self_cleaning:
         if (_nusers(session_info) == 0) and (abs(room.lastvisit() - now) > GRACE):
-           room = _clean(request,room)
+            room = _clean(request,room)
     
     room.lastvisited = datetime.now()
     room.save()

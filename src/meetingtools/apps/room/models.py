@@ -27,7 +27,7 @@ class Room(models.Model):
     lastvisited = models.DateTimeField(blank=True,null=True)
     
     def __unicode__(self):
-        return "%s (sco_id=%d,source_sco_id=%d)" % (self.name,self.sco_id,self.source_sco_id)
+        return "%s (sco_id=%s,source_sco_id=%s,folder_sco_id=%s,urlpath=%s)" % (self.name,self.sco_id,self.source_sco_id,self.folder_sco_id,self.urlpath)
     
     def lastvisit(self):
         if not self.lastvisited:
