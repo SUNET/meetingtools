@@ -205,8 +205,6 @@ def _import_room(request,acc,sco_id,source_sco_id,folder_sco_id,name,urlpath):
         logging.debug(room.id)
         room.save()
     
-    
-    
     return room
 
 @login_required
@@ -228,6 +226,10 @@ def list(request):
         if (not r.sco_id in ar) and (not r.self_cleaning):
             r.delete() 
     return respond_to(request,{'text/html':'apps/room/list.html'},{'user':request.user,'rooms':Room.objects.filter(creator=request.user).all()})
+
+def rooms_by_group(request,group):
+    for room in Room.objects.filter(participants=group):
+        pass
 
 @login_required
 def delete(request,id):
