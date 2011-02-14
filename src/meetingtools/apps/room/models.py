@@ -9,6 +9,7 @@ from django.db.models.fields import CharField, BooleanField, IntegerField, Small
 from django.db.models.fields.related import ForeignKey
 from django.contrib.auth.models import User
 from meetingtools.apps.cluster.models import ACCluster
+import time
 
 class Room(models.Model):
     creator = ForeignKey(User,editable=False)
@@ -33,4 +34,4 @@ class Room(models.Model):
         if not self.lastvisited:
             return 0
         else:
-            return self.lastvisited
+            return int(time.mktime(self.lastvisited.timetuple())*1000)
