@@ -23,7 +23,7 @@
 		   <div>
 		   	<p>Created by {{r.creator}} {{r.timecreated|datehumanize}}.</p>
 		   	<p>Meeting room URL: <a href="{{r|roomurl}}">{{r|roomurl}}</a></p>
-		   	<div class="buttons">
+		   	<div class="buttons ilist">
 		   		<ul>
 		   			<li><div class="button"><a href="{% prefix %}/room/{{r.id}}/modify">Modify Room</a></li>
 		   			<li><div class="button"><a href="{% prefix %}/room/{{r.id}}/delete">Delete Room</a></li>
