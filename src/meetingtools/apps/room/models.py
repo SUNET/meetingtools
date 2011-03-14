@@ -27,6 +27,9 @@ class Room(models.Model):
     lastupdated = models.DateTimeField(auto_now=True)
     lastvisited = models.DateTimeField(blank=True,null=True)
     
+    class Meta:
+        unique_together = ('acc','sco_id')
+    
     def __unicode__(self):
         return "%s (sco_id=%s,source_sco_id=%s,folder_sco_id=%s,urlpath=%s)" % (self.name,self.sco_id,self.source_sco_id,self.folder_sco_id,self.urlpath)
     
