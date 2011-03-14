@@ -19,6 +19,7 @@ import time
 from meetingtools.settings import GRACE
 from django.utils.datetime_safe import datetime
 from django.http import HttpResponseRedirect
+from django.core.exceptions import ObjectDoesNotExist
 
 def _acc_for_user(user):
     (local,domain) = user.username.split('@')
@@ -171,10 +172,12 @@ def update(request,id=None):
 
 def _import_room(request,acc,sco_id,source_sco_id,folder_sco_id,name,urlpath):
     modified = False
-    room,created = Room.objects.get_or_create(sco_id=sco_id,acc=acc,creator=request.user,folder_sco_id=folder_sco_id)
-    
+    try:
+        room = Room.objects.get(sco_id=sco_id,acc=acc)
+    except ObjectDoesNotExist:
+        room = Room.objects.create(sco_id=sco_id,acc=acc,creator=request.user,folder_sco_id=folder_sco_id)
+        
     logging.debug(pformat(room))
-    logging.debug(room.id)
     
     if room.name != name and name:
         room.name = name
@@ -202,7 +205,7 @@ def _import_room(request,acc,sco_id,source_sco_id,folder_sco_id,name,urlpath):
     logging.debug(pformat(room))
         
     if modified:
-        logging.debug(room.id)
+        logging.debug("saving ... %s" % pformat(room))
         room.save()
     
     return room
