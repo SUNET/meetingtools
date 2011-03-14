@@ -5,7 +5,7 @@ Created on Jan 31, 2011
 '''
 
 from django.db import models
-from django.db.models.fields import CharField, BooleanField, IntegerField, SmallIntegerField
+from django.db.models.fields import CharField, BooleanField, IntegerField
 from django.db.models.fields.related import ForeignKey
 from django.contrib.auth.models import User
 from meetingtools.apps.cluster.models import ACCluster
