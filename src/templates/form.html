@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% load prefix %}
+{% block content %}
+   <h1>{% block formtitle %}{{formtitle}}{% endblock %}</h1>
+   {% block beforeform %}{% endblock %}
+   <form method="POST" id="wizard" enctype="multipart/form-data" class="bbq infopanel">
+    {% if form.non_field_errors %}{{ form.non_field_errors }}{% endif %}
+	{% for fieldset in form.fieldsets %}
+	  <fieldset id="{{fieldset.name}}" class="{{ fieldset.classes }}">
+		  {% if fieldset.legend %}
+		  <legend class="ui-state-highlight ui-corner-all">{{ fieldset.legend }}</legend>
+		  {% endif %}
+		  {% if fieldset.description %}
+		  <p class="description" style="border-bottom: 1px solid #CECECE; padding-bottom: 5px;">{{ fieldset.description }}</p>
+		  {% endif %}
+		  <ul class="links">
+		  {% for field in fieldset %}
+		    {% if field.is_hidden %}
+		      {{ field }}
+		    {% else %}
+		      <li class="links {% if field.field.required %}required{% endif %}" {{ field.row_attrs }}>
+		        {{ field.errors }}
+		        <label for="id_{{ field.html_name }}" class="fieldlabel">{{ field.label }}
+                {% if field.field.required %}<b>*</b>{% endif %}</label>
+		        <div class="fieldinput">{{ field }}</div>
+		      </li>
+		    {% endif %}
+		  {% endfor %}
+		  </ul>
+	  </fieldset>
+	{% endfor %}
+	   <ul class="ilist" style="padding-top: 10px; padding-bottom: 5px;">
+	      <li class="button left"><input type="reset" value="Back"/></li>
+	      <li class="button left"><input type="submit" value="Finish"/></li>
+	      <li class="button right"><input type="button" onClick="document.location='/room'" value="Cancel"/></li>
+	   </ul>
+    <div class="clear"></div>
+  </form>
+{% endblock %}
