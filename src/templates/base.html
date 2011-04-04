@@ -10,10 +10,13 @@
 	<link href="{% prefix %}/site-media/css/reset.css" rel="stylesheet" type="text/css" />
 	<link type="text/css" href="{% prefix %}/site-media/css/flick/jquery-ui-1.8.2.custom.css" rel="stylesheet">
 	<link href="{% prefix %}/site-media/css/sunet.css" rel="stylesheet" type="text/css" />
-	<link href="{% prefix %}/site-media/css/style.css" rel="stylesheet" type="text/css" />
 	<link href="{% prefix %}/site-media/css/gs.css" rel="stylesheet" type="text/css" />
+	<link href="{% prefix %}/site-media/css/style.css" rel="stylesheet" type="text/css" />
     <script type="text/javascript" src="{% prefix %}/site-media/js/jquery-1.4.2.min.js"></script>
-    <script type="text/javascript" src="{% prefix %}/site-media/js/jquery-ui-1.8.2.custom.min.js"></script>
+    <script type="text/javascript" src="{% prefix %}/site-media/js/jquery-ui-1.8.6.custom.min.js"></script>
+    <script type="text/javascript" src="{% prefix %}/site-media/js/jquery.validate.js"></script>
+    <script type="text/javascript" src="{% prefix %}/site-media/js/bbq.js"></script>
+    <script type="text/javascript" src="{% prefix %}/site-media/js/jquery.form.wizard-3.0.4.js"></script>
 
 	<!--[if IE]>
 	<link href="css/sunet-ie6.css" rel="stylesheet" type="text/css" />
@@ -47,12 +50,14 @@
 
 	  var feedback_widget = new GSFN.feedback_widget(feedback_widget_options);
 	</script>
+	{% block js %}{% endblock %}
 	<script type="text/javascript">
 	$(function() {
-		$("input:submit, input:button, a",".button").button();
+		$("input:submit, input:button, input:reset, a",".button").button();
 	    {% block widgets %}{% endblock %}
 	});
 	</script>
+	
 </head>
 <body>
 	<div class="wrapper">

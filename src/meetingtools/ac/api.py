@@ -4,13 +4,13 @@ Created on Jan 31, 2011
 @author: leifj
 '''
 
-from lxml import etree
 import httplib2
 from urllib import quote
 import logging
 from pprint import pformat
 import os
 import tempfile
+from lxml import etree
 
 class ACPException(Exception):
     def __init__(self, value):

@@ -146,12 +146,14 @@ def update(request,id=None):
         acc = room.acc
         what = "Update"
         title = "Modify %s" % room.name
+        formname = "update"
         update = True
     else:
         acc = _acc_for_user(request.user)
         my_meetings_sco_id = _user_meeting_folder(request,acc)
         room = Room(creator=request.user,acc=acc,folder_sco_id=my_meetings_sco_id)
         what = "Create"
+        formname = "create"
         title = "Create a new room"
         update = False
     
@@ -168,7 +170,7 @@ def update(request,id=None):
         if update:
             form.fields['urlpath'].widget.attrs['readonly'] = True
         
-    return respond_to(request,{'text/html':'edit.html'},{'form':form,'formtitle': title,'submitname':'%s Room' % what})
+    return respond_to(request,{'text/html':'apps/room/%s.html' % formname},{'form':form,'formtitle': title,'submitname':'%s Room' % what})
 
 def _import_room(request,acc,sco_id,source_sco_id,folder_sco_id,name,urlpath):
     modified = False
