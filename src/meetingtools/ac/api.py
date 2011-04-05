@@ -105,7 +105,7 @@ class ACPClient():
         if result.is_error():
             if result.status_code() != 'no_data':
                 result.exception()
-        elif not principal:
+        elif principal:
             dict['principal-id'] = principal.get('principal-id')
         
         update_result = self.request('principal-update',dict)
