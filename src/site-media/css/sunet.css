@@ -23,7 +23,7 @@ html, body {
 	height: 191px;
 }
 	#logo {
-		//display: block;
+		display: block;
 		background: url(../img/sunet-banner.png);
 	}
 .footer, .push {

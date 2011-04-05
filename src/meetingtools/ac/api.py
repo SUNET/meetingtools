@@ -26,7 +26,7 @@ class ACPResult():
     
     def __init__(self,content):
         self.et = etree.fromstring(content)
-        self.status = self.et.find('status')
+        self.status = self.et.xpath('//status')[0]
         
     def is_error(self):
         return self.status_code() != 'ok'
