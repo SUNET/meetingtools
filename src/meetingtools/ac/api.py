@@ -39,7 +39,11 @@ class ACPResult():
 
     def get_principal(self):
         logger.debug(lxml.etree.tostring(self.et))
-        return self.et.xpath('principal')[0]
+        pl = self.et.xpath('//principal')
+        if pl:
+            return pl[0]
+        else:
+            return None
 
 def _enc(v):
         ev = v
