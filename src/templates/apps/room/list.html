@@ -14,7 +14,7 @@
    	});
 {% endblock %}
 {% block content %}
-	<h1>Your Rooms</h1>
+	<h1>Your meeting rooms</h1>
 	{% if rooms %}
 	<div id="rooms">
 		{% for r in rooms %}
@@ -23,12 +23,10 @@
 		   <div>
 		   	<p>Created by {{r.creator}} {{r.timecreated|datehumanize}}.</p>
 		   	<p>Meeting room URL: <a href="{{r|roomurl}}">{{r|roomurl}}</a></p>
-		   	<div class="buttons ilist">
-		   		<ul>
+		   		<ul class="ilist">
 		   			<li><div class="button"><a href="{% prefix %}/room/{{r.id}}/modify">Modify Room</a></li>
 		   			<li><div class="button"><a href="{% prefix %}/room/{{r.id}}/delete">Delete Room</a></li>
 		   		</ul>
-		   	</div>
 		   </div>
 		</div>
 		{% endfor %}
@@ -37,9 +35,7 @@
 	<p>You don't have any rooms listed right now...</p>
 	{% endif %}
 	<br/>
-	<div class="buttons">
-		<ul>
-		   <li><div class="button"><a href="{% prefix %}/room/create">Create a new room</a></div></li>
-		</ul>
-	</div>
+	<ul class="ilist">
+	   <li><div class="button"><a href="{% prefix %}/room/create">Create a new room</a></div></li>
+	</ul>
 {% endblock %}

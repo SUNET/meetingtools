@@ -7,11 +7,9 @@
 	<meta http-equiv="content-type" 
 		content="text/html;charset=utf-8" />
 	<meta http-equiv="Content-Style-Type" content="text/css" />
-	<link href="{% prefix %}/site-media/css/reset.css" rel="stylesheet" type="text/css" />
 	<link type="text/css" href="{% prefix %}/site-media/css/flick/jquery-ui-1.8.2.custom.css" rel="stylesheet">
-	<link href="{% prefix %}/site-media/css/sunet.css" rel="stylesheet" type="text/css" />
-	<link href="{% prefix %}/site-media/css/gs.css" rel="stylesheet" type="text/css" />
 	<link href="{% prefix %}/site-media/css/style.css" rel="stylesheet" type="text/css" />
+	<link href="{% prefix %}/site-media/css/gs.css" rel="stylesheet" type="text/css" />
     <script type="text/javascript" src="{% prefix %}/site-media/js/jquery-1.4.2.min.js"></script>
     <script type="text/javascript" src="{% prefix %}/site-media/js/jquery-ui-1.8.6.custom.min.js"></script>
     <script type="text/javascript" src="{% prefix %}/site-media/js/jquery.validate.js"></script>
@@ -60,30 +58,39 @@
 	
 </head>
 <body>
-	<div class="wrapper">
-		<div class="wCont">
-			<div class="header">
-				<a href="#" id="logo">&nbsp;</a>
-				<div id="menuContL"><h1>Meeting Tools</h1></div>
-				<div id="menuContR">
-				</div>
-			</div>
-	
-			<div class="content">
-				<div style="display:none;" class="contL"></div>
-				{% block content %}{% endblock %}
-				<div style="display:none;" class="blockCont"></div>
-				<div style="display:none;" class="contR"></div>
-				<div class="clr"></div>
+	<div id="container">
+		<div id="header">
+		    <div id="headline"><h1>SUNET Meting Tools</h1></div>
+			<a href="#"><img src="{% prefix %}/site-media/img/sunet-banner.png"/></a>
+			
+			<ul class="ui-helper-reset ui-widget ilist">
+				<li><a href="http://www.sunet.se">SUNET</a>&raquo;</li>
+				<li><a href="#">SUNET Meeting tools</a></li>
+			</ul>
+		</div>
+		<div id="content">
+		    <div style="width: 80%;">
+			{% block content %}{% endblock %}
 			</div>
 		</div>
-		<div class="push"></div>
-	</div>
-	<div class="clr"></div>
-	<div class="footer">
-		<div class="wCont">
-			<div id="footerText">
-			</div>
+		<div class="clear"/>
+		<div id="footer">
+			<ul>
+			   	<li>
+			   		<ul>
+			   			<li><h3>Users</h3></li>
+			   			<li><a class="tip" title="{{ user.get_full_name }}" href="{% prefix %}/rooms">My Profile</a></li>
+			   			<li><a class="tip" title="Logout" id="logout" href="{% prefix %}/accounts/logout/">Logout</a></li>
+			   		</ul>
+			   	</li>
+			   	<li>
+			   		<ul>
+			   			<li><h3>Support</h3></li>
+			   			<li><a class="tip" title="SUNET" href="http://www.sunet.se">SUNET</a></li>
+			   			<li><a class="tip" title="SUNET Community Support" href="http://community.sunet.se">SUNET Community Support</a></li>
+			   		</ul>
+			   	</li>
+			</ul>
 		</div>
 	</div>
 </body>

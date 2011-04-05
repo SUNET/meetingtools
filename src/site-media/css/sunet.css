@@ -6,7 +6,6 @@
 }
 html, body {
 	height: 100%;
-	background: url(../img/header.jpg) center top repeat-x;
 	width: 100%;
 }
 .wrapper {
@@ -15,7 +14,6 @@ html, body {
 	height: 100%;
 	margin: 0 auto -4em;
 	width: 100%;
-	margin: 0 auto;
 }
 .wCont {
 	width: 850px;
@@ -25,10 +23,8 @@ html, body {
 	height: 191px;
 }
 	#logo {
-		display: block;
-		height: 145px;
-		width: 81px;
-		background: url(../img/logo.jpg) center no-repeat;
+		//display: block;
+		background: url(../img/sunet-banner.png);
 	}
 .footer, .push {
 	height: 4em;
@@ -140,6 +136,9 @@ html, body {
 	background: #EFEFEF;
 	border-top: 2px solid #EBEBEB;
 	border-bottom: 2px solid #EBEBEB;
+	position: absolute;
+	bottom: 0;
+	padding-bottom: 0px;
 }
 #footerText {
 	padding: 20px 0 0;

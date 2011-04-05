@@ -1,17 +1,19 @@
-html,body { font-size: 80%; font-family: arial, sans-serif; height: 100%; margin:0; padding:0;}
+html,body { font-size: 80%; font-family: Verdana, Geneva, Arial, Helvetica, sans-serif; height: 100%; margin:0; padding:0;}
 body { min-width: 900px; width: 90%; }
 div#container { position: relative; height:auto !important; height: 100%; min-height: 80%; margin-left: 50px; margin-top: 0; padding-bottom: 90px;}
 #modal-dialog { font-size: 110%; }
 #modal-dialog input.text textarea { margin-bottom:12px; width:95%; padding: .4em; }
 #modal-dialog fieldset { padding:0; border:0; margin-top:25px; }
 div#intro { font-size: 150%; margin-top: 50px; }
-div#footer { margin-right: 50px; border-top: 1px solid #CECECE; position: absolute; bottom: 0; padding-bottom: 0px; width: 95%; }
+div#footer { margin-right: 50px; border-top: 1px solid #CECECE; position: absolute; bottom: 0; padding-bottom: 0px; width: 100%; }
 div#footer ul { list-style: none; padding: 0; margin: 0; }
 div#footer li { display: inline; }
 div#footer li li { display: block; }
 div#footer ul ul { float: left; padding-right: 50px; }
 div#header { margin: 0; padding: 0; padding-bottom: 30px; }
 div#header img { width: 100%; border: 0;}
+#headline { position: absolute; top: 20px; left: 150px; z-index: 1; }
+div#headline a { text-decoration: none; }
 h3.listheader { padding-left: 20px; }
 .navlist ul { list-style: none; padding: 0; margin: 0; font-size: 90%; }
 .navlist li { float: right; display: inline;}
@@ -56,7 +58,18 @@ form .ui-widget li { float: right; border-right: 1px solid #CECECE; padding-righ
 .left { float: left; }
 .fieldinput ul { list-style: none inside; padding: 0; margin: 0; }
 .fieldinput li { padding: 0; margin: 0; display: inline; float: left; }
-
+a, a:hover, a:visited {
+	text-decoration: none;
+	color: #E37424;
+}
+h1, h1 a {
+	color: #E37424;
+	font-size: 220%;
+}
+h2, h2 a {
+	color: #E37424;
+	font-size: 150%
+}
 
 #files { width: 520px; clear: both; margin: 20px 0 10px; }
 #files .viewport { width: 500px; height: 200px; overflow: hidden; position: relative; }

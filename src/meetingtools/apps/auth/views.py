@@ -9,9 +9,11 @@ import datetime
 from django.views.decorators.cache import never_cache
 import logging
 from meetingtools.apps.userprofile.models import UserProfile
-from meetingtools.multiresponse import redirect_to
+from meetingtools.multiresponse import redirect_to, make_response_dict
 from meetingtools.apps.room.views import _acc_for_user
 from meetingtools.ac import ac_api_client
+from django.shortcuts import render_to_response
+from django.contrib import auth
 
 def meta(request,attr):
     v = request.META.get(attr)
@@ -36,6 +38,15 @@ def _localpart(a):
 def _is_member_or_employee(affiliations):
     lpa = map(_localpart,affiliations)
     return 'student' in lpa or 'staff' in lpa or ('member' in lpa and not 'student' in lpa)
+
+@never_cache
+def logout(request):
+    auth.logout(request)
+    return HttpResponseRedirect('/Shibboleth.sso/Logout')
+
+@never_cache
+def login(request):
+    return render_to_response('apps/auth/login.html',make_response_dict(request,{'next': request.REQUEST.get("next")}));
 
 def accounts_login_federated(request):
     if request.user.is_authenticated():
@@ -122,9 +133,3 @@ def accounts_login_federated(request):
     else:
         pass
     return redirect_to("/")
-
-@never_cache
-def logout(request):
-    from django.contrib.auth import logout
-    logout(request) 
-    return HttpResponseRedirect("/Shibboleth.sso/Logout")
