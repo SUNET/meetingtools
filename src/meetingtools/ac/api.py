@@ -26,7 +26,10 @@ class ACPResult():
         self.status = self.et.find('status')
         
     def is_error(self):
-        return self.status.get('code') != 'ok'
+        return self.status_code() != 'ok'
+
+    def status_code(self):
+        return self.status.get('code')
 
     def exception(self):
         raise ACPException,self.status
@@ -87,3 +90,37 @@ class ACPClient():
         if result.is_error():
             raise result.exception()
     
+    def find_or_create_principal(self,key,value,type,dict):
+        result = self.request('principal-list',{'filter-%s' % key: value,'filter-type': type}, True)
+        principal = result.get_principal()
+        if result.is_error():
+            if result.status_code() != 'no_data':
+                result.exception()
+        elif not principal:
+            dict['principal-id'] = principal.get('principal-id')
+        
+        update_result = self.request('principal-update',dict)
+        rp = update_result.get_principal()
+        if not rp:
+            rp = principal
+        return principal
+    
+    def find_builtin(self,type):
+        result = self.request('principal-list', {'filter-type': type}, True)
+        return result.get_principal()
+    
+    def find_group(self,name):
+        result = self.request('principal-list',{'filter-name':name,'filter-type':'group'},True)
+        return result.get_principal()
+    
+    def add_remove_member(self,principal_id,group_id,is_member):
+        m = "0"
+        if is_member:
+            m = "1"
+        self.request('group-membership-update',{'group-id': group_id, 'principal-id': principal_id,'is-member':m},True)
+        
+    def add_member(self,principal_id,group_id):
+        return self.add_remove_member(principal_id, group_id, True)
+    
+    def remove_member(self,principal_id,group_id):
+        return self.add_remove_member(principal_id, group_id, False)
