@@ -36,7 +36,7 @@ class ACPResult():
         raise ACPException,self.status
 
     def get_principal(self):
-        return self.et.find('principal')
+        return self.et.xpath('principal')[0]
 
 def _enc(v):
         ev = v
@@ -93,7 +93,6 @@ class ACPClient():
     
     def find_or_create_principal(self,key,value,type,dict):
         result = self.request('principal-list',{'filter-%s' % key: value,'filter-type': type}, True)
-        logging.debug(result)
         principal = result.get_principal()
         if result.is_error():
             if result.status_code() != 'no_data':
