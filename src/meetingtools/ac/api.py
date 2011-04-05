@@ -12,6 +12,8 @@ import os
 import tempfile
 from lxml import etree
 import pprint
+from meetingtools.site_logging import logger
+import lxml
 
 class ACPException(Exception):
     def __init__(self, value):
@@ -36,6 +38,7 @@ class ACPResult():
         raise ACPException,self.status
 
     def get_principal(self):
+        logger.debug(lxml.etree.tostring(self.et))
         return self.et.xpath('principal')[0]
 
 def _enc(v):
