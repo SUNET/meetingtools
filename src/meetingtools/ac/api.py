@@ -94,7 +94,7 @@ class ACPClient():
     def find_or_create_principal(self,key,value,type,dict):
         result = self.request('principal-list',{'filter-%s' % key: value,'filter-type': type}, True)
         principal = result.get_principal()
-        logging.debug(pprint(principal))
+        logging.debug(principal)
         if result.is_error():
             if result.status_code() != 'no_data':
                 result.exception()
