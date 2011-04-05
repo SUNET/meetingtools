@@ -112,7 +112,7 @@ class ACPClient():
         rp = update_result.get_principal()
         if not rp:
             rp = principal
-        return principal
+        return rp
     
     def find_builtin(self,type):
         result = self.request('principal-list', {'filter-type': type}, True)
