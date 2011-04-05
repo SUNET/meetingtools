@@ -22,11 +22,16 @@ class ACPException(Exception):
     def __str__(self):
         return etree.tostring(self.value)
 
+def _first_or_none(x):
+    if not x:
+        return None
+    return x[0]
+
 class ACPResult():
     
     def __init__(self,content):
         self.et = etree.fromstring(content)
-        self.status = self.et.xpath('//status')[0]
+        self.status = _first_or_none(self.et.xpath('//status'))
         
     def is_error(self):
         return self.status_code() != 'ok'
@@ -39,11 +44,7 @@ class ACPResult():
 
     def get_principal(self):
         logger.debug(lxml.etree.tostring(self.et))
-        pl = self.et.xpath('//principal')
-        if pl:
-            return pl[0]
-        else:
-            return None
+        return _first_or_none(self.et.xpath('//principal'))
 
 def _enc(v):
         ev = v
