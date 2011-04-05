@@ -121,10 +121,10 @@ def accounts_login_federated(request):
             member = affiliation in affiliations
             connect_api.add_remove_member(principal.get('principal-id'),group.get('principal-id'),member)
             
-        #for e in epe:
-        #    group = connect_api.find_or_create_principal('name',e,'group',{'type': 'group','has-children':'1','name': e})
-        #    if group:
-        #        connect_api.add_remove_member(principal.get('principal-id'),group.get('principal-id'),True)
+        for e in epe:
+            group = connect_api.find_or_create_principal('name',e,'group',{'type': 'group','has-children':'1','name': e})
+            if group:
+                connect_api.add_remove_member(principal.get('principal-id'),group.get('principal-id'),True)
             
         next = request.session.get("after_login_redirect", None)
         if next is not None:
