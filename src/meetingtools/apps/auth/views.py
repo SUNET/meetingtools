@@ -57,15 +57,14 @@ def accounts_login_federated(request):
             profile.save()        
         
         update = False
+        fn = meta1(request,'givenName')
+        ln = meta1(request,'sn')
         cn = meta1(request,'cn')
         if not cn:
             cn = meta1(request,'displayName')
         logging.warn(cn)
-        if not cn:
-            fn = meta1(request,'givenName')
-            ln = meta1(request,'sn')
-            if fn and ln:
-                cn = "%s %s" % (fn,ln)
+        if not cn and fn and ln:
+            cn = "%s %s" % (fn,ln)
         if not cn:
             cn = profile.identifier
             
