@@ -52,6 +52,15 @@ def _enc(v):
             ev = ev.encode('iso-8859-1')
         return ev
 
+def _getset(dict,key,value=None):
+    if value:
+        if dict.has_key(key):
+            return dict[key]
+        else:
+            return None
+    else:
+        dict[key] = value
+
 class ACPClient():
     
     def __init__(self,url,username=None,password=None):
@@ -59,6 +68,7 @@ class ACPClient():
         self.session = None
         if username and password:
             self.login(username,password)
+        self._cache = {'login':{},'group':{}}
     
     def request(self,method,p={},raise_error=False):
         url = self.url+"?"+"action=%s" % method
@@ -68,7 +78,7 @@ class ACPClient():
         u = []
         for (k,v) in p.items():
             if v:
-                kv = "%s=%s" % (k,quote(str(v)))
+                kv = "%s=%s" % (k,quote(unicode(v)))
                 u.append(kv)
         url = url + "&" + "&".join(u)
     
@@ -100,18 +110,34 @@ class ACPClient():
             raise result.exception()
     
     def find_or_create_principal(self,key,value,type,dict):
+        if not self._cache.has_key(type):
+            self._cache[type] = {}
+        cache = self._cache[type]
+        
+        if not cache.has_key(key):
+            p = self._find_or_create_principal(key,value,type,dict)
+            cache[key] = p
+            
+        return cache[key]
+        
+    def find_principal(self,key,value,type):
+        return self.find_or_create_principal(key,value,type,None)
+    
+    def _find_or_create_principal(self,key,value,type,dict):
         result = self.request('principal-list',{'filter-%s' % key: value,'filter-type': type}, True)
         principal = result.get_principal()
         if result.is_error():
             if result.status_code() != 'no_data':
                 result.exception()
-        elif principal:
+        elif principal and dict:
             dict['principal-id'] = principal.get('principal-id')
         
-        update_result = self.request('principal-update',dict)
-        rp = update_result.get_principal()
-        if not rp:
-            rp = principal
+        rp = principal
+        if dict:
+            update_result = self.request('principal-update',dict)
+            rp = update_result.get_principal()
+            if not rp:
+                rp = principal
         return rp
     
     def find_builtin(self,type):
@@ -121,6 +147,9 @@ class ACPClient():
     def find_group(self,name):
         result = self.request('principal-list',{'filter-name':name,'filter-type':'group'},True)
         return result.get_principal()
+    
+    def find_user(self,login):
+        return self.find_principal("login", login, "user")
     
     def add_remove_member(self,principal_id,group_id,is_member):
         m = "0"

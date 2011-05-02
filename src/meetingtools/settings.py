@@ -100,6 +100,8 @@ INSTALLED_APPS = (
     'django.contrib.admin',
     'django.contrib.humanize',
     'django_extensions',
+    'django_co_connector',
+    'django_co_acls',
     'meetingtools.extensions',
     'meetingtools.apps.auth',
     'meetingtools.apps.room',

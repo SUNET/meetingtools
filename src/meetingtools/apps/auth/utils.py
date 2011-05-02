@@ -14,13 +14,6 @@ def anonid():
 def groups(request):
     groups = []
     if request.user.is_authenticated():
-        if request.session and request.session.has_key('entitlement'):
-            groups = groups + request.session['entitlement']
-        
-        if '@' in request.user.username:
-            (local,domain) = request.user.username.split('@')
-            groups.append(domain)
-            for e in ('member','employee','student'):
-                groups.append("%s@%s" % (e,domain))
+        groups = request.user.groups
 
     return groups
