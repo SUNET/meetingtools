@@ -44,7 +44,7 @@ def _is_member_or_employee_old(affiliations):
     return 'student' in lpa or 'staff' in lpa or ('member' in lpa and not 'student' in lpa)
 
 def _is_member_or_employee(user):
-    lpa = map(_localpart,user.groups)
+    lpa = map(_localpart,user.groups.all())
     return 'student' in lpa or 'staff' in lpa or ('member' in lpa and not 'student' in lpa)
 
 @never_cache
