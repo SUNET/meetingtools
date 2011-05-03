@@ -78,7 +78,7 @@ class ACPClient():
         u = []
         for (k,v) in p.items():
             if v:
-                kv = "%s=%s" % (k,quote(unicode(v)))
+                kv = "%s=%s" % (k,quote(v))
                 u.append(kv)
         url = url + "&" + "&".join(u)
     
