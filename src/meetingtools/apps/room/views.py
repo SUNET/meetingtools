@@ -21,7 +21,6 @@ from meetingtools.settings import GRACE
 from django.utils.datetime_safe import datetime
 from django.http import HttpResponseRedirect
 from django.core.exceptions import ObjectDoesNotExist
-from django_co_acls.models import allow, deny, acl
 
 def _acc_for_user(user):
     (local,domain) = user.username.split('@')
@@ -144,27 +143,26 @@ def _update_room(request, room, form=None):
     room.save()
     logging.debug(pformat(room))
     
+    #r = api.request('permissions-reset',{'acl-id': room.sco_id},True)
+    user_principal = api.find_user(request.user.username)
+    api.request('permissions-update',{'acl-id': room.sco_id,'principal-id': user_principal.get('principal-id'),'permission-id':'host'},True) # owner is always host
+    
     for (key,perm) in [('participants','view'),('presenters','mini-host'),('hosts','host')]:
         if form.cleaned_data.has_key(key):
             group = form.cleaned_data[key]
             if not group and key == 'participants':
-                group = "anyone"
                 permission = "view-hidden"
-            
-            if group:
-                allow(room, group, permission)
+                principal_id = "public-access"
             else:
-                deny(room,group,permission)
-    
-    r = api.request('permissions-reset',{'acl-id': room.sco_id},True)
-    user_principal = api.find_user(request.user.username)
-    r = api.request('permissions-update',{'acl-id': room.sco_id,'principal-id': user_principal.get('principal-id'),'permission-id':'host'}) # owner is always host
-    for ace in acl(room):
-        principal_id = "public-access"
-        if ace.group:
-            principal_id = ace.group.name    
-        r = api.request('permissions-update',{'acl-id': room.sco_id, 'principal-id': principal_id, 'permission-id': ace.permission},True)
-        
+                permission = perm
+            
+            principal_id = user_principal.get('principal-id')
+            if group:
+                group_principal = api.find_group(group.name)
+                principal_id = group_principal.get('principal-id')        
+            
+            api.request('permissions-update',{'acl-id': room.sco_id, 'principal-id': principal_id, 'permission-id': permission},True)
+
     return room
 
 @login_required

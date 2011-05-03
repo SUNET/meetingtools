@@ -17,10 +17,6 @@ class Room(models.Model):
     name = CharField(max_length=128,unique=True)
     urlpath = CharField(max_length=128,unique=True)
     acc =  ForeignKey(ACCluster,verbose_name="Adobe Connect Cluster",editable=False)
-    acl = ForeignKey(AccessControlEntry,blank=True,null=True)
-    #participants = CharField(max_length=255,blank=True,verbose_name="Participants") # populate from entitlement held by creator session
-    #presenters = CharField(max_length=255,blank=True,verbose_name="Presenters") # populate from entitlement held by creator session
-    #hosts = CharField(max_length=255,blank=True,verbose_name="Hosts") # populate from entitlement held by creator session
     self_cleaning = BooleanField(verbose_name="Clean-up when empty?")
     sco_id = IntegerField(verbose_name="Adobe Connect Room")
     source_sco_id = IntegerField(verbose_name="Template",blank=True,null=True)
