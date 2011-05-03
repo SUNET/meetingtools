@@ -5,7 +5,7 @@ Created on Jan 31, 2011
 '''
 
 import httplib2
-from urllib import quote
+from urllib import quote, urlencode
 import logging
 from pprint import pformat
 import os
@@ -71,16 +71,11 @@ class ACPClient():
         self._cache = {'login':{},'group':{}}
     
     def request(self,method,p={},raise_error=False):
-        url = self.url+"?"+"action=%s" % method
         if self.session:
-            url = url + "&session=%s" % self.session
+            p['session'] = self.session
+        p['action'] = method
         
-        u = []
-        for (k,v) in p.items():
-            if v:
-                kv = "%s=%s" % (k,quote(v))
-                u.append(kv)
-        url = url + "&" + "&".join(u)
+        url = self.url + '?' + urlencode(p)
     
         h = httplib2.Http(tempfile.gettempdir()+os.sep+".cache");
         logging.debug(url)
