@@ -58,6 +58,7 @@ form .ui-widget li { float: right; border-right: 1px solid #CECECE; padding-righ
 .left { float: left; }
 .fieldinput ul { list-style: none inside; padding: 0; margin: 0; }
 .fieldinput li { padding: 0; margin: 0; display: inline; float: left; }
+div .fieldinput { margin-top: 10px; }
 a, a:hover, a:visited {
 	text-decoration: none;
 	color: #E37424;

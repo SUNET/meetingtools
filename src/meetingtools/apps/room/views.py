@@ -12,7 +12,6 @@ from meetingtools.ac import ac_api_client, api
 import re
 from meetingtools.apps import room
 from django.contrib.auth.decorators import login_required
-from meetingtools.apps.auth.utils import groups
 import logging
 from pprint import pformat
 from meetingtools.utils import session
@@ -21,6 +20,7 @@ from meetingtools.settings import GRACE
 from django.utils.datetime_safe import datetime
 from django.http import HttpResponseRedirect
 from django.core.exceptions import ObjectDoesNotExist
+from django_co_acls.models import allow, deny, acl, clear_acl
 
 def _acc_for_user(user):
     (local,domain) = user.username.split('@')
@@ -116,91 +116,113 @@ def view(request,id):
                        })
 
 def _init_update_form(request,form,acc,my_meetings_sco_id):
-    if form.fields.has_key('participants'):
-        form.fields['participants'].queryset = request.user.groups
-    if form.fields.has_key('presenters'):
-        form.fields['presenters'].queryset = request.user.groups
-    if form.fields.has_key('hosts'):
-        form.fields['hosts'].queryset = request.user.groups
+    if form.fields.has_key('urlpath'):
+        form.fields['urlpath'].widget.prefix = acc.url
     if form.fields.has_key('source_sco_id'):
         form.fields['source_sco_id'].widget.choices = [('','-- select template --')]+[r for r in _user_templates(request,acc,my_meetings_sco_id)]
 
-@login_required
-def _update_room(request, room, form=None):
+def _update_room(request, room, form=None):        
     api = ac_api_client(request, room.acc)
-    params = {'type':'meeting', 
-              'name':room.name, 
-              'folder-id': room.folder_sco_id, 
-              'source-sco-id': room.source_sco_id, 
-              'url-path':room.urlpath}
+    params = {'type':'meeting'}
     
-    if room.sco_id:
-        params['sco-id'] = room.sco_id
-    r = api.request('sco-update', params, raise_error=True)
-    
-    room.sco_id = r.et.find(".//sco").get('sco-id')
-    room.source_sco_id = r.et.find(".//sco").get('sco-source-id')
-    room.save()
-    logging.debug(pformat(room))
-    
-    #r = api.request('permissions-reset',{'acl-id': room.sco_id},True)
-    user_principal = api.find_user(request.user.username)
-    api.request('permissions-update',{'acl-id': room.sco_id,'principal-id': user_principal.get('principal-id'),'permission-id':'host'},True) # owner is always host
-    
-    for (key,perm) in [('participants','view'),('presenters','mini-host'),('hosts','host')]:
-        if form.cleaned_data.has_key(key):
-            group = form.cleaned_data[key]
-            if not group and key == 'participants':
-                permission = "view-hidden"
-                principal_id = "public-access"
+    for attr,param in (('sco_id','sco-id'),('folder_sco_id','folder-id'),('source_sco_id','source-sco-id'),('urlpath','url-path'),('name','name')):
+        v = None
+        if hasattr(room,attr):
+            v = getattr(room,attr) 
+        logging.debug("%s,%s = %s" % (attr,param,v))
+        if form and form.cleaned_data.has_key(attr) and form.cleaned_data[attr]:
+            v = form.cleaned_data[attr]
+        
+        if v:
+            if isinstance(v,(str,unicode)):
+                params[param] = v
+            elif hasattr(v,'__getitem__'):
+                params[param] = v[0]
             else:
-                permission = perm
-            
-            principal_id = user_principal.get('principal-id')
-            if group:
-                group_principal = api.find_group(group.name)
-                principal_id = group_principal.get('principal-id')        
-            
-            api.request('permissions-update',{'acl-id': room.sco_id, 'principal-id': principal_id, 'permission-id': permission},True)
+                params[param] = repr(v)
+        
+    logging.debug(pformat(params))
+    r = api.request('sco-update', params, True)
+    
+    sco_id = r.et.find(".//sco").get('sco-id')
+    if form:
+        form.cleaned_data['sco_id'] = sco_id
+        form.cleaned_data['source_sco_id'] = r.et.find(".//sco").get('sco-source-id')
+    
+    room.sco_id = sco_id
+    room.save()
+    
+    user_principal = api.find_user(request.user.username)
+    #api.request('permissions-reset',{'acl-id': sco_id},True)
+    api.request('permissions-update',{'acl-id': sco_id,'principal-id': user_principal.get('principal-id'),'permission-id':'host'},True) # owner is always host
+    
+    if form:
+        if form.cleaned_data.has_key('access'):
+            access = form.cleaned_data['access']
+            if access == 'public':
+                allow(room,'anyone','view-hidden')
+            elif access == 'private':
+                allow(room,'anyone','remove')
+    
+    # XXX figure out how to keep the room permissions in sync with the AC permissions
+    for ace in acl(room):
+        principal_id = None
+        if ace.group:
+            principal = api.find_group(ace.group.name)
+            if principal:
+                principal_id = principal.get('principal-id')
+        elif ace.user:
+            principal = api.find_user(ace.user.username)
+            if principal:
+                principal_id = principal.get('principal-id')
+        else:
+            principal_id = "public-access"
+        
+        if principal_id:  
+            api.request('permissions-update',{'acl-id': room.sco_id, 'principal-id': principal_id, 'permission-id': ace.permission},True)
 
     return room
 
 @login_required
-def update(request,id=None):
-    if id:
-        room = get_object_or_404(Room,pk=id)
-        acc = room.acc
-        what = "Update"
-        title = "Modify %s" % room.name
-        formname = "update"
-        update = True
-    else:
-        acc = _acc_for_user(request.user)
-        my_meetings_sco_id = _user_meeting_folder(request,acc)
-        room = Room(creator=request.user,acc=acc,folder_sco_id=my_meetings_sco_id)
-        what = "Create"
-        formname = "create"
-        title = "Create a new room"
-        update = False
+def create(request):
+    acc = _acc_for_user(request.user)
+    my_meetings_sco_id = _user_meeting_folder(request,acc)
+    room = Room(creator=request.user,acc=acc,folder_sco_id=my_meetings_sco_id)
+    what = "Create"
+    title = "Create a new room"
     
     if request.method == 'POST':
-        if update:
-            form = ModifyRoomForm(request.POST,instance=room)
-        else:
-            form = CreateRoomForm(request.POST,instance=room)
+        form = CreateRoomForm(request.POST,instance=room)
         _init_update_form(request, form, acc, room.folder_sco_id)
         if form.is_valid():
-            room = _update_room(request, room, form)
+            _update_room(request, room, form)
             room = form.save()
             return redirect_to("/rooms#%d" % room.id)
     else:
-        if update:
-            form = ModifyRoomForm(instance=room)
-        else:
-            form = CreateRoomForm(instance=room)
+        form = CreateRoomForm(instance=room)
         _init_update_form(request, form, acc, room.folder_sco_id)
         
-    return respond_to(request,{'text/html':'apps/room/%s.html' % formname},{'form':form,'formtitle': title,'submitname':'%s Room' % what})
+    return respond_to(request,{'text/html':'apps/room/create.html'},{'form':form,'formtitle': title,'submitname':'%s Room' % what})
+
+@login_required
+def update(request,id):
+    room = get_object_or_404(Room,pk=id)
+    acc = room.acc
+    what = "Update"
+    title = "Modify %s" % room.name
+    
+    if request.method == 'POST':
+        form = ModifyRoomForm(request.POST,instance=room)
+        _init_update_form(request, form, acc, room.folder_sco_id)
+        if form.is_valid():
+            _update_room(request, room, form)
+            room = form.save()
+            return redirect_to("/rooms#%d" % room.id)
+    else:
+        form = ModifyRoomForm(instance=room)
+        _init_update_form(request, form, acc, room.folder_sco_id)
+        
+    return respond_to(request,{'text/html':'apps/room/update.html'},{'form':form,'formtitle': title,'submitname':'%s Room' % what})
 
 def _import_room(request,acc,sco_id,source_sco_id,folder_sco_id,name,urlpath):
     modified = False
@@ -258,7 +280,7 @@ def list(request):
       
     for r in Room.objects.filter(creator=request.user).all():
         #logging.debug(pformat(r))
-        if (not r.sco_id in ar) and (not r.self_cleaning):
+        if (not r.sco_id in ar): # and (not r.self_cleaning): #XXX this logic isn't right!
             r.delete() 
     return respond_to(request,{'text/html':'apps/room/list.html'},{'user':request.user,'rooms':Room.objects.filter(creator=request.user).all()})
 
@@ -274,7 +296,9 @@ def delete(request,id):
         if form.is_valid():
             api = ac_api_client(request,room.acc)
             api.request('sco-delete',{'sco-id':room.sco_id},raise_error=True)
+            clear_acl(room)
             room.delete()
+            
             return redirect_to("/rooms")
     else:
         form = DeleteRoomForm()
