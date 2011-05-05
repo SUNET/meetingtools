@@ -272,16 +272,17 @@ def list(request):
     
     ar = []
     for (sco_id,name,source_sco_id,urlpath) in user_rooms:
-        logging.debug("%s %s %s %s" % (sco_id,name,source_sco_id,urlpath))
-        room = _import_room(request,acc,sco_id,source_sco_id,my_meetings_sco_id,name,urlpath)
         ar.append(int(sco_id))
     
-    #logging.debug(pformat(ar))
-      
     for r in Room.objects.filter(creator=request.user).all():
         #logging.debug(pformat(r))
         if (not r.sco_id in ar): # and (not r.self_cleaning): #XXX this logic isn't right!
             r.delete() 
+    
+    for (sco_id,name,source_sco_id,urlpath) in user_rooms:
+        logging.debug("%s %s %s %s" % (sco_id,name,source_sco_id,urlpath))
+        room = _import_room(request,acc,sco_id,source_sco_id,my_meetings_sco_id,name,urlpath)
+
     return respond_to(request,{'text/html':'apps/room/list.html'},{'user':request.user,'rooms':Room.objects.filter(creator=request.user).all()})
 
 def rooms_by_group(request,group):
