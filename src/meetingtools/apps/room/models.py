@@ -5,7 +5,8 @@ Created on Jan 31, 2011
 '''
 
 from django.db import models
-from django.db.models.fields import CharField, BooleanField, IntegerField
+from django.db.models.fields import CharField, BooleanField, IntegerField,\
+    TextField
 from django.db.models.fields.related import ForeignKey
 from django.contrib.auth.models import User
 from meetingtools.apps.cluster.models import ACCluster
@@ -21,6 +22,8 @@ class Room(models.Model):
     sco_id = IntegerField(verbose_name="Adobe Connect Room")
     source_sco_id = IntegerField(verbose_name="Template",blank=True,null=True)
     folder_sco_id = IntegerField(verbose_name="Adobe Connect Room Folder",editable=False)
+    description = TextField(blank=True,null=True)
+    user_count = IntegerField(verbose_name="User Count At Last Visit",editable=False,blank=True,null=True)
     timecreated = models.DateTimeField(auto_now_add=True)
     lastupdated = models.DateTimeField(auto_now=True)
     lastvisited = models.DateTimeField(blank=True,null=True)
