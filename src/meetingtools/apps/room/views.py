@@ -16,11 +16,12 @@ import logging
 from pprint import pformat
 from meetingtools.utils import session
 import time
-from meetingtools.settings import GRACE
+from meetingtools.settings import GRACE, BASE_URL
 from django.utils.datetime_safe import datetime
 from django.http import HttpResponseRedirect
 from django.core.exceptions import ObjectDoesNotExist
 from django_co_acls.models import allow, deny, acl, clear_acl
+from meetingtools.ac.api import ACPClient
 
 def _acc_for_user(user):
     (local,domain) = user.username.split('@')
@@ -60,7 +61,7 @@ def _user_rooms(request,acc,my_meetings_sco_id):
         connect_api = ac_api_client(request, acc)
         meetings = connect_api.request('sco-expanded-contents',{'sco-id': my_meetings_sco_id,'filter-type': 'meeting'})
         if meetings:
-            rooms = [(r.get('sco-id'),r.findtext('name'),r.get('source-sco-id'),r.findtext('url-path')) for r in meetings.et.findall('.//sco')]
+            rooms = [(r.get('sco-id'),r.findtext('name'),r.get('source-sco-id'),r.findtext('url-path'),r.findtext('description')) for r in meetings.et.findall('.//sco')]
     return rooms
 
 def _user_templates(request,acc,my_meetings_sco_id):
@@ -117,7 +118,8 @@ def view(request,id):
 
 def _init_update_form(request,form,acc,my_meetings_sco_id):
     if form.fields.has_key('urlpath'):
-        form.fields['urlpath'].widget.prefix = acc.url
+        url = BASE_URL
+        form.fields['urlpath'].widget.prefix = url.rstrip('/')+"/"
     if form.fields.has_key('source_sco_id'):
         form.fields['source_sco_id'].widget.choices = [('','-- select template --')]+[r for r in _user_templates(request,acc,my_meetings_sco_id)]
 
@@ -224,7 +226,7 @@ def update(request,id):
         
     return respond_to(request,{'text/html':'apps/room/update.html'},{'form':form,'formtitle': title,'submitname':'%s Room' % what})
 
-def _import_room(request,acc,sco_id,source_sco_id,folder_sco_id,name,urlpath):
+def _import_room(request,acc,sco_id,source_sco_id,folder_sco_id,name,urlpath,description=None):
     modified = False
     try:
         room = Room.objects.get(sco_id=sco_id,acc=acc)
@@ -252,6 +254,10 @@ def _import_room(request,acc,sco_id,source_sco_id,folder_sco_id,name,urlpath):
         room.urlpath = urlpath
         modified = True
         
+    if (description and not room.description) or (room.description and not description):
+        room.description = description
+        modified = True 
+        
     #if '/' in room.urlpath:
     #    room.urlpath = urlpath.strip('/')
     #    modified = True
@@ -271,7 +277,7 @@ def list(request):
     user_rooms = _user_rooms(request,acc,my_meetings_sco_id)
     
     ar = []
-    for (sco_id,name,source_sco_id,urlpath) in user_rooms:
+    for (sco_id,name,source_sco_id,urlpath,description) in user_rooms:
         ar.append(int(sco_id))
     
     for r in Room.objects.filter(creator=request.user).all():
@@ -279,9 +285,9 @@ def list(request):
         if (not r.sco_id in ar): # and (not r.self_cleaning): #XXX this logic isn't right!
             r.delete() 
     
-    for (sco_id,name,source_sco_id,urlpath) in user_rooms:
+    for (sco_id,name,source_sco_id,urlpath,description) in user_rooms:
         logging.debug("%s %s %s %s" % (sco_id,name,source_sco_id,urlpath))
-        room = _import_room(request,acc,sco_id,source_sco_id,my_meetings_sco_id,name,urlpath)
+        room = _import_room(request,acc,sco_id,source_sco_id,my_meetings_sco_id,name,urlpath,description)
 
     return respond_to(request,{'text/html':'apps/room/list.html'},{'user':request.user,'rooms':Room.objects.filter(creator=request.user).all()})
 
@@ -326,13 +332,19 @@ def goto(request,room):
     
     now = time.time()
     if room.self_cleaning:
-        if (_nusers(session_info) == 0) and (abs(room.lastvisit() - now) > GRACE):
+        nusers = _nusers(session_info)
+        if (nusers == 0) and (abs(room.lastvisit() - now) > GRACE):
             room = _clean(request,room)
+        room.user_count = nusers
     
     room.lastvisited = datetime.now()
     room.save()
     
     r = api.request('sco-info',{'sco-id':room.sco_id})
     urlpath = r.et.findtext('.//sco/url-path')
-    return HttpResponseRedirect(room.acc.url+urlpath) #in this case we want the absolute URL
+    if request.session.has_key('acp_key'):
+        user_client = ACPClient(room.acc.api_url, request.user.username, request.session['acp_key'], cache=False)
+        return user_client.redirect_to(room.acc.url+urlpath)
+    else:
+        return HttpResponseRedirect(room.acc.url+urlpath)
     
