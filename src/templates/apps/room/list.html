@@ -3,6 +3,7 @@
 {% load datehumanize %}
 {% load roomurl %}
 {% load prefix %}
+{% load tagging_tags %}
 {% block widgets %}
     $("#rooms").accordion({
    		header: 'h3',
@@ -22,11 +23,26 @@
 		<div id="{{r.id}}">
 		   <h3 class="listheader">{{r.name}}</h3>
 		   <div>
-		      <ul>
-		         <li>Created by {{r.creator}} {{r.timecreated|datehumanize}}.</li>
-		         {% if r.lastvisited %}<li>Last visited {{r.lastvisited|datehumanize}}{% if r.user_count %}when there was {{r.user_count}} user{{r.user_count|pluralize}} in the room{%endif%}.</li>{%endif%} 
-		   	     <li>Meeting room URL: <a href="{{r|roomurl}}">{{r|roomurl}}<span style="vertical-align: bottom;" class="ui-icon ui-icon-extlink"></span></a></li>
-		   	  </ul>
+		      <ul class="ilist">
+		        <li style="vertical-align: top;">
+		           <ul class="nlist">
+			         {% if r.self_cleaning %}<li>Room will be reset when empty.</li>{% endif %}
+			         <li>Created by {{r.creator}} {{r.timecreated|datehumanize}}.</li>
+			         {% if r.lastvisited %}<li>Last visited {{r.lastvisited|datehumanize}} when there was {{r.nusers}} user{{r.nusers|pluralize}} in the room.</li>{%endif%} 
+			   	     <li>Meeting room URL: <a href="{{r|roomurl}}">{{r|roomurl}}<span style="vertical-align: bottom;" class="ui-icon ui-icon-extlink"></span></a></li>
+			  	   </ul>
+			  	</li>
+			  	{% tags_for_object r as tags %}
+			  	<li style="vertical-align: top;">
+			  		<ul class="nlist">
+			  		   <li>Room tags: 
+			  		    {% for tag in tags %}
+			  			<a href="{% prefix %}/+{{tag}}">{{tag}}</a>
+			  		    {% endfor %} ... <a href="{% prefix %}/room/{{r.id}}/tag"><em>manage room tags</em></a></li>
+			  		</ul>
+			  	</li>
+			  </ul>
+			   	 
 		   	  <br/>
 		   	  {% if r.description %}
 		   	  <p class="ui-widget">{{r.description|safe}}</p>

@@ -3,7 +3,8 @@
 {% block content %}
 {% block beforeform %}{% endblock %}
 <h1>{{formtitle}}</h1>
-<form method="POST" class="ui-widget ui-corner-all ui-state-highlight bbq infopanel" style="width: 50%">
+<form method="POST" class="ui-widget ui-corner-all ui-state-highlight bbq infopanel" style="width: 66%">
+{% block beforefields %}{% endblock %}
 <ul class="links">
   {% for field in form %}
     {% if field.is_hidden %}
@@ -19,6 +20,7 @@
 </ul>
 <ul class="ilist" style="padding-top: 10px; padding-bottom: 5px;">
     <li class="button"><input type="submit" value="{{submitname}}" /></li>
+    <li class="button"><input type="button" onClick="document.location='{% prefix %}/rooms'" value="Done"/></li>
     <li class="button right"><input type="button" onClick="document.location='{% prefix %}/rooms'" value="Cancel"/></li>
 </ul>
 </form>

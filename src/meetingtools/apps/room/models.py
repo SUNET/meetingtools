@@ -40,4 +40,10 @@ class Room(models.Model):
         else:
             return int(time.mktime(self.lastvisited.timetuple())*1000)
         
+    def nusers(self):
+        if not self.user_count:
+            return "unknown"
+        else:
+            return self.user_count
+        
 tagging.register(Room)

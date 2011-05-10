@@ -10,8 +10,8 @@ div#footer ul { list-style: none; padding: 0; margin: 0; }
 div#footer li { display: inline; }
 div#footer li li { display: block; }
 div#footer ul ul { float: left; padding-right: 50px; }
-div#header { margin: 0; padding: 0; padding-bottom: 30px; }
-div#header img { width: 100%; border: 0;}
+div#header { margin: 0;  padding: 0; padding-bottom: 30px; }
+div#header img { width: 100%; border: 0; margin-top: 5px;}
 #headline { position: absolute; top: 20px; left: 150px; z-index: 1; }
 div#headline a { text-decoration: none; }
 h3.listheader { padding-left: 20px; }
@@ -25,7 +25,9 @@ h3.listheader { padding-left: 20px; }
 .rlist ul { list-style: none inside; padding: inherit; }
 .rlist li { float: right; display: inline; padding: inherit; }
 .clist ul { list-style: none; }
-.clist li { display: block; }
+.clist li { display: list-item; }
+.nlist ul { list-style: none; }
+.nlist li { display: list-item; list-style: none inside none; }
 .description { clear: both; margin-top: 10px; padding-top: 15px; }
 p.info { font-size: 120%; margin-top: 10px; padding-top: 15px; }
 div.toolbar{ padding: 4px; float: right; margin-right: 30px; margin-bottom: 20px; margin-top: 50px; }
@@ -60,7 +62,6 @@ form .ui-widget li { float: right; border-right: 1px solid #CECECE; padding-righ
 .fieldinput li { padding: 0; margin: 0; display: inline; float: left; }
 div .fieldinput { margin-top: 10px; }
 a, a:hover, a:visited {
-	text-decoration: none;
 	color: #E37424;
 }
 h1, h1 a {

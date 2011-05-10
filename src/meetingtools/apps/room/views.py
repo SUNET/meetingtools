@@ -330,13 +330,11 @@ def go_by_path(request,path):
 def goto(request,room):
     api = ac_api_client(request, room.acc)
     session_info = api.request('report-meeting-sessions',{'sco-id':room.sco_id})
-    
     now = time.time()
+    room.user_count = _nusers(session_info)
     if room.self_cleaning:
-        nusers = _nusers(session_info)
-        if (nusers == 0) and (abs(room.lastvisit() - now) > GRACE):
+        if (room.user_count == 0) and (abs(room.lastvisit() - now) > GRACE):
             room = _clean(request,room)
-        room.user_count = nusers
     
     room.lastvisited = datetime.now()
     room.save()
