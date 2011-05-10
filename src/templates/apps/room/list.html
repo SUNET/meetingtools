@@ -10,7 +10,8 @@
         event: "click", 
    		collapsible: true,
    		navigation: true,
-   		animated: true
+   		animated: true,
+   		autoHeight: false
    	});
 {% endblock %}
 {% block content %}
@@ -21,12 +22,19 @@
 		<div id="{{r.id}}">
 		   <h3 class="listheader">{{r.name}}</h3>
 		   <div>
-		   	<p>Created by {{r.creator}} {{r.timecreated|datehumanize}}.</p>
-		   	<p>Meeting room URL: <a href="{{r|roomurl}}">{{r|roomurl}}</a></p>
-		   		<ul class="ilist">
-		   			<!-- li><div class="button"><a href="{% prefix %}/room/{{r.id}}/modify">Modify Room</a></li -->
-		   			<li><div class="button"><a href="{% prefix %}/room/{{r.id}}/delete">Delete Room</a></li>
-		   		</ul>
+		      <ul>
+		         <li>Created by {{r.creator}} {{r.timecreated|datehumanize}}.</li>
+		         {% if r.lastvisited %}<li>Last visited {{r.lastvisited|datehumanize}}{% if r.user_count %}when there was {{r.user_count}} user{{r.user_count|pluralize}} in the room{%endif%}.</li>{%endif%} 
+		   	     <li>Meeting room URL: <a href="{{r|roomurl}}">{{r|roomurl}}<span style="vertical-align: bottom;" class="ui-icon ui-icon-extlink"></span></a></li>
+		   	  </ul>
+		   	  <br/>
+		   	  {% if r.description %}
+		   	  <p class="ui-widget">{{r.description|safe}}</p>
+		   	  {% endif %}
+		   	  <ul class="ilist">
+		   	     <!-- li><div class="button"><a href="{% prefix %}/room/{{r.id}}/modify">Modify Room</a></li -->
+		   	     <li><div class="button"><a href="{% prefix %}/room/{{r.id}}/delete">Delete Room</a></li>
+		   	  </ul>
 		   </div>
 		</div>
 		{% endfor %}

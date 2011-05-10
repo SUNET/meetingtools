@@ -14,6 +14,7 @@ from lxml import etree
 import pprint
 from meetingtools.site_logging import logger
 import lxml
+from django.http import HttpResponseRedirect
 
 class ACPException(Exception):
     def __init__(self, value):
@@ -63,12 +64,13 @@ def _getset(dict,key,value=None):
 
 class ACPClient():
     
-    def __init__(self,url,username=None,password=None):
+    def __init__(self,url,username=None,password=None,cache=True):
         self.url = url
         self.session = None
         if username and password:
             self.login(username,password)
-        self._cache = {'login':{},'group':{}}
+        if cache:
+            self._cache = {'login':{},'group':{}}
     
     def request(self,method,p={},raise_error=False):
         if self.session:
@@ -99,10 +101,17 @@ class ACPClient():
         
         return r;
     
+    def redirect_to(self,url):
+        if self.session:
+            return HttpResponseRedirect("%s?BREEZESESSION=%s" % (url,self.session))
+        else:
+            return HttpResponseRedirect(url)
+    
     def login(self,username,password):
         result = self.request('login',{'login':username,'password':password})
         if result.is_error():
             raise result.exception()
+        return result
     
     def find_or_create_principal(self,key,value,type,dict):
         if not self._cache.has_key(type):
