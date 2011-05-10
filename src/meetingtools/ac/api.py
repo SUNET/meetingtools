@@ -103,7 +103,7 @@ class ACPClient():
     
     def redirect_to(self,url):
         if self.session:
-            return HttpResponseRedirect("%s?BREEZESESSION=%s" % (url,self.session))
+            return HttpResponseRedirect("%s?session=%s" % (url,self.session))
         else:
             return HttpResponseRedirect(url)
     
