@@ -57,7 +57,6 @@ def logout(request):
 def login(request):
     return render_to_response('apps/auth/login.html',make_response_dict(request,{'next': request.REQUEST.get("next")}));
 
-
 def join_group(group,**kwargs):
     user = kwargs['user']
     acc = _acc_for_user(user)

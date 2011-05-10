@@ -64,7 +64,8 @@ LOGOUT_URL = "%s/accounts/logout/" % PREFIX_URL
 # Make this unique, and don't share it with anybody.
 SECRET_KEY = 'tz78l!c=cl2=jic5$2#(bq)7-4s1ivtm*a+q0w1yi0$)hrmc7l'
 
-SESSION_ENGINE = "django.contrib.sessions.backends.db"
+SESSION_ENGINE = "django.contrib.sessions.backends.file"
+SESSION_FILE_PATH = "/tmp"
 SESSION_EXPIRE_AT_BROWSER_CLOSE = True
 
 # List of callables that know how to import templates from various sources.
