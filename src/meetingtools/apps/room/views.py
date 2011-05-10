@@ -342,6 +342,7 @@ def goto(request,room):
     
     r = api.request('sco-info',{'sco-id':room.sco_id})
     urlpath = r.et.findtext('.//sco/url-path')
+    logging.debug("++++++++++ %s" % request.session.session_key)
     key = request.session.get('acp_key',None)
     if key:
         user_client = ACPClient(room.acc.api_url, request.user.username, key, cache=False)
