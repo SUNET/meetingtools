@@ -131,7 +131,7 @@ def accounts_login_federated(request):
         acc = _acc_for_user(request.user)
         connect_api = ac_api_client(request, acc)
         # make sure the principal is created before shooting off 
-        key = _random_key()
+        key = _random_key(10)
         request.session['ac_key'] = key
         #request.session.save()
         principal = connect_api.find_or_create_principal("login", request.user.username, "user", 
