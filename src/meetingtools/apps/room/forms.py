@@ -35,7 +35,10 @@ class ModifyRoomForm(BetterModelForm):
                      ('properties',{'fields': ['self_cleaning','urlpath','source_sco_id'],
                                     'classes': ['step'],
                                     'legend': 'Step 2: Room properties',
-                                    'description': 'These are basic properties for your room. If you set your room to be self-cleaning it will be reset every time the last participant leaves the room.'}),
+                                    'description': '''
+                                    These are basic properties for your room. If you set your room to be cleaned up after use it will 
+                                    be reset every time the last participant leaves the room.'''
+                                    }),
                     ]
         widgets = {'source_sco_id': Select(),
                    'urlpath': PrefixTextInput(attrs={'size': '15'}),
@@ -45,6 +48,7 @@ class ModifyRoomForm(BetterModelForm):
 class CreateRoomForm(BetterModelForm):
 
     access = ChoiceField(choices=(('public','Public'),('private','Private')))
+    
     class Meta:
         model = Room
         fields = ['name','urlpath','access','self_cleaning']
@@ -56,7 +60,21 @@ class CreateRoomForm(BetterModelForm):
                      ('properties',{'fields': ['self_cleaning','urlpath','access'],
                                     'classes': ['step'],
                                     'legend': 'Step 2: Room properties',
-                                    'description': 'These are basic properties for your room. If you set your room to clean-up after use it will be reset every time the last participant leaves the room. If you create a public room it will be open to anyone who has the room URL. If you create a private room then guests will have to be approved by an active meeting host before being able to join the room.'}),               
+                                    'description': '''
+                                    <p>These are basic properties for your room. If you set your room to cleaned up after 
+                                    use it will be reset every time the last participant leaves the room. If you create a public room it 
+                                    will be open to anyone who has the room URL. If you create a private room then guests will have to be 
+                                    approved by an active meeting host before being able to join the room.</p>
+                                    
+                                    <div class="ui-widget">
+                                        <div class="ui-state-highlight ui-corner-all" style="margin-top: 20px; padding: 0 .7em;"> 
+                                            <p><span class="ui-icon ui-icon-info" style="float: left; margin-right: .3em;"></span>
+                                            <strong>Warning</strong> Setting a room to be cleaned up when empty will cause all existing content 
+                                            associated with the to be destroyed each time the room is reset.</p>
+                                        </div>
+                                    </div>
+                                    '''
+                                    }),               
                     ]
         widgets = {'access': RadioSelect(),
                    'urlpath': PrefixTextInput(attrs={'size': '15'}),
