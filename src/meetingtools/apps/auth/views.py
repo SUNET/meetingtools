@@ -141,9 +141,10 @@ def accounts_login_federated(request):
                                                           'last-name':ln,
                                                           'email':mail,
                                                           'send-email': 0,
-                                                          'password': key,
                                                           'login':request.user.username,
                                                           'ext-login':request.user.username})
+        
+        connect_api.request("user-update-pwd",{"user-id": principal.get('principal-id'),'password': key,'password-verify': key},True)
         
         co_import_from_request(request)
         

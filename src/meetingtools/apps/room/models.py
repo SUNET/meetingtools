@@ -11,7 +11,7 @@ from django.db.models.fields.related import ForeignKey
 from django.contrib.auth.models import User
 from meetingtools.apps.cluster.models import ACCluster
 import time
-from django_co_acls.models import AccessControlEntry
+import tagging
 
 class Room(models.Model):
     creator = ForeignKey(User,editable=False)
@@ -39,3 +39,5 @@ class Room(models.Model):
             return 0
         else:
             return int(time.mktime(self.lastvisited.timetuple())*1000)
+        
+tagging.register(Room)

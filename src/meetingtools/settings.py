@@ -106,6 +106,7 @@ INSTALLED_APPS = (
     'django_extensions',
     'django_co_connector',
     'django_co_acls',
+    'tagging',
     'meetingtools.extensions',
     'meetingtools.apps.auth',
     'meetingtools.apps.room',

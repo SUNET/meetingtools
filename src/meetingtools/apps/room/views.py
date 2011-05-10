@@ -6,7 +6,7 @@ Created on Jan 31, 2011
 from meetingtools.apps.room.models import Room, ACCluster
 from meetingtools.multiresponse import respond_to, redirect_to
 from meetingtools.apps.room.forms import DeleteRoomForm,\
-    CreateRoomForm, ModifyRoomForm
+    CreateRoomForm, ModifyRoomForm, TagRoomForm
 from django.shortcuts import get_object_or_404
 from meetingtools.ac import ac_api_client, api
 import re
@@ -22,6 +22,7 @@ from django.http import HttpResponseRedirect
 from django.core.exceptions import ObjectDoesNotExist
 from django_co_acls.models import allow, deny, acl, clear_acl
 from meetingtools.ac.api import ACPClient
+from tagging.models import Tag, TaggedItem
 
 def _acc_for_user(user):
     (local,domain) = user.username.split('@')
@@ -349,3 +350,44 @@ def goto(request,room):
     else:
         return HttpResponseRedirect(room.acc.url+urlpath)
     
+## Tagging
+
+@login_required
+def list_by_tag(request,tn):
+    tags = tn.split('+')
+    rooms = TaggedItem.objects.get_by_model(Room, tags)
+    
+    
+def _can_tag(request,tag):
+    if tag in ('selfcleaning','public','private'):
+        return False,"'%s' is reserved" % tag
+    # XXX implement access model for tags here soon
+    return True,""
+
+@login_required
+def untag(request,rid,tag):
+    room = get_object_or_404(Room,pk=rid)
+    new_tags = []
+    for t in Tag.objects.get_for_object(room):
+        if t.name != tag:
+            new_tags.append(t.name)
+    
+    Tag.objects.update_tags(room, ' '.join(new_tags))
+    return redirect_to("/room/%d/tag" % room.id) 
+    
+@login_required    
+def tag(request,rid):
+    room = get_object_or_404(Room,pk=rid)
+    if request.method == 'POST':
+        form = TagRoomForm(request.POST)
+        if form.is_valid():
+            tag = form.cleaned_data['tag']
+            ok,reason = _can_tag(request,tag)
+            if ok:
+                Tag.objects.add_tag(room, tag)
+            else:
+                form._errors['tag'] = form.error_class([u'%s ... please choose another tag!' % reason])
+    else:
+        form = TagRoomForm()
+    
+    return respond_to(request, {'text/html': "apps/room/tag.html"}, {'form': form,'formtitle': 'Add Tag','submitname': 'Add Tag','room': room, 'tags': Tag.objects.get_for_object(room)})

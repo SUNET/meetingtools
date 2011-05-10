@@ -1,9 +1,7 @@
-from django.conf.urls.defaults import *
+from django.conf.urls.defaults import patterns,include
 
 # Uncomment the next two lines to enable the admin:
 from django.contrib import admin
-from django.http import HttpResponseRedirect
-from django.contrib.auth.views import login, logout
 from meetingtools.settings import ADMIN_MEDIA_ROOT, MEDIA_ROOT
 from meetingtools.multiresponse import redirect_to
 admin.autodiscover()
@@ -27,6 +25,9 @@ urlpatterns = patterns('',
     (r'^room/(\d+)$','meetingtools.apps.room.views.view'),
     (r'^room/(\d+)/modify$','meetingtools.apps.room.views.update'),
     (r'^room/(\d+)/delete$','meetingtools.apps.room.views.delete'),
+    (r'^room/(\d+)/tag$','meetingtools.apps.room.views.tag'),
+    (r'^room/(\d+)/untag/(.+)$','meetingtools.apps.room.views.untag'),
+    (r'^\+(.+)','meetingtools.apps.room.views.list_by_tag'),
     # Uncomment the admin/doc line below to enable admin documentation:
     # (r'^admin/doc/', include('django.contrib.admindocs.urls')),
     

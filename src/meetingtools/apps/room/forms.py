@@ -6,7 +6,7 @@ Created on Feb 1, 2011
 
 from meetingtools.apps.room.models import Room
 from django.forms.widgets import Select, TextInput, RadioSelect
-from django.forms.fields import BooleanField, ChoiceField
+from django.forms.fields import BooleanField, ChoiceField, CharField
 from django.forms.forms import Form
 from form_utils.forms import BetterModelForm
 from django.utils.safestring import mark_safe
@@ -82,3 +82,6 @@ class CreateRoomForm(BetterModelForm):
         
 class DeleteRoomForm(Form):
     confirm = BooleanField(label="Confirm remove room")
+    
+class TagRoomForm(Form):
+    tag = CharField(max_length=256)

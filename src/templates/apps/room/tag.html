@@ -1,0 +1,21 @@
+{% extends "edit.html" %}
+{% load prefix %}
+{% load datehumanize %}
+{% load roomurl %}
+{% load prefix %}
+{% block widgets %}
+
+{% endblock %}
+{% block beforeform %}
+	<h1>Tags for {{room.name}}</h1>
+	{% if tags %}
+	<ul class="ilist">
+	  {% for tag in tags %}
+	    <li class="ui-widget ui-state-highlight ui-corner-all" style="padding: 6px 10px;"><a href="{%prefix%}/+{{tag}}">{{tag}}</a>&nbsp;<a href="{% prefix %}/room/{{room.id}}/untag/{{tag}}"><span style="vertical-align: middle;" class="ui-icon ui-icon-closethick"></span></a></li>
+	  {% endfor %}
+	</ul>
+	{% else %}
+	<em>There are no tags yet...</em>
+	{% endif %}
+	<br/>
+{% endblock %}
