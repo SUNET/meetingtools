@@ -101,7 +101,7 @@ def accounts_login_federated(request):
         cn = meta1(request,'cn')
         if not cn:
             cn = meta1(request,'displayName')
-        logging.warn(cn)
+        logging.debug("cn=%s" % cn)
         if not cn and fn and ln:
             cn = "%s %s" % (fn,ln)
         if not cn:
@@ -133,6 +133,7 @@ def accounts_login_federated(request):
         # make sure the principal is created before shooting off 
         key = _random_key()
         request.session['ac_key'] = key
+        logging.debug("key %s" % request.session['ac_key'])
         logging.debug("++++++++++ %s" % request.session.session_key)
         principal = connect_api.find_or_create_principal("login", request.user.username, "user", 
                                                          {'type': "user",
