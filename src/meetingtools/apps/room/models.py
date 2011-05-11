@@ -41,8 +41,8 @@ class Room(models.Model):
             return int(time.mktime(self.lastvisited.timetuple())*1000)
         
     def nusers(self):
-        if not self.user_count:
-            return "unknown"
+        if self.user_count == None:
+            return "unknown many"
         else:
             return self.user_count
         
