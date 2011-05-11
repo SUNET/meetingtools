@@ -27,7 +27,8 @@ h3.listheader { padding-left: 20px; }
 .clist ul { list-style: none; }
 .clist li { display: list-item; }
 .nlist ul { list-style: none; }
-.nlist li { display: list-item; list-style: none inside none; }
+.nlist li { display: list-item; list-style: none; }
+.square li { list-style: square outside none; }
 .description { clear: both; margin-top: 10px; padding-top: 15px; }
 p.info { font-size: 120%; margin-top: 10px; padding-top: 15px; }
 div.toolbar{ padding: 4px; float: right; margin-right: 30px; margin-bottom: 20px; margin-top: 50px; }
@@ -63,6 +64,7 @@ form .ui-widget li { float: right; border-right: 1px solid #CECECE; padding-righ
 div .fieldinput { margin-top: 10px; }
 a, a:hover, a:visited {
 	color: #E37424;
+	text-decoration: none;
 }
 h1, h1 a {
 	color: #E37424;
