@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% load datehumanize %}
+{% load prefix %}
+{% block widgets %}
+{% endblock %}
+{% block content %}
+	<h1>Entering {{room.name}}</h1>
+	<div class="ui-widget">
+		<div class="ui-state-highlight ui-corner-all" style="margin-top: 20px; padding: 0 .7em; width: 80%"> 
+			<p><span class="ui-icon ui-icon-info" style="float: left; margin-right: .3em;"></span>
+				<strong>Note</strong> 
+				You are about to enter the meeting room '{{room.name}}'. 
+				{%if room.nusers == 0 %}You are the first user to enter the room. If you are hosting this meeting and are comfortable with
+				the Adobe Connect software you may press 'Enter as Host' below.
+				{%else%}
+				There are {{room.nusers}} other participants in the room.
+				{% endif %}
+			</p>
+		</div>
+	</div>
+	<br/>
+	<ul class="ilist">
+	    {%if room.nusers == 0 %}
+		<li class="button"><a href="{% prefix %}/promote/{{room.id}}">Enter as Host</a></li>
+		{% endif %}
+		<li class="button"><a href="{% prefix %}/launch/{{room.id}}">Enter</a></li>
+	</ul>
+{% endblock %}
