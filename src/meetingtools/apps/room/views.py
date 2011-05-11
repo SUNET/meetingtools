@@ -23,6 +23,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from django_co_acls.models import allow, deny, acl, clear_acl
 from meetingtools.ac.api import ACPClient
 from tagging.models import Tag, TaggedItem
+import random, string
 
 def _acc_for_user(user):
     (local,domain) = user.username.split('@')
@@ -205,7 +206,7 @@ def create(request):
         form = CreateRoomForm(instance=room)
         _init_update_form(request, form, acc, room.folder_sco_id)
         
-    return respond_to(request,{'text/html':'apps/room/create.html'},{'form':form,'formtitle': title,'submitname':'%s Room' % what})
+    return respond_to(request,{'text/html':'apps/room/create.html'},{'form':form,'formtitle': title,'cancelname':'Cancel','submitname':'%s Room' % what})
 
 @login_required
 def update(request,id):
@@ -225,7 +226,7 @@ def update(request,id):
         form = ModifyRoomForm(instance=room)
         _init_update_form(request, form, acc, room.folder_sco_id)
         
-    return respond_to(request,{'text/html':'apps/room/update.html'},{'form':form,'formtitle': title,'submitname':'%s Room' % what})
+    return respond_to(request,{'text/html':'apps/room/update.html'},{'form':form,'formtitle': title,'cancelname': 'Cancel','submitname':'%s Room' % what})
 
 def _import_room(request,acc,sco_id,source_sco_id,folder_sco_id,name,urlpath,description=None):
     modified = False
@@ -272,7 +273,7 @@ def _import_room(request,acc,sco_id,source_sco_id,folder_sco_id,name,urlpath,des
     return room
 
 @login_required
-def list(request):
+def user_rooms(request):
     acc = _acc_for_user(request.user)
     my_meetings_sco_id = _user_meeting_folder(request,acc)
     user_rooms = _user_rooms(request,acc,my_meetings_sco_id)
@@ -282,19 +283,14 @@ def list(request):
         ar.append(int(sco_id))
     
     for r in Room.objects.filter(creator=request.user).all():
-        #logging.debug(pformat(r))
         if (not r.sco_id in ar): # and (not r.self_cleaning): #XXX this logic isn't right!
             r.delete() 
     
     for (sco_id,name,source_sco_id,urlpath,description) in user_rooms:
         logging.debug("%s %s %s %s" % (sco_id,name,source_sco_id,urlpath))
         room = _import_room(request,acc,sco_id,source_sco_id,my_meetings_sco_id,name,urlpath,description)
-
-    return respond_to(request,{'text/html':'apps/room/list.html'},{'user':request.user,'rooms':Room.objects.filter(creator=request.user).all()})
-
-def rooms_by_group(request,group):
-    for room in Room.objects.filter(participants=group):
-        pass
+        
+    return respond_to(request,{'text/html':'apps/room/list.html'},{'title':'Your Rooms','edit':True,'rooms':Room.objects.filter(creator=request.user).all()})
 
 @login_required
 def delete(request,id):
@@ -311,7 +307,7 @@ def delete(request,id):
     else:
         form = DeleteRoomForm()
         
-    return respond_to(request,{'text/html':'edit.html'},{'form':form,'formtitle': 'Delete %s' % room.name,'submitname':'Delete Room'})      
+    return respond_to(request,{'text/html':'edit.html'},{'form':form,'formtitle': 'Delete %s' % room.name,'cancelname':'Cancel','submitname':'Delete Room'})      
 
 def _clean(request,room):
     api = ac_api_client(request, room.acc)
@@ -327,21 +323,51 @@ def go_by_path(request,path):
     room = get_object_or_404(Room,urlpath=path)
     return goto(request,room)
         
+@login_required
+def promote_and_launch(request,rid):
+    room = get_object_or_404(Room,pk=rid)
+    return _goto(request,room,clean=False,promote=True)
+
+def launch(request,rid):
+    room = get_object_or_404(Room,pk=rid)
+    return _goto(request,room,clean=False)
+        
 def goto(request,room):
+    return _goto(request,room,clean=True)
+
+def _random_key(length=20):
+    rg = random.SystemRandom()
+    alphabet = string.letters + string.digits
+    return str().join(rg.choice(alphabet) for _ in range(length))
+
+def _goto(request,room,clean=True,promote=False):
     api = ac_api_client(request, room.acc)
-    session_info = api.request('report-meeting-sessions',{'sco-id':room.sco_id})
     now = time.time()
-    room.user_count = _nusers(session_info)
-    if room.self_cleaning:
-        if (room.user_count == 0) and (abs(room.lastvisit() - now) > GRACE):
-            room = _clean(request,room)
-    
     room.lastvisited = datetime.now()
-    room.save()
     
-    r = api.request('sco-info',{'sco-id':room.sco_id})
+    if clean:
+        session_info = api.request('report-meeting-sessions',{'sco-id':room.sco_id})
+        room.user_count = _nusers(session_info)
+        room.save()
+        if room.self_cleaning:
+            if (room.user_count == 0) and (abs(room.lastvisit() - now) > GRACE):        
+                room = _clean(request,room)
+                return respond_to(request, {"text/html": "apps/room/launch.html"}, {'room': room})
+    else:
+        room.save()
+    
+    key = None
+    if request.user.is_authenticated():
+        key = _random_key(20)
+        user_principal = api.find_user(request.user.username)
+        principal_id =  user_principal.get('principal-id')
+        api.request("user-update-pwd",{"user-id": principal_id, 'password': key,'password-verify': key},True)
+        if promote and room.self_cleaning:
+            if user_principal:
+                api.request('permissions-update',{'acl-id': room.sco_id,'principal-id': user_principal.get('principal-id'),'permission-id':'host'},True)
+    
+    r = api.request('sco-info',{'sco-id':room.sco_id},True)
     urlpath = r.et.findtext('.//sco/url-path')
-    key = request.session.get('ac_key',None)
     if key:
         user_client = ACPClient(room.acc.api_url, request.user.username, key, cache=False)
         return user_client.redirect_to(room.acc.url+urlpath)
@@ -355,6 +381,7 @@ def list_by_tag(request,tn):
     tags = tn.split('+')
     rooms = TaggedItem.objects.get_by_model(Room, tags)
     
+    return respond_to(request,{'text/html':'apps/room/list.html'},{'title':'Rooms tagged with %s' % " and ".join(tags),'edit':False,'rooms':rooms.all()})
     
 def _can_tag(request,tag):
     if tag in ('selfcleaning','public','private'):
@@ -388,4 +415,4 @@ def tag(request,rid):
     else:
         form = TagRoomForm()
     
-    return respond_to(request, {'text/html': "apps/room/tag.html"}, {'form': form,'formtitle': 'Add Tag','submitname': 'Add Tag','room': room, 'tags': Tag.objects.get_for_object(room)})
+    return respond_to(request, {'text/html': "apps/room/tag.html"}, {'form': form,'formtitle': 'Add Tag','cancelname':'Done','submitname': 'Add Tag','room': room, 'tags': Tag.objects.get_for_object(room)})
