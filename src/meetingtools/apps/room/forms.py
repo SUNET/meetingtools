@@ -10,6 +10,7 @@ from django.forms.fields import BooleanField, ChoiceField, CharField
 from django.forms.forms import Form
 from form_utils.forms import BetterModelForm
 from django.utils.safestring import mark_safe
+from django.forms.models import ModelForm
         
 PUBLIC = 0
 PROTECTED = 1
@@ -23,25 +24,11 @@ class PrefixTextInput(TextInput):
     def render(self, name, value, attrs=None):
         return mark_safe("<b>"+self.prefix+"</b>&nbsp;"+super(PrefixTextInput, self).render(name, value, attrs))
         
-class ModifyRoomForm(BetterModelForm):
+class ModifyRoomForm(ModelForm):
     class Meta:
         model = Room
         fields = ['name','source_sco_id','self_cleaning']
-        fieldsets = [('name',{'fields': ['name'],
-                              'classes': ['step'],
-                              'legend': 'Step 1: Room name',
-                              'description': 'The room name should be short and descriptive.'
-                              }),
-                     ('properties',{'fields': ['self_cleaning','urlpath','source_sco_id'],
-                                    'classes': ['step'],
-                                    'legend': 'Step 2: Room properties',
-                                    'description': '''
-                                    These are basic properties for your room. If you set your room to be cleaned up after use it will 
-                                    be reset every time the last participant leaves the room.'''
-                                    }),
-                    ]
         widgets = {'source_sco_id': Select(),
-                   'urlpath': PrefixTextInput(attrs={'size': '15'}),
                    'name': TextInput(attrs={'size': '40'})}
         
         
