@@ -16,7 +16,6 @@ from django.shortcuts import render_to_response
 from django.contrib import auth
 from django_co_connector.models import co_import_from_request, add_member,\
     remove_member
-import random, string
 
 def meta(request,attr):
     v = request.META.get(attr)
@@ -82,11 +81,6 @@ def leave_group(group,**kwargs):
 add_member.connect(join_group,sender=Group)
 remove_member.connect(leave_group,sender=Group)
 
-def _random_key(length=20):
-    rg = random.SystemRandom()
-    alphabet = string.letters + string.digits
-    return str().join(rg.choice(alphabet) for _ in range(length))
-
 def accounts_login_federated(request):
     if request.user.is_authenticated():
         profile,created = UserProfile.objects.get_or_create(user=request.user)
@@ -131,9 +125,6 @@ def accounts_login_federated(request):
         acc = _acc_for_user(request.user)
         connect_api = ac_api_client(request, acc)
         # make sure the principal is created before shooting off 
-        key = _random_key(10)
-        request.session['ac_key'] = key
-        #request.session.save()
         principal = connect_api.find_or_create_principal("login", request.user.username, "user", 
                                                          {'type': "user",
                                                           'has-children': "0",
@@ -144,7 +135,7 @@ def accounts_login_federated(request):
                                                           'login':request.user.username,
                                                           'ext-login':request.user.username})
         
-        connect_api.request("user-update-pwd",{"user-id": principal.get('principal-id'),'password': key,'password-verify': key},True)
+        
         
         co_import_from_request(request)
         
