@@ -12,6 +12,7 @@ from meetingtools.settings import PREFIX_URL
 default_suffix_mapping = {"\.htm(l?)$": "text/html",
                           "\.json$": "application/json",
                           "\.rss$": "application/rss+xml",
+                          "\.atom$": "application/atom+xml",
                           "\.torrent$": "application/x-bittorrent"}
 
 def _accept_types(request, suffix):
