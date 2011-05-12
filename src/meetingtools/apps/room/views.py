@@ -4,7 +4,7 @@ Created on Jan 31, 2011
 @author: leifj
 '''
 from meetingtools.apps.room.models import Room, ACCluster
-from meetingtools.multiresponse import respond_to, redirect_to
+from meetingtools.multiresponse import respond_to, redirect_to, json_response
 from meetingtools.apps.room.forms import DeleteRoomForm,\
     CreateRoomForm, ModifyRoomForm, TagRoomForm
 from django.shortcuts import get_object_or_404
@@ -376,12 +376,36 @@ def _goto(request,room,clean=True,promote=False):
     
 ## Tagging
 
+def _room2dict(room):
+    return {'name':room.name,
+            'description':room.description,
+            'user_count':room.user_count,
+            'self_cleaning': room.self_cleaning,
+            'url': room.go_url()}
+
+@login_required
+def widget(request,tn):
+    tags = tn.split('+')
+    rooms = TaggedItem.objects.get_by_model(Room, tags)
+    title = 'Rooms tagged with %s' % " and ".join(tags)
+    return respond_to(request,
+                      {'text/html':'apps/room/widget-test.html',
+                       'application/json': json_response([_room2dict(room) for room in rooms]),
+                       'application/rss+xml': 'apps/room/rss2.xml',
+                       'text/rss': 'apps/room/rss2.xml'},
+                      {'title':title,'description':title ,'edit':False,'date': datetime.now(),'tags': tn,'rooms':rooms.all()})
+
 @login_required
 def list_by_tag(request,tn):
     tags = tn.split('+')
     rooms = TaggedItem.objects.get_by_model(Room, tags)
-    
-    return respond_to(request,{'text/html':'apps/room/list.html'},{'title':'Rooms tagged with %s' % " and ".join(tags),'edit':False,'rooms':rooms.all()})
+    title = 'Rooms tagged with %s' % " and ".join(tags)
+    return respond_to(request,
+                      {'text/html':'apps/room/list.html',
+                       'application/json': json_response([_room2dict(room) for room in rooms]),
+                       'application/rss+xml': 'apps/room/rss2.xml',
+                       'text/rss': 'apps/room/rss2.xml'},
+                      {'title':title,'description':title ,'edit':False,'date': datetime.now(),'tags': tn,'rooms':rooms.all()})
     
 def _can_tag(request,tag):
     if tag in ('selfcleaning','public','private'):
