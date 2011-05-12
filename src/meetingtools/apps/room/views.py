@@ -343,14 +343,16 @@ def _random_key(length=20):
 def _goto(request,room,clean=True,promote=False):
     api = ac_api_client(request, room.acc)
     now = time.time()
+    lastvisit = room.lastvisit()
     room.lastvisited = datetime.now()
     
     if clean:
         session_info = api.request('report-meeting-sessions',{'sco-id':room.sco_id})
         room.user_count = _nusers(session_info)
+        logging.debug("---------- nusers: %d" % room.user_count)
         room.save()
         if room.self_cleaning:
-            if (room.user_count == 0) and (abs(room.lastvisit() - now) > GRACE):        
+            if (room.user_count == 0) and (abs(lastvisit - now) > GRACE):        
                 room = _clean(request,room)
                 return respond_to(request, {"text/html": "apps/room/launch.html"}, {'room': room})
     else:
