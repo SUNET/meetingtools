@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+{% load prefix %}
+<feed xmlns="http://www.w3.org/2005/Atom">
+	<title>{{title}}</title>
+    <summary>{{description}}</summary>
+    <updated>{{date}}/updated>
+    <link rel="self" href="{{baseurl}}/room/+{{tags}}.atom"/>
+    <link href="{{baseurl}}/room/+{{tags}}"/>
+    {% if rooms %}
+    {% for room in rooms %}
+    <item>
+          <title>{{room.name}}</title>
+          {% if room.description %}
+          <summary>{{room.description}}</summary>
+          {% endif %}
+          <link href="{{room.go_url}}"/>
+          <updated>{{room.lastupdated}}</updated>
+    </item>
+    {% endfor %}
+    {% endif %}
+</feed>
