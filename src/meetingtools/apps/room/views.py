@@ -4,7 +4,8 @@ Created on Jan 31, 2011
 @author: leifj
 '''
 from meetingtools.apps.room.models import Room, ACCluster
-from meetingtools.multiresponse import respond_to, redirect_to, json_response
+from meetingtools.multiresponse import respond_to, redirect_to, json_response,\
+    timeAsrfc822
 from meetingtools.apps.room.forms import DeleteRoomForm,\
     CreateRoomForm, ModifyRoomForm, TagRoomForm
 from django.shortcuts import get_object_or_404
@@ -382,6 +383,7 @@ def _room2dict(room):
     return {'name':room.name,
             'description':room.description,
             'user_count':room.user_count,
+            'lastupdated': timeAsrfc822(room.lastupdated),
             'self_cleaning': room.self_cleaning,
             'url': room.go_url()}
 
@@ -412,6 +414,7 @@ def list_by_tag(request,tn):
     return respond_to(request,
                       {'text/html':'apps/room/list.html',
                        'application/json': json_response([_room2dict(room) for room in rooms]),
+                       'application/atom+xml': 'apps/room/atom.xml',
                        'application/rss+xml': 'apps/room/rss2.xml',
                        'text/rss': 'apps/room/rss2.xml'},
                       {'title':title,'description':title ,'edit':False,'baseurl': BASE_URL,'date': now,'tags': tn,'rooms':rooms.all()})
