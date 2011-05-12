@@ -31,11 +31,11 @@
 		       <p><a href="{{r|roomurl}}">{{r|roomurl}}<span style="vertical-align: bottom;" class="ui-icon ui-icon-extlink"></span></a></p>
 		  	   <p class="infopanel ui-widget ui-corner-all ui-state-highlight">{% if r.description %}{{r.description|safe}}{% else %}<em>No description available...</em>{% endif %}</p>
 		  	   <ul class="nlist square" style="padding-left: 2px;">
-		  		  <li style="margin-top: 5px;">Tags: {% for tag in tags %}<a style="margin-right: 5px;" class="ui-widget" href="{% prefix %}/room/+{{tag}}">{{tag}}</a>{% endfor %} {%if edit %}<a style="font-size: 75%;" href="{% prefix %}/room/{{r.id}}/tag"><em>... manage room tags</em></a>{%endif%}</li>
-		          <li>Created by {{r.creator}} {{r.timecreated|datehumanize}}.</li>
-		          {% if r.self_cleaning %}<li>Room will be reset when empty.</li>{%else%}<li>Room state is preserved between sessions.</li>{% endif %}
-		          {% if r.lastvisited %}<li>Last visited {{r.lastvisited|datehumanize}}</li>{%endif%} 
-		  	      <li>Hosted on {{r.acc.name}}</li>
+		  		  <li>&raquo;&nbsp;Tags: {% for tag in tags %}<a style="margin-right: 5px;" class="ui-widget" href="{% prefix %}/room/+{{tag}}">{{tag}}</a>{% endfor %} {%if edit %}<a style="font-size: 75%;" href="{% prefix %}/room/{{r.id}}/tag"><em>... manage room tags</em></a>{%endif%}</li>
+		          <li>&raquo;&nbsp;Created by {{r.creator}} {{r.timecreated|datehumanize}}.</li>
+		          {% if r.self_cleaning %}<li>&raquo;&nbsp;Room will be reset when empty.</li>{%else%}<li>&raquo;&nbsp;Room state is preserved between sessions.</li>{% endif %}
+		          {% if r.lastvisited %}<li>&raquo;&nbsp;Last visited {{r.lastvisited|datehumanize}}</li>{%endif%} 
+		  	      <li>&raquo;&nbsp;Hosted on {{r.acc.name}}</li>
 		  	   </ul>
 		   	  <br/>
 		   	  <ul class="ilist">
