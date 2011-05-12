@@ -12,6 +12,7 @@ from django.contrib.auth.models import User
 from meetingtools.apps.cluster.models import ACCluster
 import time
 import tagging
+from meetingtools.settings import BASE_URL
 
 class Room(models.Model):
     creator = ForeignKey(User,editable=False)
@@ -39,6 +40,12 @@ class Room(models.Model):
             return 0
         else:
             return int(time.mktime(self.lastvisited.timetuple())*1000)
+        
+    def go_url(self):
+        return "%s/go/%s" % (BASE_URL,self.urlpath)
+        
+    def go_url_internal(self):
+        return "%s/go/%d" % (BASE_URL,self.id)
         
     def nusers(self):
         if self.user_count == None:
