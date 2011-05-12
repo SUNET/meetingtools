@@ -27,7 +27,7 @@ class PrefixTextInput(TextInput):
 class ModifyRoomForm(ModelForm):
     class Meta:
         model = Room
-        fields = ['name','source_sco_id','self_cleaning']
+        fields = ['name','description','source_sco_id','self_cleaning']
         widgets = {'source_sco_id': Select(),
                    'name': TextInput(attrs={'size': '40'})}
         
@@ -38,15 +38,20 @@ class CreateRoomForm(BetterModelForm):
     
     class Meta:
         model = Room
-        fields = ['name','urlpath','access','self_cleaning']
+        fields = ['name','description','urlpath','access','self_cleaning']
         fieldsets = [('name',{'fields': ['name'],
                               'classes': ['step'],
                               'legend': 'Step 1: Room name',
                               'description': 'The room name should be short and descriptive.'
                               }),
+                     ('description',{'fields': ['description'],
+                                  'classes': ['step'],
+                                  'legend': 'Step 2: Room description',
+                                  'description': 'Please provide a short summary of this room.'
+                                  }),
                      ('properties',{'fields': ['self_cleaning','urlpath','access'],
                                     'classes': ['step'],
-                                    'legend': 'Step 2: Room properties',
+                                    'legend': 'Step 3: Room properties',
                                     'description': '''
                                     <p>These are basic properties for your room. If you set your room to cleaned up after 
                                     use it will be reset every time the last participant leaves the room. If you create a public room it 

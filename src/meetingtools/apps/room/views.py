@@ -16,7 +16,7 @@ import logging
 from pprint import pformat
 from meetingtools.utils import session
 import time
-from meetingtools.settings import GRACE, BASE_URL
+from meetingtools.settings import GRACE, BASE_URL, DEFAULT_TEMPLATE_SCO
 from django.utils.datetime_safe import datetime
 from django.http import HttpResponseRedirect
 from django.core.exceptions import ObjectDoesNotExist
@@ -129,7 +129,7 @@ def _update_room(request, room, form=None):
     api = ac_api_client(request, room.acc)
     params = {'type':'meeting'}
     
-    for attr,param in (('sco_id','sco-id'),('folder_sco_id','folder-id'),('source_sco_id','source-sco-id'),('urlpath','url-path'),('name','name')):
+    for attr,param in (('sco_id','sco-id'),('folder_sco_id','folder-id'),('source_sco_id','source-sco-id'),('urlpath','url-path'),('name','name'),('description','description')):
         v = None
         if hasattr(room,attr):
             v = getattr(room,attr) 
@@ -191,7 +191,7 @@ def _update_room(request, room, form=None):
 def create(request):
     acc = _acc_for_user(request.user)
     my_meetings_sco_id = _user_meeting_folder(request,acc)
-    room = Room(creator=request.user,acc=acc,folder_sco_id=my_meetings_sco_id)
+    room = Room(creator=request.user,acc=acc,folder_sco_id=my_meetings_sco_id,source_sco_id=DEFAULT_TEMPLATE_SCO)
     what = "Create"
     title = "Create a new room"
     
