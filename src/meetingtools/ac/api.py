@@ -77,6 +77,9 @@ class ACPClient():
             p['session'] = self.session
         p['action'] = method
         
+        for k,v in p.items():
+            p[k] = ("%s" % v).encode('utf-8')
+        
         url = self.url + '?' + urlencode(p)
     
         h = httplib2.Http(tempfile.gettempdir()+os.sep+".cache");
