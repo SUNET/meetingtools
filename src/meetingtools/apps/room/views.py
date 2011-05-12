@@ -397,7 +397,6 @@ def widget(request,tn):
                        'text/rss': 'apps/room/rss2.xml'},
                       {'title':title,'description':title ,'edit':False,'date': datetime.now(),'tags': tn,'rooms':rooms.all()})
 
-@login_required
 def list_by_tag(request,tn):
     tags = tn.split('+')
     rooms = TaggedItem.objects.get_by_model(Room, tags)
