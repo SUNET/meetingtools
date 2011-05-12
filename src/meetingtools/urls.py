@@ -11,8 +11,8 @@ def welcome(request):
 
 urlpatterns = patterns('',
     (r'^$',welcome),
-    (r'^admin-media/(?P<path>.*)$',                 'django.views.static.serve',{'document_root': ADMIN_MEDIA_ROOT}),
-    (r'^site-media/(?P<path>.*)$',                  'django.views.static.serve',{'document_root': MEDIA_ROOT}),
+    (r'^admin-media/(?P<path>.*)$','django.views.static.serve',{'document_root': ADMIN_MEDIA_ROOT}),
+    (r'^site-media/(?P<path>.*)$','django.views.static.serve',{'document_root': MEDIA_ROOT}),
     # Login/Logout
     (r'^accounts/login?$','meetingtools.apps.auth.views.login'),
     (r'^accounts/login-federated$','meetingtools.apps.auth.views.accounts_login_federated'),
