@@ -1,5 +1,5 @@
 html,body { font-size: 80%; font-family: Verdana, Geneva, Arial, Helvetica, sans-serif; height: 100%; margin:0; padding:0;}
-body { min-width: 900px; width: 90%; }
+body { min-width: 600px; width: 90%; }
 div#container { position: relative; height:auto !important; height: 100%; min-height: 80%; margin-left: 50px; margin-top: 0; padding-bottom: 90px;}
 #modal-dialog { font-size: 110%; }
 #modal-dialog input.text textarea { margin-bottom:12px; width:95%; padding: .4em; }
@@ -28,7 +28,7 @@ h3.listheader { padding-left: 20px; }
 .clist li { display: list-item; }
 .nlist ul { list-style: none; }
 .nlist li { display: list-item; list-style: none; }
-.square li { list-style: square outside none; }
+.square li { list-style: square inside none; }
 .description { clear: both; margin-top: 10px; padding-top: 15px; }
 p.info { font-size: 120%; margin-top: 10px; padding-top: 15px; }
 div.toolbar{ padding: 4px; float: right; margin-right: 30px; margin-bottom: 20px; margin-top: 50px; }
