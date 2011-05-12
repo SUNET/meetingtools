@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
+{% load prefix %}
 <rss version="2.0"
         xmlns:dc="http://purl.org/dc/elements/1.1/"
         xmlns:content="http://purl.org/rss/1.0/modules/content/">
@@ -7,6 +8,8 @@
           <description>{{description}}</description>
           <!-- {{tags}} -->
           <lastBuildDate>{{date}}</lastBuildDate>
+          <link>{{baseurl}}/room/+{{tags}}</link>
+          <link rel="self">{{baseurl}}/room/+{{tags}}.rss</link>
           {% if rooms %}
           {% for room in rooms %}
           <item>
