@@ -2,7 +2,6 @@
 {% load prefix %}
 {% load datehumanize %}
 {% load roomurl %}
-{% load prefix %}
 {% load tagging_tags %}
 {% block widgets %}
     $("#rooms").accordion({
@@ -14,6 +13,11 @@
    		animated: true,
    		autoHeight: false
    	});
+{% endblock %}
+{% block meta %}
+{% if tags %}
+<link rel="alternate" type="application/rss+xml" title="{{title}} (RSS 2.0)" href="{% prefix %}/room/+{{tags}}.rss" />
+{% endif %}
 {% endblock %}
 {% block content %}
 	<h1>{{title}}</h1>

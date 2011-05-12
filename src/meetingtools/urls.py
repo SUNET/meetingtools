@@ -28,7 +28,9 @@ urlpatterns = patterns('',
     (r'^room/(\d+)/delete$','meetingtools.apps.room.views.delete'),
     (r'^room/(\d+)/tag$','meetingtools.apps.room.views.tag'),
     (r'^room/(\d+)/untag/(.+)$','meetingtools.apps.room.views.untag'),
-    (r'^room/\+(.+)','meetingtools.apps.room.views.list_by_tag'),
+    (r'^widget/\+(.+)$','meetingtools.apps.room.views.widget'),
+    (r'^room/\+(.+)\.(?:[^\.]+)$','meetingtools.apps.room.views.list_by_tag'),
+    (r'^room/\+(.+)$','meetingtools.apps.room.views.list_by_tag'),
     # Uncomment the admin/doc line below to enable admin documentation:
     # (r'^admin/doc/', include('django.contrib.admindocs.urls')),
     
