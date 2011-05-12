@@ -7,14 +7,14 @@
     <link href="{{baseurl}}/room/+{{tags}}"/>
     {% if rooms %}
     {% for room in rooms %}
-    <item>
+    <entry>
           <title>{{room.name}}</title>
           {% if room.description %}
           <summary>{{room.description}}</summary>
           {% endif %}
-          <link href="{{room.go_url}}"/>
-          <updated>{{room.lastupdated}}</updated>
-    </item>
+          <link href="{{room.url}}"/>
+          <updated>{{room.updated}}</updated>
+    </entry>
     {% endfor %}
     {% endif %}
 </feed>

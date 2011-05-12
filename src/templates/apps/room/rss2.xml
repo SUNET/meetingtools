@@ -18,8 +18,7 @@
                 {% if room.description %}
                 <description>{{room.description}}</description>
                 {% endif %}
-                <link>{{room.go_url}}</link>
-                <guid isPermaLink="true">{{room.go_url_internal}}</guid>
+                <link>{{room.url}}</link>
           </item>
           {% endfor %}
           {% endif %}

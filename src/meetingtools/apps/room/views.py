@@ -25,6 +25,7 @@ from django_co_acls.models import allow, deny, acl, clear_acl
 from meetingtools.ac.api import ACPClient
 from tagging.models import Tag, TaggedItem
 import random, string
+from django.utils.feedgenerator import rfc3339_date
 
 def _acc_for_user(user):
     (local,domain) = user.username.split('@')
@@ -383,7 +384,7 @@ def _room2dict(room):
     return {'name':room.name,
             'description':room.description,
             'user_count':room.user_count,
-            'lastupdated': timeAsrfc822(room.lastupdated),
+            'updated': rfc3339_date(room.lastupdated),
             'self_cleaning': room.self_cleaning,
             'url': room.go_url()}
 
@@ -398,21 +399,21 @@ def widget(request,tn):
                        'application/json': json_response([_room2dict(room) for room in rooms]),
                        'application/rss+xml': 'apps/room/rss2.xml',
                        'text/rss': 'apps/room/rss2.xml'},
-                      {'title':title,'description':title ,'edit':False,'date': now,'tags': tn,'rooms':rooms.all()})
+                      {'title':title,'description':title ,'edit':False,'date': now,'tags': tn,'rooms': [_room2dict(room) for room in rooms.all()]})
 
 # should not require login
 def list_by_tag(request,tn):
     tags = tn.split('+')
     rooms = TaggedItem.objects.get_by_model(Room, tags)
     title = 'Rooms tagged with %s' % " and ".join(tags)
-    now = timeAsrfc822( datetime.now())
+    now = rfc3339_date(datetime.now())
     return respond_to(request,
                       {'text/html':'apps/room/list.html',
                        'application/json': json_response([_room2dict(room) for room in rooms]),
                        'application/atom+xml': 'apps/room/atom.xml',
                        'application/rss+xml': 'apps/room/rss2.xml',
                        'text/rss': 'apps/room/rss2.xml'},
-                      {'title':title,'description':title ,'edit':False,'baseurl': BASE_URL,'date': now,'tags': tn,'rooms':rooms.all()})
+                      {'title':title,'description':title ,'edit':False,'baseurl': BASE_URL,'date': now,'tags': tn,'rooms':[_room2dict(room) for room in rooms.all()]})
     
 def _can_tag(request,tag):
     if tag in ('selfcleaning','public','private'):
