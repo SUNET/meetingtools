@@ -407,13 +407,14 @@ def list_by_tag(request,tn):
     rooms = TaggedItem.objects.get_by_model(Room, tags)
     title = 'Rooms tagged with %s' % " and ".join(tags)
     now = rfc3339_date(datetime.now())
+    now822 = timeAsrfc822( datetime.now() )
     return respond_to(request,
                       {'text/html':'apps/room/list.html',
                        'application/json': json_response([_room2dict(room) for room in rooms]),
                        'application/atom+xml': 'apps/room/atom.xml',
                        'application/rss+xml': 'apps/room/rss2.xml',
                        'text/rss': 'apps/room/rss2.xml'},
-                      {'title':title,'description':title ,'edit':False,'baseurl': BASE_URL,'date': now,'tags': tn,'rooms':[_room2dict(room) for room in rooms.all()]})
+                      {'title':title,'description':title ,'edit':False,'baseurl': BASE_URL,'rfc3339_date': now,'rfc822_date': now822,'tags': tn,'rooms':[_room2dict(room) for room in rooms.all()]})
     
 def _can_tag(request,tag):
     if tag in ('selfcleaning','public','private'):
