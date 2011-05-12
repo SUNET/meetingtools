@@ -29,7 +29,7 @@ urlpatterns = patterns('',
     (r'^room/(\d+)/tag$','meetingtools.apps.room.views.tag'),
     (r'^room/(\d+)/untag/(.+)$','meetingtools.apps.room.views.untag'),
     (r'^widget/\+(.+)$','meetingtools.apps.room.views.widget'),
-    (r'^room/\+(.+)\.(?:[^\.]+)$','meetingtools.apps.room.views.list_by_tag'),
+    (r'^room/\+(.+)\.(?:json|xml|html|htm|atom|rss)$','meetingtools.apps.room.views.list_by_tag'),
     (r'^room/\+(.+)$','meetingtools.apps.room.views.list_by_tag'),
     # Uncomment the admin/doc line below to enable admin documentation:
     # (r'^admin/doc/', include('django.contrib.admindocs.urls')),
