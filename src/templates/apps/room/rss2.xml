@@ -10,7 +10,7 @@
           <!-- {{tags}} -->
           <lastBuildDate>{{date}}</lastBuildDate>
           <link>{{baseurl}}/room/+{{tags}}</link>
-          <atom:link rel="self">{{baseurl}}/room/+{{tags}}.rss</atom:link>
+          <atom:link rel="self" href="{{baseurl}}/room/+{{tags}}.rss"/>
           {% if rooms %}
           {% for room in rooms %}
           <item>
