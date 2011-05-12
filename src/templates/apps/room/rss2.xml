@@ -9,7 +9,6 @@
           <!-- {{tags}} -->
           <lastBuildDate>{{date}}</lastBuildDate>
           <link>{{baseurl}}/room/+{{tags}}</link>
-          <link rel="self">{{baseurl}}/room/+{{tags}}.rss</link>
           {% if rooms %}
           {% for room in rooms %}
           <item>
