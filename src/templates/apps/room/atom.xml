@@ -2,8 +2,7 @@
 {% load prefix %}
 <feed xmlns="http://www.w3.org/2005/Atom">
 	<title>{{title}}</title>
-    <summary>{{description}}</summary>
-    <updated>{{date}}/updated>
+    <updated>{{date}}</updated>
     <link rel="self" href="{{baseurl}}/room/+{{tags}}.atom"/>
     <link href="{{baseurl}}/room/+{{tags}}"/>
     {% if rooms %}
