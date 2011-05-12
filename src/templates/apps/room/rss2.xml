@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0"
+        xmlns:dc="http://purl.org/dc/elements/1.1/"
+        xmlns:content="http://purl.org/rss/1.0/modules/content/">
+      <channel>
+          <title>{{title}}</title>
+          <description>{{description}}</description>
+          <!-- {{tags}} -->
+          <lastBuildDate>{{date}}</lastBuildDate>
+          {% if rooms %}
+          {% for room in rooms %}
+          <item>
+                <title>{{room.name}}</title>
+                {% if room.description %}
+                <description>{{room.description}}</description>
+                {% endif %}
+                <link>{{room.go_url}}</link>
+                <guid isPermaLink="true">{{room.go_url_internal}}</guid>
+          </item>
+          {% endfor %}
+          {% endif %}
+      </channel>  
+</rss>
