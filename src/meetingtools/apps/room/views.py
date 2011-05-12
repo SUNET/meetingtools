@@ -387,17 +387,12 @@ def _room2dict(room):
             'self_cleaning': room.self_cleaning,
             'url': room.go_url()}
 
-def timeAsrfc822 ( theTime ) :
-    import rfc822
-    return rfc822 . formatdate ( rfc822 . mktime_tz ( rfc822 . parsedate_tz ( theTime . strftime ( "%a, %d %b %Y %H:%M:%S" ) ) ) )
-
-
 @login_required
 def widget(request,tn):
     tags = tn.split('+')
     rooms = TaggedItem.objects.get_by_model(Room, tags)
     title = 'Rooms tagged with %s' % " and ".join(tags)
-    now = timeAsrfc822 ( datetime.now() )
+    now = timeAsrfc822( datetime.now() )
     return respond_to(request,
                       {'text/html':'apps/room/widget-test.html',
                        'application/json': json_response([_room2dict(room) for room in rooms]),
@@ -410,7 +405,7 @@ def list_by_tag(request,tn):
     tags = tn.split('+')
     rooms = TaggedItem.objects.get_by_model(Room, tags)
     title = 'Rooms tagged with %s' % " and ".join(tags)
-    now = timeAsrfc822 ( datetime.now() )
+    now = timeAsrfc822( datetime.now())
     return respond_to(request,
                       {'text/html':'apps/room/list.html',
                        'application/json': json_response([_room2dict(room) for room in rooms]),
