@@ -13,6 +13,8 @@ from meetingtools.apps.cluster.models import ACCluster
 import time
 import tagging
 from meetingtools.settings import BASE_URL
+from django.db.models.signals import post_save
+from tagging.models import Tag
 
 class Room(models.Model):
     creator = ForeignKey(User,editable=False)
@@ -57,3 +59,17 @@ class Room(models.Model):
             return self.user_count
         
 tagging.register(Room)
+
+def _magic_tags(sender,**kwargs):
+    room = kwargs['instance']
+    if room.self_cleaning:
+        Tag.objects.add_tag(room, "cleaning")
+    else:
+        tags = Tag.objects.get_for_object(room)
+        ntags = []
+        for tag in tags:
+            if tag.name != "cleaning":
+                ntags.append(tag.name)
+        Tag.objects.update_tags(room, ntags)
+    
+post_save.connect(_magic_tags,sender=Room)

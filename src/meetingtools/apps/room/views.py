@@ -409,7 +409,7 @@ def list_by_tag(request,tn):
                       {'title':title,'description':title ,'edit':False,'baseurl': BASE_URL,'tags': tn,'rooms':rooms.all()})
     
 def _can_tag(request,tag):
-    if tag in ('selfcleaning','public','private'):
+    if tag in ('selfcleaning','cleaning','public','private'):
         return False,"'%s' is reserved" % tag
     # XXX implement access model for tags here soon
     return True,""
