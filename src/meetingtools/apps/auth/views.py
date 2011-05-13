@@ -159,7 +159,7 @@ def accounts_login_federated(request):
             
         next = request.session.get("after_login_redirect", None)
         if not next and request.GET.has_key('next'):
-            next = request.GET['']
+            next = request.GET['next']
         if next is not None:
             return redirect_to(next)
     else:
