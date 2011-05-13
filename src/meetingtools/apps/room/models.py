@@ -51,6 +51,9 @@ class Room(models.Model):
     
     def permalink(self):
         return "%s/room/%d" % (BASE_URL,self.id)
+    
+    def recordings_url(self):
+        return "%s/room/%d/recordings" % (BASE_URL,self.id)
         
     def nusers(self):
         if self.user_count == None:

@@ -9,6 +9,8 @@ from meetingtools.apps.room.models import Room
 from tagging.models import TaggedItem
 from meetingtools.settings import BASE_URL
 from django.utils.feedgenerator import Atom1Feed, Rss201rev2Feed
+from meetingtools.apps.room.views import room_recordings
+from django.shortcuts import get_object_or_404
 
 class TagsWrapper(object):
     
@@ -25,7 +27,7 @@ class TagsWrapper(object):
     def link(self,ext):
         return "%s/room/+%s.%s" % (BASE_URL,"+".join(self.tags),ext)
 
-class RoomTagFeed(Feed):
+class MeetingToolsFeed(Feed):
     
     item_author_name = 'SUNET e-meeting tools'
     
@@ -37,6 +39,9 @@ class RoomTagFeed(Feed):
             return "rss"
         
         return "rss"
+
+
+class RoomTagFeed(MeetingToolsFeed):
     
     def get_object(self,request,tn):
         return TagsWrapper(tn)
@@ -73,4 +78,42 @@ class RoomAtomTagFeed(RoomTagFeed):
     feed_type = Atom1Feed
     
 class RoomRSSTagField(RoomTagFeed):
+    feed_type = Rss201rev2Feed
+    
+class RecordingsWrapper(object):
+    def __init__(self,room,request):
+        self.room = room
+        self.items = room_recordings(request, room)
+    
+class RecordingFeed(MeetingToolsFeed):
+    
+    def get_object(self,request,rid):
+        room = get_object_or_404(Room,pk=rid)
+        return RecordingsWrapper(room,request)
+    
+    def title(self,recordings):
+        return "Recordings in room '%s'" % recordings.room.name
+    
+    def link(self,recordings):
+        return recordings.room.recordings_url()
+    
+    def items(self,recordings):
+        return recordings.items
+    
+    def item_title(self,recording):
+        return recording['name']
+    
+    def item_description(self,recording):
+        return recording['description']
+    
+    def item_link(self,recording):
+        return recording['url']
+    
+    def item_pubdate(self,recording):
+        return recording['date_created']
+    
+class AtomRecordingFeed(RecordingFeed):
+    feed_type = Atom1Feed
+    
+class RSSRecordingField(RecordingFeed):
     feed_type = Rss201rev2Feed

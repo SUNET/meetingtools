@@ -448,19 +448,19 @@ def tag(request,rid):
 from time import mktime
 from feedparser import _parse_date as parse_date
 
+def room_recordings(request,room):
+    api = ac_api_client(request, room.acc)
+    r = api.request('sco-expanded-contents',{'sco-id': room.sco_id,'filter-icon':'archive'},True)
+    return [{'name': sco.findtext('name'),
+             'sco_id': sco.get('sco-id'),
+             'url': room.acc.make_url(sco.findtext('url-path')),
+             'description':  sco.findtext('description'),
+             'date_created': datetime.fromtimestamp(mktime(parse_date(sco.findtext('date-created')))),
+             'date_modified': datetime.fromtimestamp(mktime(parse_date(sco.findtext('date-modified'))))} for sco in r.et.findall(".//sco")]
+
 @login_required
 def recordings(request,rid):
     room = get_object_or_404(Room,pk=rid)
-    api = ac_api_client(request, room.acc)
-    
-    r = api.request('sco-expanded-contents',{'sco-id': room.sco_id,'filter-icon':'archive'},True)
-    recordings = [{'name': sco.findtext('name'),
-                   'sco_id': sco.get('sco-id'),
-                   'url': room.acc.make_url(sco.findtext('url-path')),
-                   'description':  sco.findtext('description'),
-                   'date_created': datetime.fromtimestamp(mktime(parse_date(sco.findtext('date-created')))),
-                   'date_modified': datetime.fromtimestamp(mktime(parse_date(sco.findtext('date-modified'))))} for sco in r.et.findall(".//sco")]
-    
     return respond_to(request,
                       {'text/html': 'apps/room/recordings.html'},
-                      {'recordings': recordings,'room':room})
+                      {'recordings': room_recordings(request,room),'room':room})
