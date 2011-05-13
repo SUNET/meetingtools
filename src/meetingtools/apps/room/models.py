@@ -70,6 +70,6 @@ def _magic_tags(sender,**kwargs):
         for tag in tags:
             if tag.name != "cleaning":
                 ntags.append(tag.name)
-        Tag.objects.update_tags(room, ntags)
+        Tag.objects.update_tags(room, " ".join(ntags))
     
 post_save.connect(_magic_tags,sender=Room)
