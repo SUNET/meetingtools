@@ -4,6 +4,7 @@ from django.conf.urls.defaults import patterns,include
 from django.contrib import admin
 from meetingtools.settings import ADMIN_MEDIA_ROOT, MEDIA_ROOT
 from meetingtools.multiresponse import redirect_to
+from meetingtools.apps.room.feeds import RoomAtomTagFeed,RoomRSSTagField
 admin.autodiscover()
 
 def welcome(request):
@@ -29,7 +30,9 @@ urlpatterns = patterns('',
     (r'^room/(\d+)/tag$','meetingtools.apps.room.views.tag'),
     (r'^room/(\d+)/untag/(.+)$','meetingtools.apps.room.views.untag'),
     (r'^widget/\+(.+)$','meetingtools.apps.room.views.widget'),
-    (r'^room/\+(.+)\.(?:json|xml|html|htm|atom|rss)$','meetingtools.apps.room.views.list_by_tag'),
+    (r'^room/\+(.+)\.(?:json|html|htm)$','meetingtools.apps.room.views.list_by_tag'),
+    (r'^room/\+(.+)\.(?:atom)$',RoomAtomTagFeed()),
+    (r'^room/\+(.+)\.(?:rss)$',RoomRSSTagField()),
     (r'^room/\+(.+)$','meetingtools.apps.room.views.list_by_tag'),
     # Uncomment the admin/doc line below to enable admin documentation:
     # (r'^admin/doc/', include('django.contrib.admindocs.urls')),

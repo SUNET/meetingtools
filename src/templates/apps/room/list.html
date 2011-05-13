@@ -17,6 +17,7 @@
 {% block meta %}
 {% if tags %}
 <link rel="alternate" type="application/rss+xml" title="{{title}} (RSS 2.0)" href="{% prefix %}/room/+{{tags}}.rss" />
+<link rel="alternate" type="application/atom+xml" title="{{title}} (ATOM 1.0)" href="{% prefix %}/room/+{{tags}}.atom" />
 {% endif %}
 {% endblock %}
 {% block content %}
