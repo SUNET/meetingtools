@@ -46,6 +46,9 @@ class Room(models.Model):
         
     def go_url_internal(self):
         return "%s/go/%d" % (BASE_URL,self.id)
+    
+    def permalink(self):
+        return "%s/room/%d" % (BASE_URL,self.id)
         
     def nusers(self):
         if self.user_count == None:
