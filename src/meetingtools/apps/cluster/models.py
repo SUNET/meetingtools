@@ -17,3 +17,6 @@ class ACCluster(models.Model):
     
     def __unicode__(self):
         return self.url
+    
+    def make_url(self,path=""):
+        return "%s%s" % (self.url,path)

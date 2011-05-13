@@ -7,7 +7,7 @@
     $("#rooms").accordion({
    		header: 'h3',
         active: false,
-        event: "click", 
+        event: "click",
    		collapsible: true,
    		navigation: true,
    		animated: true,
@@ -29,7 +29,7 @@
 		   <h3 class="listheader">{{r.name}}</h3>
 		   <div>
 		       {% tags_for_object r as tags %}
-		       <p><a href="{{r|roomurl}}">{{r|roomurl}}<span style="vertical-align: bottom;" class="ui-icon ui-icon-extlink"></span></a></p>
+		       <p><a target="_connect" href="{{r|roomurl}}">{{r|roomurl}}<span style="vertical-align: bottom;" class="ui-icon ui-icon-extlink"></span></a></p>
 		  	   <p class="infopanel ui-widget ui-corner-all ui-state-highlight">{% if r.description %}{{r.description|safe}}{% else %}<em>No description available...</em>{% endif %}</p>
 		  	   <ul class="nlist square" style="padding-left: 2px;">
 		  		  <li>&raquo;&nbsp;Tags: {% for tag in tags %}<a style="margin-right: 5px;" class="ui-widget" href="{% prefix %}/room/+{{tag}}">{{tag}}</a>{% endfor %} {%if edit %}<a style="font-size: 75%;" href="{% prefix %}/room/{{r.id}}/tag"><em>... manage room tags</em></a>{%endif%}</li>
@@ -40,9 +40,10 @@
 		  	   </ul>
 		   	  <br/>
 		   	  <ul class="ilist">
-		   	  	 <li class="button"><a href="{% prefix %}/go/{{r.id}}">Enter Room</a></li>
+		   	  	 <li class="button"><a target="_connect" href="{% prefix %}/go/{{r.id}}">Enter Room</a></li>
 		   	  	 {% if edit %}
 		   	  	 <li class="button"><a href="{% prefix %}/room/{{r.id}}/tag">Room Tags</a></li>
+		   	  	 <li class="button"><a href="{% prefix %}/room/{{r.id}}/recordings">Room Recordings</a></li>
 		   	     <li class="button"><a href="{% prefix %}/room/{{r.id}}/modify">Modify Room</a></li>
 		   	     <li class="button"><a href="{% prefix %}/room/{{r.id}}/delete">Delete Room</a></li> 
 		   	  	 {% endif %}
