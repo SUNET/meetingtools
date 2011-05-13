@@ -60,8 +60,8 @@ MEDIA_URL = '%s/site-media/' % PREFIX_URL
 ADMIN_MEDIA_PREFIX = '%s/admin-media/' % PREFIX_URL
 
 
-LOGIN_URL = "%s/accounts/login/" % PREFIX_URL
-LOGOUT_URL = "%s/accounts/logout/" % PREFIX_URL
+LOGIN_URL = "%s/accounts/login" % PREFIX_URL
+LOGOUT_URL = "%s/accounts/logout" % PREFIX_URL
 
 # Make this unique, and don't share it with anybody.
 SECRET_KEY = 'tz78l!c=cl2=jic5$2#(bq)7-4s1ivtm*a+q0w1yi0$)hrmc7l'
