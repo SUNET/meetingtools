@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+{% load prefix %}
+{% load datehumanize %}
+{% load roomurl %}
+{% load tagging_tags %}
+{% block widgets %}
+    $("#recordings").accordion({
+   		header: 'h3',
+        active: false,
+        event: "click", 
+   		collapsible: true,
+   		navigation: true,
+   		animated: true,
+   		autoHeight: false
+   	});
+{% endblock %}
+{% block meta %}
+{% if tags %}
+<link rel="alternate" type="application/rss+xml" title="{{title}} recordings (RSS 2.0)" href="{% prefix %}/room/{{room.id}}/recordings.rss" />
+<link rel="alternate" type="application/atom+xml" title="{{title}} recordings (ATOM 1.0)" href="{% prefix %}/room/{{room.id}}/recordings.atom" />
+{% endif %}
+{% endblock %}
+{% block content %}
+	<h1>Recordings in '{{room.name}}'</h1>
+	{% if recordings %}
+	<div id="recordings">
+		{% for r in recordings %}
+		<div id="{{r.sco_id}}">
+		   <h3 class="listheader">{{r.name}}</h3>
+		   <div>
+		      <p><a target="_connect" href="{{r.url}}">{{r.url}}<span style="vertical-align: bottom;" class="ui-icon ui-icon-extlink"></span></a></p>
+		   	  <p class="infopanel ui-widget ui-corner-all ui-state-highlight">{% if r.description %}{{r.description|safe}}{% else %}<em>No description available...</em>{% endif %}</p>
+		   	  <ul class="nlist square" style="padding-left: 2px;">
+		          <li>&raquo;&nbsp;Created {{r.date_created|datehumanize}}.</li>
+		          <li>&raquo;&nbsp;Modified {{r.date_modified|datehumanize}}.</li>
+		  	      <li>&raquo;&nbsp;Hosted on {{room.acc.name}}</li>
+		  	   </ul>
+		   	  <br/>
+		   	  <ul class="ilist">
+			   <li class="button"><a target="_connect" href="{{r.url}}">Play Recording</a></li>
+			</ul>
+		   </div>
+		</div>
+		{% endfor %}
+	</div>
+	{% else %}
+	<p>No recordings right now...</p>
+	{% endif %}
+	<br/>
+	<ul class="ilist">
+	   <li class="button"><a href="{%prefix%}/room#{{room.id}}">Back to '{{room.name}}'</a></li>
+	</ul>
+{% endblock %}
