@@ -158,6 +158,8 @@ def accounts_login_federated(request):
         #        connect_api.add_remove_member(principal.get('principal-id'),group.get('principal-id'),True)
             
         next = request.session.get("after_login_redirect", None)
+        if not next and request.GET.has_key('next'):
+            next = request.GET['']
         if next is not None:
             return redirect_to(next)
     else:
