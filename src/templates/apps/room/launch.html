@@ -21,7 +21,7 @@
 	<br/>
 	<ul class="ilist">
 	    {%if room.nusers == 0 %}
-		<li class="button"><a href="{% prefix %}/accounts/login-federated?next={% prefix %}/promote/{{room.id}}">Enter as Host</a></li>
+		<li class="button"><a href="{% prefix %}/accounts/login-federated?next=/promote/{{room.id}}">Enter as Host</a></li>
 		{% endif %}
 		<li class="button"><a href="{% prefix %}/launch/{{room.id}}">Enter</a></li>
 	</ul>
