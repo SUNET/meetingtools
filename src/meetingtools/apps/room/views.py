@@ -352,7 +352,7 @@ def _goto(request,room,clean=True,promote=False):
         userlist = api.request('meeting-usermanager-user-list',{'sco-id': room.sco_id},False)
         room.user_count = 0
         if userlist.status_code() == 'ok':
-            room.user_count = userlist.et.xpath("count(.//userdetails)")
+            room.user_count = int(userlist.et.xpath("count(.//userdetails)"))
         
         #session_info = api.request('report-meeting-sessions',{'sco-id':room.sco_id})
         #room.user_count = _nusers(session_info)
