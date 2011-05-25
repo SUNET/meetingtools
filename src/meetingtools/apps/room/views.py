@@ -349,8 +349,13 @@ def _goto(request,room,clean=True,promote=False):
     room.lastvisited = datetime.now()
     
     if clean:
-        session_info = api.request('report-meeting-sessions',{'sco-id':room.sco_id})
-        room.user_count = _nusers(session_info)
+        userlist = api.request('meeting-usermanager-user-list',{'sco-id': room.sco_id},False)
+        room.user_count = 0
+        if userlist.status_code() == 'ok':
+            room.user_count = userlist.et.xpath("count(.//userdetails)")
+        
+        #session_info = api.request('report-meeting-sessions',{'sco-id':room.sco_id})
+        #room.user_count = _nusers(session_info)
         logging.debug("---------- nusers: %s" % room.user_count)
         room.save()
         if room.self_cleaning:
