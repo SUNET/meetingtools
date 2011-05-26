@@ -10,17 +10,20 @@
 			<p><span class="ui-icon ui-icon-info" style="float: left; margin-right: .3em;"></span>
 				<strong>Note</strong> 
 				You are about to enter the meeting room '{{room.name}}'. 
-				{%if room.nusers == 0 %}You are the first user to enter the room. If you are hosting this meeting and are comfortable with
-				the Adobe Connect software you may press 'Enter as Host' below.
+				{%if room.nusers == 0 %}
+				You are the first user to enter the room.
 				{%else%}
-				There are {{room.nusers}} other participants in the room.
+				There are {{room.nusers}} other participants in the room right now.
+				{% endif %}
+				{%if room.nhosts == 0 %} There are no hosts in the room right now. This means that the participants in the room may not be able to make full use of the room.
+				If you are hosting this meeting and are comfortable with the Adobe Connect software you may press 'Enter as Host' below to become the first host.
 				{% endif %}
 			</p>
 		</div>
 	</div>
 	<br/>
 	<ul class="ilist">
-	    {%if room.nusers == 0 %}
+	    {%if room.nhosts == 0 %}
 		<li class="button"><a href="{% prefix %}/accounts/login-federated?next=/promote/{{room.id}}">Enter as Host</a></li>
 		{% endif %}
 		<li class="button"><a href="{% prefix %}/launch/{{room.id}}">Enter</a></li>

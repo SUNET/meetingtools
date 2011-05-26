@@ -347,8 +347,10 @@ def _goto(request,room,clean=True,promote=False):
     if clean:
         userlist = api.request('meeting-usermanager-user-list',{'sco-id': room.sco_id},False)
         room.user_count = 0
+        room.host_count = 0
         if userlist.status_code() == 'ok':
             room.user_count = int(userlist.et.xpath("count(.//userdetails)"))
+            room.host_count = int(userlist.et.xpath("count(.//userdetails/role[text() = 'host'])"))
         
         #session_info = api.request('report-meeting-sessions',{'sco-id':room.sco_id})
         #room.user_count = _nusers(session_info)
@@ -357,6 +359,8 @@ def _goto(request,room,clean=True,promote=False):
         if room.self_cleaning:
             if (room.user_count == 0) and (abs(lastvisit - now) > GRACE):        
                 room = _clean(request,room)
+                
+            if room.host_count == 0:
                 return respond_to(request, {"text/html": "apps/room/launch.html"}, {'room': room})
     else:
         room.save()

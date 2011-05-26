@@ -27,6 +27,7 @@ class Room(models.Model):
     folder_sco_id = IntegerField(verbose_name="Adobe Connect Room Folder",editable=False)
     description = TextField(blank=True,null=True)
     user_count = IntegerField(verbose_name="User Count At Last Visit",editable=False,blank=True,null=True)
+    host_count = IntegerField(verbose_name="Host Count At Last Visit",editable=False,blank=True,null=True)
     timecreated = models.DateTimeField(auto_now_add=True)
     lastupdated = models.DateTimeField(auto_now=True)
     lastvisited = models.DateTimeField(blank=True,null=True)
@@ -60,6 +61,12 @@ class Room(models.Model):
             return "unknown many"
         else:
             return self.user_count
+        
+    def nhosts(self):
+        if self.host_count == None:
+            return "unknown many"
+        else:
+            return self.host_count
         
 tagging.register(Room)
 
