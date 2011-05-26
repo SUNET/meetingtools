@@ -105,19 +105,12 @@ def _nusers(session_info):
 @login_required
 def view(request,id):
     room = get_object_or_404(Room,pk=id)
-    api = ac_api_client(request,room.acc)
-    room_info = api.request('sco-info',{'sco-id':room.sco_id},raise_error=True)
-    perm_info = api.request('permissions-info',{'acl-id':room.sco_id,'filter-principal-id': 'public-access'},raise_error=True)
-    session_info = api.request('report-meeting-sessions',{'sco-id':room.sco_id},raise_error=True)
-    
-    room.name = room_info.et.findtext('.//sco/name')
-    room.save()
     return respond_to(request,
-                      {'text/html':'apps/room/view.html'},
+                      {'text/html':'apps/room/list.html'},
                       {'user':request.user,
-                       'room':room,
-                       'permission':  perm_info.et.find('.//principal').get('permission-id'),       
-                       'nusers': _nusers(session_info)
+                       'rooms':[room],
+                       'title': room.name,
+                       'active': True,
                        })
 
 def _init_update_form(request,form,acc,my_meetings_sco_id):
@@ -292,7 +285,10 @@ def user_rooms(request):
         logging.debug("%s %s %s %s" % (sco_id,name,source_sco_id,urlpath))
         room = _import_room(request,acc,sco_id,source_sco_id,my_meetings_sco_id,name,urlpath,description)
         
-    return respond_to(request,{'text/html':'apps/room/list.html'},{'title':'Your Rooms','edit':True,'rooms':Room.objects.filter(creator=request.user).all()})
+    rooms = Room.objects.filter(creator=request.user).all()
+    return respond_to(request,
+                      {'text/html':'apps/room/list.html'},
+                      {'title':'Your Rooms','edit':True,'active':len(rooms) == 1,'rooms':rooms})
 
 @login_required
 def delete(request,id):
@@ -406,12 +402,18 @@ def widget(request,tn):
 # should not require login
 def list_by_tag(request,tn):
     tags = tn.split('+')
-    rooms = TaggedItem.objects.get_by_model(Room, tags)
+    rooms = TaggedItem.objects.get_by_model(Room, tags).all()
     title = 'Rooms tagged with %s' % " and ".join(tags)
     return respond_to(request,
                       {'text/html':'apps/room/list.html',
                        'application/json': json_response([_room2dict(room) for room in rooms])},
-                      {'title':title,'description':title ,'edit':False,'baseurl': BASE_URL,'tags': tn,'rooms':rooms.all()})
+                      {'title':title,
+                       'description':title ,
+                       'edit':False,
+                       'active':len(rooms) == 1,
+                       'baseurl': BASE_URL,
+                       'tags': tn,
+                       'rooms':rooms})
     
 def _can_tag(request,tag):
     if tag in ('selfcleaning','cleaning','public','private'):

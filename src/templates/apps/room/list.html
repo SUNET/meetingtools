@@ -6,7 +6,11 @@
 {% block widgets %}
     $("#rooms").accordion({
    		header: 'h3',
+{%if active %}
+        active: true,
+{% else %}
         active: false,
+{% endif %}
         event: "click",
    		collapsible: true,
    		navigation: true,
