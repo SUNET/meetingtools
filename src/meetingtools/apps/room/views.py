@@ -388,20 +388,11 @@ def _goto(request,room,clean=True,promote=False):
 def _room2dict(room):
     return {'name':room.name,
             'description':room.description,
-            'user_count':room.user_count,
+            'user_count':room.nusers(),
+            'host_count':room.nhosts(),
             'updated': rfc3339_date(room.lastupdated),
             'self_cleaning': room.self_cleaning,
             'url': room.go_url()}
-
-@login_required
-def widget(request,tn):
-    tags = tn.split('+')
-    rooms = TaggedItem.objects.get_by_model(Room, tags)
-    title = 'Rooms tagged with %s' % " and ".join(tags)
-    now = timeAsrfc822( datetime.now() )
-    return respond_to(request,
-                      {'text/html':'apps/room/widget-test.html'},
-                      {'title':title,'description':title ,'edit':False,'date': now,'tags': tn,'rooms':rooms.all()})
 
 # should not require login
 def list_by_tag(request,tn):
