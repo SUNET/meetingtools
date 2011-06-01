@@ -88,6 +88,16 @@
 			   			<li><a class="tip" title="SUNET Community Support" href="http://community.sunet.se">SUNET Community Support</a></li>
 			   		</ul>
 			   	</li>
+			   	<li>
+			   		<ul>
+			   			<li><h3>Developers</h3></li>
+			   			{% if tags %}
+			   			<li><a href="{% prefix %}/widget/+{{tags}}">Meetingtools jQuery widget</a></li>
+			   			{% else %}
+			   			<li><a href="{% prefix %}/widget/+example">Meetingtools jQuery widget</a></li>
+			   			{% endif %}
+			   		</ul>
+			   	</li>
 			</ul>
 			<div style="float: right; margin-top: 10px;">
 				{% block validators %}{% endblock %}

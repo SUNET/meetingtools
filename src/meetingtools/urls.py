@@ -37,6 +37,7 @@ urlpatterns = patterns('',
     (r'^room/(\d+)/recordings\.(?:atom)$',AtomRecordingFeed()),
     (r'^room/(\d+)/recordings\.(?:rss)$',RSSRecordingField()),
     (r'^room/\+(.+)$','meetingtools.apps.room.views.list_by_tag'),
+    (r'^widget/?\+?(.*)$','meetingtools.apps.room.views.widget'),
     # Uncomment the admin/doc line below to enable admin documentation:
     # (r'^admin/doc/', include('django.contrib.admindocs.urls')),
     
