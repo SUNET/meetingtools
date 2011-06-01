@@ -65,7 +65,11 @@ def _user_rooms(request,acc,my_meetings_sco_id):
         connect_api = ac_api_client(request, acc)
         meetings = connect_api.request('sco-expanded-contents',{'sco-id': my_meetings_sco_id,'filter-type': 'meeting'})
         if meetings:
-            rooms = [(r.get('sco-id'),r.findtext('name'),r.get('source-sco-id'),r.findtext('url-path'),r.findtext('description')) for r in meetings.et.findall('.//sco')]
+            rooms = [{'sco_id': r.get('sco-id'),
+                     'name': r.findtext('name'),
+                     'source_sco_id': r.get('source-sco-id'),
+                     'urlpath': r.findtext('url-path'),
+                     'description': r.findtext('description')} for r in meetings.et.findall('.//sco')]
     return rooms
 
 def _user_templates(request,acc,my_meetings_sco_id):
@@ -223,41 +227,26 @@ def update(request,id):
         
     return respond_to(request,{'text/html':'apps/room/update.html'},{'form':form,'formtitle': title,'cancelname': 'Cancel','submitname':'%s Room' % what})
 
-def _import_room(request,acc,sco_id,source_sco_id,folder_sco_id,name,urlpath,description=None):
+def _import_room(request,acc,r):
     modified = False
+    room = None
     try:
-        room = Room.objects.get(sco_id=sco_id,acc=acc)
+        room = Room.objects.get(sco_id=r['sco_id'],acc=acc)
     except ObjectDoesNotExist:
-        room = Room.objects.create(sco_id=sco_id,acc=acc,creator=request.user,folder_sco_id=folder_sco_id)
+        if r['folder_sco_id']:
+            room = Room.objects.create(sco_id=r['sco_id'],acc=acc,creator=request.user,folder_sco_id=r['folder_sco_id'])
+        
+    if not room:
+        return None
         
     logging.debug(pformat(room))
     
-    if room.name != name and name:
-        room.name = name
-        modified = True
-    
-    if room.sco_id != sco_id and sco_id:
-        room.sco_id = sco_id
-        modified = True
-    
-    if not room.source_sco_id and source_sco_id:
-        room.source_sco_id = source_sco_id
-        modified = True
-        
-    if urlpath:
-        urlpath = urlpath.strip('/')
-        
-    if room.urlpath != urlpath and urlpath:
-        room.urlpath = urlpath
-        modified = True
-        
-    if (description and not room.description) or (room.description and not description):
-        room.description = description
-        modified = True 
-        
-    #if '/' in room.urlpath:
-    #    room.urlpath = urlpath.strip('/')
-    #    modified = True
+    for key in ('sco_id','name','source_sco_id','urlpath','description'):
+        if r.has_key(key) and hasattr(room,key):
+            rv = getattr(room,key)
+            if rv != r[key] and r[key]:
+                setattr(room,key,r[key])
+                modified = True
     
     logging.debug(pformat(room))
         
@@ -274,16 +263,17 @@ def user_rooms(request):
     user_rooms = _user_rooms(request,acc,my_meetings_sco_id)
     
     ar = []
-    for (sco_id,name,source_sco_id,urlpath,description) in user_rooms:
-        ar.append(int(sco_id))
+    for r in user_rooms:
+        logging.debug(pformat(r))
+        ar.append(int(r['sco_id']))
     
     for r in Room.objects.filter(creator=request.user).all():
         if (not r.sco_id in ar): # and (not r.self_cleaning): #XXX this logic isn't right!
             r.delete() 
     
-    for (sco_id,name,source_sco_id,urlpath,description) in user_rooms:
-        logging.debug("%s %s %s %s" % (sco_id,name,source_sco_id,urlpath))
-        room = _import_room(request,acc,sco_id,source_sco_id,my_meetings_sco_id,name,urlpath,description)
+    for r in user_rooms:
+        r['folder_sco_id'] = my_meetings_sco_id
+        room = _import_room(request,acc,r)
         
     rooms = Room.objects.filter(creator=request.user).all()
     return respond_to(request,
@@ -409,6 +399,10 @@ def list_by_tag(request,tn):
                        'baseurl': BASE_URL,
                        'tags': tn,
                        'rooms':rooms})
+    
+def widget(request,tags=None):
+    title = 'Meetingtools jQuery widget'
+    return respond_to(request,{'text/html':'apps/room/widget.html'},{'title': title,'tags':tags})
     
 def _can_tag(request,tag):
     if tag in ('selfcleaning','cleaning','public','private'):
