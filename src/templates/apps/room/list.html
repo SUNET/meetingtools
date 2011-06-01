@@ -65,7 +65,7 @@
 {% endblock %}
 {% block validators %}
 {% if tags %}
-<a href="http://feed1.w3.org/check.cgi?url={% prefix %}/room/+{{tags}}.atom"><img src="{% prefix %}/site-media/img/valid-atom.png" alt="[Valid Atom 1.0]" title="Validate my Atom 1.0 feed" /></a>
-<a href="http://feed1.w3.org/check.cgi?url={% prefix %}/room/+{{tags}}.rss"><img src="{% prefix %}/site-media/img/valid-rss-rogers.png" alt="[Valid RSS]" title="Validate my RSS feed" /></a>
+<a href="http://feed1.w3.org/check.cgi?url={% baseurl %}{% prefix %}/room/+{{tags}}.atom"><img src="{% prefix %}/site-media/img/valid-atom.png" alt="[Valid Atom 1.0]" title="Validate my Atom 1.0 feed" /></a>
+<a href="http://feed1.w3.org/check.cgi?url={% baseurl %}{% prefix %}/room/+{{tags}}.rss"><img src="{% prefix %}/site-media/img/valid-rss-rogers.png" alt="[Valid RSS]" title="Validate my RSS feed" /></a>
 {% endif %}
 {% endblock %}
