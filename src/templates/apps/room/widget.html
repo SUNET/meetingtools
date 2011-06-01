@@ -29,11 +29,11 @@
 &lt;html&gt;
    &lt;head&gt;
       &lt;script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.1/jquery.min.js"&gt;&lt;/script&gt;
-      &lt;script type="text/javascript" src="{% baseurl %}/{% prefix %}js/jquery.meetingtools.js"&gt;&lt;/script&gt;
-      &lt;link href="{% baseurl %}/{% prefix %}css/jquery.meetingtools.css" rel="stylesheet" type="text/css" /&gt;
+      &lt;script type="text/javascript" src="{% baseurl %}/js/jquery.meetingtools.js"&gt;&lt;/script&gt;
+      &lt;link href="{% baseurl %}/css/jquery.meetingtools.css" rel="stylesheet" type="text/css" /&gt;
       &lt;script type="text/javascript"&gt;
          $(function() {
-            $("#meetings").meetingtools({tags: '{{tags}}',url: '{% baseurl %}/{% prefix %}'});
+            $("#meetings").meetingtools({tags: '{{tags}}',url: '{% baseurl %}'});
          });
       &lt;/script&gt;
    &lt;/head&gt;
