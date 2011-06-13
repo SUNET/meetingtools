@@ -13,7 +13,7 @@ jQuery.fn.meetingtools = function(options) {
 		}
 		var url = url+'/room/+'+tags+'.json';
 		var div = $(this);
-		$.getJSON(url+"?jsoncallback=?",function(data) {
+		$.getJSON(url,function(data) {
 			html = "<ul class=\"meeting-list\">";
 			$.each(data,function(i,room) {
 				html += "<li class=\"meeting\"><h4>"+room['name']+"</h4><div class=\"meeting-info\">";
