@@ -249,6 +249,9 @@ def _import_room(request,acc,r):
         
     #logging.debug(pformat(room))
     
+    if r.has_key('urlpath'):
+        r['urlpath'] = r['urlpath'].strip('/')
+    
     for key in ('sco_id','name','source_sco_id','urlpath','description','user_count','host_count'):
         if r.has_key(key) and hasattr(room,key):
             rv = getattr(room,key)
