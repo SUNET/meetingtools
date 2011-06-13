@@ -239,16 +239,24 @@ def _import_room(request,acc,r):
     if not room:
         return None
         
-    logging.debug(pformat(room))
+    api = ac_api_client(request,acc)
+    userlist = api.request('meeting-usermanager-user-list',{'sco-id': room.sco_id},False)
+    r['user_count'] = 0
+    r['host_count'] = 0
+    if userlist.status_code() == 'ok':
+        r['user_count'] = int(userlist.et.xpath("count(.//userdetails)"))
+        r['host_count'] = int(userlist.et.xpath("count(.//userdetails/role[text() = 'host'])"))
+        
+    #logging.debug(pformat(room))
     
-    for key in ('sco_id','name','source_sco_id','urlpath','description'):
+    for key in ('sco_id','name','source_sco_id','urlpath','description','user_count','host_count'):
         if r.has_key(key) and hasattr(room,key):
             rv = getattr(room,key)
             if rv != r[key] and r[key]:
                 setattr(room,key,r[key])
                 modified = True
     
-    logging.debug(pformat(room))
+    #logging.debug(pformat(room))
         
     if modified:
         logging.debug("saving ... %s" % pformat(room))
@@ -388,6 +396,8 @@ def _room2dict(room):
 def list_by_tag(request,tn):
     tags = tn.split('+')
     rooms = TaggedItem.objects.get_by_model(Room, tags).all()
+    for room in rooms:
+        _import_room(request,room.acc,{'sco_id': room.sco_id})
     title = 'Rooms tagged with %s' % " and ".join(tags)
     return respond_to(request,
                       {'text/html':'apps/room/list.html',
