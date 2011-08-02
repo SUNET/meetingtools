@@ -60,47 +60,48 @@
 <body>
 	<div id="container">
 		<div id="header">
-		    <div id="headline"><h1>SUNET Meeting Tools</h1></div>
-			<a href="#"><img src="{% prefix %}/site-media/img/sunet-banner.png"/></a>
-			
-			<ul class="ui-helper-reset ui-widget ilist">
-				<li><a href="http://www.sunet.se">SUNET</a>&raquo;</li>
-				<li><a href="#">SUNET Meeting tools</a></li>
-			</ul>
+			<div class="centered">
+                <ul class="ilist">
+					<li><a href="#"><img src="{% prefix %}/site-media/img/sunet.jpg" /></a></li>
+                    <li style="vertical-align: super;"><a href="#"><h1>Meeting Tools</h1></a></li>
+				</ul>
+			</div>
 		</div>
 		<div id="content">
-		   {% block content %}{% endblock %}
+		   <div class="centered">{% block content %}{% endblock %}</div>
 		</div>
 		<div class="clear"/>
 		<div id="footer">
-			<ul>
-			   	<li>
-			   		<ul>
-			   			<li><h3>Users</h3></li>
-			   			<li><a class="tip" title="{{ user.get_full_name }}" href="{% prefix %}/rooms">My Profile</a></li>
-			   			<li><a class="tip" title="Logout" id="logout" href="{% prefix %}/accounts/logout/">Logout</a></li>
-			   		</ul>
-			   	</li>
-			   	<li>
-			   		<ul>
-			   			<li><h3>Support</h3></li>
-			   			<li><a class="tip" title="SUNET" href="http://www.sunet.se">SUNET</a></li>
-			   			<li><a class="tip" title="SUNET Community Support" href="http://community.sunet.se">SUNET Community Support</a></li>
-			   		</ul>
-			   	</li>
-			   	<li>
-			   		<ul>
-			   			<li><h3>Developers</h3></li>
-			   			{% if tags %}
-			   			<li><a href="{% prefix %}/widget/+{{tags}}">Meetingtools jQuery widget</a></li>
-			   			{% else %}
-			   			<li><a href="{% prefix %}/widget/+example">Meetingtools jQuery widget</a></li>
-			   			{% endif %}
-			   		</ul>
-			   	</li>
-			</ul>
-			<div style="float: right; margin-top: 10px;">
-				{% block validators %}{% endblock %}
+			<div class="centered">
+				<ul class="list-of-lists">
+				   	<li>
+				   		<ul>
+				   			<li><h3>Users</h3></li>
+				   			<li><a class="tip" title="{{ user.get_full_name }}" href="{% prefix %}/rooms">My Profile</a></li>
+				   			<li><a class="tip" title="Logout" id="logout" href="{% prefix %}/accounts/logout/">Logout</a></li>
+				   		</ul>
+				   	</li>
+				   	<li>
+				   		<ul>
+				   			<li><h3>Support</h3></li>
+				   			<li><a class="tip" title="SUNET" href="http://www.sunet.se">SUNET</a></li>
+				   			<li><a class="tip" title="SUNET Community Support" href="http://community.sunet.se">SUNET Community Support</a></li>
+				   		</ul>
+				   	</li>
+				   	<li>
+				   		<ul>
+				   			<li><h3>Developers</h3></li>
+				   			{% if tags %}
+				   			<li><a href="{% prefix %}/widget/+{{tags}}">Meetingtools jQuery widget</a></li>
+				   			{% else %}
+				   			<li><a href="{% prefix %}/widget/+example">Meetingtools jQuery widget</a></li>
+				   			{% endif %}
+				   		</ul>
+				   	</li>
+				</ul>
+				<div style="float: right; margin-top: 10px;">
+					{% block validators %}{% endblock %}
+				</div>
 			</div>
 		</div>
 	</div>
