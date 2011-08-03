@@ -35,6 +35,7 @@
 		  	   <ul class="nlist square" style="padding-left: 2px;">
 		  		  <li>&raquo;&nbsp;Tags: {% for tag in tags %}<a style="margin-right: 5px;" class="ui-widget" href="{% prefix %}/room/+{{tag}}">{{tag}}</a>{% endfor %} {%if edit %}<a style="font-size: 75%;" href="{% prefix %}/room/{{r.id}}/tag"><em>... manage room tags</em></a>{%endif%}</li>
 		          <li>&raquo;&nbsp;Created by {{r.creator}} {{r.timecreated|datehumanize}}.</li>
+                  <li>&raquo;&nbsp;{%if r.nusers%}There are {{r.nusers}} users present, {{r.nhosts}} of whom are hosts.{%else%}The room is currently unoccupied.{%endif%}</li>
 		          {% if r.self_cleaning %}<li>&raquo;&nbsp;Room will be reset when empty.</li>{%else%}<li>&raquo;&nbsp;Room state is preserved between sessions.</li>{% endif %}
 		          {% if r.lastvisited %}<li>&raquo;&nbsp;Last visited {{r.lastvisited|datehumanize}}</li>{%endif%} 
 		  	      <li>&raquo;&nbsp;Hosted on {{r.acc.name}}</li>
