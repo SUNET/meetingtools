@@ -280,6 +280,8 @@ def user_rooms(request):
     
     for r in Room.objects.filter(creator=request.user).all():
         if (not r.sco_id in ar): # and (not r.self_cleaning): #XXX this logic isn't right!
+            for t in Tag.objects.get_for_object(r):
+                t.delete()
             r.delete() 
     
     for r in user_rooms:
