@@ -10,7 +10,7 @@ ul.list-of-lists li ul li { display: block; }
 #content{ padding-bottom: 50px; width: 100%;}
 #header { background-image: url('../img/sidhuvudbakgrund.jpg'); background-position: top center; background-repeat: repeat-x;  }
 #header img { padding-top: 20px; }
-#welcome { font-size: 180%; margin-top: 100px;}
+#welcome { font-size: 150%; margin-top: 100px;}
 h3.listheader { padding-left: 20px; }
 .navlist ul { list-style: none; padding: 0; margin: 0; font-size: 90%; }
 .navlist li { float: right; display: inline;}
