@@ -86,7 +86,7 @@ class ACPClient():
             if type(v) == int:
                 p[k] = "%d" % v
             else:
-                p[k] = v.encode('utf-8')
+                p[k] = str(v).decode('utf-8')
         
         url = self.url + '?' + urlencode(p)
     
