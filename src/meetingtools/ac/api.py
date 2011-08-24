@@ -79,7 +79,7 @@ class ACPClient():
         
         for k,v in p.items():
             #p[k] = ("%s" % v).encode('utf-8')
-            if v is int:
+            if type(v) == int:
                 p[k] = "%d" % v
             else:
                 p[k] = v.encode('utf-8')
