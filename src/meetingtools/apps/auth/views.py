@@ -27,7 +27,7 @@ def meta(request,attr):
 def meta1(request,attr):
     v = meta(request,attr)
     if v:
-        return v[0]
+        return unicode(v[0])
     else:
         return None
 
