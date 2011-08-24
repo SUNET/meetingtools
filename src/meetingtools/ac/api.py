@@ -78,7 +78,11 @@ class ACPClient():
         p['action'] = method
         
         for k,v in p.items():
-            p[k] = ("%s" % v).encode('utf-8')
+            #p[k] = ("%s" % v).encode('utf-8')
+            if v is int:
+                p[k] = "%d" % v
+            else:
+                p[k] = v.encode('utf-8')
         
         url = self.url + '?' + urlencode(p)
     
