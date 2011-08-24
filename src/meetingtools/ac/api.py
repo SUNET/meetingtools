@@ -77,6 +77,17 @@ class ACPClient():
             p['session'] = self.session
         p['action'] = method
         
+        for k,v in p.items():
+            #p[k] = ("%s" % v).encode('utf-8')
+            logger.debug("----")
+            logger.debug(repr(k))
+            logger.debug(repr(v))
+            logger.debug(type(v))
+            if type(v) == int:
+                p[k] = "%d" % v
+            else:
+                p[k] = v.encode('utf-8')
+        
         url = self.url + '?' + urlencode(p)
     
         h = httplib2.Http(tempfile.gettempdir()+os.sep+".cache");
