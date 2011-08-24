@@ -87,6 +87,8 @@ class ACPClient():
                 p[k] = "%d" % v
             elif type(v) == unicode:
                 p[k] = v
+            elif type(v) == str:
+                p[k] = unicode(v)
             else:
                 p[k] = v.encode('utf-8')
         
