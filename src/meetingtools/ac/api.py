@@ -77,8 +77,6 @@ class ACPClient():
             p['session'] = self.session
         p['action'] = method
         
-        
-        
         url = self.url + '?' + urlencode(p)
     
         h = httplib2.Http(tempfile.gettempdir()+os.sep+".cache");
