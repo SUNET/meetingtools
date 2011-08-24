@@ -88,9 +88,9 @@ class ACPClient():
             elif type(v) == unicode:
                 p[k] = v
             elif type(v) == str:
-                p[k] = unicode(v)
+                p[k] = v.decode('utf-8')
             else:
-                p[k] = v.encode('utf-8')
+                p[k] = repr(v)
         
         url = self.url + '?' + urlencode(p)
     
