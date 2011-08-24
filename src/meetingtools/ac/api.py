@@ -77,20 +77,7 @@ class ACPClient():
             p['session'] = self.session
         p['action'] = method
         
-        for k,v in p.items():
-            #p[k] = ("%s" % v).encode('utf-8')
-            logger.debug("----")
-            logger.debug(repr(k))
-            logger.debug(repr(v))
-            logger.debug(type(v))
-            if type(v) == int:
-                p[k] = "%d" % v
-            elif type(v) == unicode:
-                p[k] = v
-            elif type(v) == str:
-                p[k] = v.decode('utf-8')
-            else:
-                p[k] = repr(v)
+        
         
         url = self.url + '?' + urlencode(p)
     
