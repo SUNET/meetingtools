@@ -5,7 +5,7 @@ Created on Jan 31, 2011
 '''
 
 import httplib2
-from urllib import quote, urlencode
+from urllib import quote, urlencode, quote_plus
 import logging
 from pprint import pformat
 import os
@@ -82,7 +82,7 @@ class ACPClient():
             value = v
             if type(v) == int:
                 value = "%d" % value
-            u.append('%s=%s' % (k,urllib.quote(value.encode("utf-8"))))
+            u.append('%s=%s' % (k,quote_plus(value.encode("utf-8"))))
         
         url = self.url + '?' + '&'.join(u)
     
