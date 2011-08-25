@@ -83,7 +83,7 @@ class ACPClient():
             value = v
             if type(v) == int:
                 value = "%d" % value
-            u.append(str(k)+'='+urllib.quote(value.encode("utf-8")))
+            u.append('%s=%s' % (k,urllib.quote(value.encode("utf-8"))))
         
         url = self.url + '?' + '&'.join(u)
     
