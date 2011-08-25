@@ -15,6 +15,7 @@ import pprint
 from meetingtools.site_logging import logger
 import lxml
 from django.http import HttpResponseRedirect
+import urllib
 
 class ACPException(Exception):
     def __init__(self, value):
@@ -77,18 +78,14 @@ class ACPClient():
             p['session'] = self.session
         p['action'] = method
         
+        u = []
         for k,v in p.items():
-            #p[k] = ("%s" % v).encode('utf-8')
-            logger.debug("----")
-            logger.debug(repr(k))
-            logger.debug(repr(v))
-            logger.debug(type(v))
+            value = v
             if type(v) == int:
-                p[k] = "%d" % v
-            else:
-                p[k] = v.decode('utf-8')
+                value = "%d" % value
+            u.append(str(k)+'='+urllib.quote(value.encode("utf-8")))
         
-        url = self.url + '?' + urlencode(p)
+        url = self.url + '?' + '&'.join(u)
     
         h = httplib2.Http(tempfile.gettempdir()+os.sep+".cache");
         logging.debug(url)
