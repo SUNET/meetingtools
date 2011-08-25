@@ -74,11 +74,10 @@ class ACPClient():
             self._cache = {'login':{},'group':{}}
     
     def request(self,method,p={},raise_error=False):
-        if self.session:
-            p['session'] = self.session
-        p['action'] = method
-        
         u = []
+        u.append("action=%s" % method)
+        if self.session:
+            u.append("session=%s" % self.session)
         for k,v in p.items():
             value = v
             if type(v) == int:
