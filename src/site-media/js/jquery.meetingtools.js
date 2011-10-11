@@ -38,7 +38,7 @@ jQuery.fn.meetingtools = function(options) {
 				options.onAdd();
 			});
 			options.onUpdate();
-		}).ajaxError(function(jqXHR, textStatus, errorThrown) { alert(textStatus); alert(errorThrown); });
+		});
 		
 		
 	});
