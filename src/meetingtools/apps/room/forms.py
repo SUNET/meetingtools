@@ -38,7 +38,7 @@ class CreateRoomForm(BetterModelForm):
     
     class Meta:
         model = Room
-        fields = ['name','description','urlpath','access','self_cleaning']
+        fields = ['name','description','urlpath','access','self_cleaning','allow_host']
         fieldsets = [('name',{'fields': ['name'],
                               'classes': ['step'],
                               'legend': 'Step 1: Room name',
@@ -49,7 +49,7 @@ class CreateRoomForm(BetterModelForm):
                                   'legend': 'Step 2: Room description',
                                   'description': 'Please provide a short summary of this room.'
                                   }),
-                     ('properties',{'fields': ['self_cleaning','urlpath','access'],
+                     ('properties',{'fields': ['self_cleaning','allow_host','urlpath','access'],
                                     'classes': ['step'],
                                     'legend': 'Step 3: Room properties',
                                     'description': '''
