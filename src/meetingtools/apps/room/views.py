@@ -247,7 +247,7 @@ def _import_room(request,acc,r):
     if not room:
         return None
     
-    if abs(room.lastupdated - time.time()) < IMPORT_TTL:
+    if abs(room.lastupdate() - time.time()) < IMPORT_TTL:
         return room
         
     api = ac_api_client(request,acc)
