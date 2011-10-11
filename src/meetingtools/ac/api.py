@@ -160,6 +160,8 @@ class ACPClient():
         return result.get_principal()
     
     def find_user(self,login):
+        if not login:
+            return None
         return self.find_principal("login", login, "user")
     
     def add_remove_member(self,principal_id,group_id,is_member):
