@@ -257,6 +257,7 @@ def _import_room(request,acc,r):
     if userlist.status_code() == 'ok':
         r['user_count'] = int(userlist.et.xpath("count(.//userdetails)"))
         r['host_count'] = int(userlist.et.xpath("count(.//userdetails/role[text() = 'host'])"))
+        modified = True
         
     #logging.debug(pformat(room))
     
@@ -279,6 +280,8 @@ def _import_room(request,acc,r):
     if modified:
         logging.debug("saving ... %s" % pformat(room))
         room.save()
+    
+    room.save()
     
     return room
 
