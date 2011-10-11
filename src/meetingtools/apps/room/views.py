@@ -247,6 +247,8 @@ def _import_room(request,acc,r):
     if not room:
         return None
     
+    logging.debug(room.lastupdate())
+    logging.debug(room.lastupdate() - time.time())
     if abs(room.lastupdate() - time.time()) < IMPORT_TTL:
         return room
         
