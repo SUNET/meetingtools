@@ -11,7 +11,7 @@ def ac_api_client_cache(request,acc):
 def ac_api_client_nocache(request,acc):
     return ACPClientWrapper(acc)
 
-ac_api_client = ac_api_client_nocache
+ac_api_client = ac_api_client_cache
 
 def ac_api(request,acc):
     return ACPClient(acc.api_url,acc.user,acc.password)
