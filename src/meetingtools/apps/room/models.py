@@ -49,7 +49,7 @@ class Room(models.Model):
         if not self.lastupdated:
             return 0
         else:
-            return int(time.mktime(self.lastupdated.timetuple())*1000)
+            return int(time.mktime(self.lastupdated.timetuple()))
         
     def go_url(self):
         return "%s/go/%s" % (BASE_URL,self.urlpath)
