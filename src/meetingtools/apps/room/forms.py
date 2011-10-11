@@ -27,7 +27,7 @@ class PrefixTextInput(TextInput):
 class ModifyRoomForm(ModelForm):
     class Meta:
         model = Room
-        fields = ['name','description','source_sco_id','self_cleaning']
+        fields = ['name','description','source_sco_id','self_cleaning','allow_host']
         widgets = {'source_sco_id': Select(),
                    'name': TextInput(attrs={'size': '40'})}
         
