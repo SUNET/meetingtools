@@ -30,7 +30,7 @@ jQuery.fn.meetingtools = function(options) {
 				html += "</li>";
 			});
 			html += "</ul>";
-			div.append(html);
+			div.html(html);
 		});
 		
 		
