@@ -15,7 +15,7 @@ jQuery.fn.meetingtools = function(options) {
 	this.each(function() {
 		var tags = options.tags;
 		var url = options.url;
-		var url = options.url+'/room/+'+tags+'.json';
+		var url = options.url+'/room/+'+tags+'.json?callback=?';
 		var div = $(this);
 		$.getJSON(url,function(data) {
 			div.html("<ul class=\"meeting-list\">");
