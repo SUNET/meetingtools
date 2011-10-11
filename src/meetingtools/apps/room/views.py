@@ -26,7 +26,7 @@ from meetingtools.ac.api import ACPClient
 from tagging.models import Tag, TaggedItem
 import random, string
 from django.utils.feedgenerator import rfc3339_date
-from django.views.decorators.cache import cache_control
+from django.views.decorators.cache import cache_control, never_cache
 
 def _acc_for_user(user):
     (local,domain) = user.username.split('@')
@@ -187,8 +187,8 @@ def _update_room(request, room, form=None):
 
     return room
 
+@never_cache
 @login_required
-@cache_control(no_cache=True)
 def create(request):
     acc = _acc_for_user(request.user)
     my_meetings_sco_id = _user_meeting_folder(request,acc)
@@ -212,8 +212,8 @@ def create(request):
         
     return respond_to(request,{'text/html':'apps/room/create.html'},{'form':form,'formtitle': title,'cancelname':'Cancel','submitname':'%s Room' % what})
 
+@never_cache
 @login_required
-@cache_control(no_cache=True)
 def update(request,id):
     room = get_object_or_404(Room,pk=id)
     acc = room.acc
