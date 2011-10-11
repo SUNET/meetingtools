@@ -5,7 +5,7 @@ Created on Feb 3, 2011
 '''
 
 from django.db import models
-from django.db.models.fields import CharField, URLField, TextField
+from django.db.models.fields import CharField, URLField, TextField, IntegerField
 
 class ACCluster(models.Model):
     api_url = URLField()
@@ -13,6 +13,7 @@ class ACCluster(models.Model):
     user = CharField(max_length=128)
     password = CharField(max_length=128)
     name = CharField(max_length=128,blank=True,unique=True)
+    default_template_sco_id = IntegerField(blank=True,unique=True)
     domain_match = TextField()
     
     def __unicode__(self):

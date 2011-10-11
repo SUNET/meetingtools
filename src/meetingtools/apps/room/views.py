@@ -190,7 +190,10 @@ def _update_room(request, room, form=None):
 def create(request):
     acc = _acc_for_user(request.user)
     my_meetings_sco_id = _user_meeting_folder(request,acc)
-    room = Room(creator=request.user,acc=acc,folder_sco_id=my_meetings_sco_id,source_sco_id=DEFAULT_TEMPLATE_SCO)
+    template_sco_id = acc.default_template_sco_id
+    if not template_sco_id:
+        template_sco_id = DEFAULT_TEMPLATE_SCO
+    room = Room(creator=request.user,acc=acc,folder_sco_id=my_meetings_sco_id,source_sco_id=template_sco_id)
     what = "Create"
     title = "Create a new room"
     
@@ -312,7 +315,7 @@ def delete(request,id):
 
 def _clean(request,room):
     api = ac_api_client(request, room.acc)
-    api.request('sco-delete',{'sco-id':room.sco_id},raise_error=True)
+    api.request('sco-delete',{'sco-id':room.sco_id},raise_error=False)
     room.sco_id = None
     return _update_room(request, room)
 
