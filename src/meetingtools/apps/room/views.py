@@ -442,7 +442,8 @@ def untag(request,rid,tag):
     Tag.objects.update_tags(room, ' '.join(new_tags))
     return redirect_to("/room/%d/tag" % room.id) 
     
-@login_required    
+@never_cache
+@login_required  
 def tag(request,rid):
     room = get_object_or_404(Room,pk=rid)
     if request.method == 'POST':
