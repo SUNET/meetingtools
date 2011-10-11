@@ -34,8 +34,15 @@ def make_response_dict(request,d={}):
 
     return d
 
-def json_response(data):
-    r = HttpResponse(simplejson.dumps(data),content_type='application/json')
+def json_response(data,request=None):
+    response_data = None
+    if request and request.GET.has_key('callback'):
+        callback = request.GET['callback']
+        json = simplejson.dumps(data)
+        response_data = "%s(%s)" % (callback, json)
+    else:
+        response_data = simplejson.dumps(data)
+    r = HttpResponse(response_data,content_type='application/json')
     r['Cache-Control'] = 'no-cache, must-revalidate'
     r['Pragma'] = 'no-cache'
     

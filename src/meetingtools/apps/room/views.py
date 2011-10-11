@@ -412,7 +412,7 @@ def list_by_tag(request,tn):
     title = 'Rooms tagged with %s' % " and ".join(tags)
     return respond_to(request,
                       {'text/html':'apps/room/list.html',
-                       'application/json': json_response([_room2dict(room) for room in rooms])},
+                       'application/json': json_response([_room2dict(room) for room in rooms],request)},
                       {'title':title,
                        'description':title ,
                        'edit':False,
