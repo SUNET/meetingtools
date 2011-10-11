@@ -25,7 +25,8 @@ jQuery.fn.meetingtools = function(options) {
 				html += "<div class=\"meeting-participants\">" 
 				html += "There are currently " + room['user_count'] + " participant(s) and " + room['host_count'] + " host(s) in the room.";
 				html += "</div>";
-				html += "<div class=\"meeting-url\"><a href=\"" + room['url'] + "\">" + room['url'] + "</a></div>";
+				html += "<div class=\"meeting-button\"><a title=\"Enter "+room['name']+"\" href=\"" + room['url'] + "\">Enter " + room['name'] + "</a></div>";
+				html += "<div class=\"meeting-url\">" + room['url'] + "</a></div>";
 				html += "</div>";
 				html += "</li>";
 			});
