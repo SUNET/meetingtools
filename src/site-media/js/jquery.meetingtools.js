@@ -7,7 +7,7 @@ jQuery.fn.meetingtools = function(options) {
 	
 	var defaults = { 
 		    onAdd:      function() {},
-		    onChange:   function() {},
+		    onUpdate:   function() {},
 		    url:        'http://localhost:8000'
     }; 
 	var options = $.extend({}, defaults, options); 
