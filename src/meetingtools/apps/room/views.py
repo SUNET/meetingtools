@@ -156,7 +156,7 @@ def _update_room(request, room, form=None):
     room.sco_id = sco_id
     room.save()
     
-    user_principal = api.find_user(request.user.username)
+    user_principal = api.find_user(room.creator.username)
     #api.request('permissions-reset',{'acl-id': sco_id},True)
     api.request('permissions-update',{'acl-id': sco_id,'principal-id': user_principal.get('principal-id'),'permission-id':'host'},True) # owner is always host
     
