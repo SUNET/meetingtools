@@ -28,7 +28,7 @@ class XsSharing(object):
             response = http.HttpResponse()
             response['Access-Control-Allow-Origin']  = XS_SHARING_ALLOWED_ORIGINS 
             response['Access-Control-Allow-Methods'] = ",".join( XS_SHARING_ALLOWED_METHODS ) 
-            
+            response['P3P'] = "CP=IDC DSP COR ADM DEVi TAIi PSA PSD IVAi IVDi CONi HIS OUR IND CNT"
             return response
 
         return None
@@ -40,5 +40,5 @@ class XsSharing(object):
 
         response['Access-Control-Allow-Origin']  = XS_SHARING_ALLOWED_ORIGINS 
         response['Access-Control-Allow-Methods'] = ",".join( XS_SHARING_ALLOWED_METHODS )
-
+        response['P3P'] = "CP=IDC DSP COR ADM DEVi TAIi PSA PSD IVAi IVDi CONi HIS OUR IND CNT"
         return response
