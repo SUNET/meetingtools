@@ -366,7 +366,7 @@ def _goto(request,room,clean=True,promote=False):
             if (room.user_count == 0) and (abs(lastvisit - now) > GRACE):        
                 room = _clean(request,room)
                 
-            if room.host_count == 0:
+            if room.host_count == 0 and room.allow_host:
                 return respond_to(request, {"text/html": "apps/room/launch.html"}, {'room': room})
     else:
         room.save()

@@ -22,6 +22,7 @@ class Room(models.Model):
     urlpath = CharField(verbose_name="Custom URL",max_length=128,unique=True)
     acc =  ForeignKey(ACCluster,verbose_name="Adobe Connect Cluster",editable=False)
     self_cleaning = BooleanField(verbose_name="Clean-up when empty?")
+    allow_host = BooleanField(verbose_name="Allow first participant to become host?",default=True)
     sco_id = IntegerField(verbose_name="Adobe Connect Room")
     source_sco_id = IntegerField(verbose_name="Template",blank=True,null=True)
     folder_sco_id = IntegerField(verbose_name="Adobe Connect Room Folder",editable=False)
