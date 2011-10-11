@@ -5,18 +5,23 @@
 
 jQuery.fn.meetingtools = function(options) {
 	
+	var defaults = { 
+		    onAdd:      function() {},
+		    onChange:   function() {},
+		    url:        'http://localhost:8000';
+    }; 
+	var options = $.extend({}, defaults, options); 
+	
 	this.each(function() {
 		var tags = options.tags;
 		var url = options.url;
-		if (!url) {
-			url = 'http://localhost:8000';
-		}
-		var url = url+'/room/+'+tags+'.json';
+		var url = options.url+'/room/+'+tags+'.json';
 		var div = $(this);
+		div.html(''); // stop any spinners;
 		$.getJSON(url,function(data) {
-			html = "<ul class=\"meeting-list\">";
+			div.append("<ul class=\"meeting-list\">");
 			$.each(data,function(i,room) {
-				html += "<li class=\"meeting\"><h4>"+room['name']+"</h4><div class=\"meeting-info\">";
+				var html += "<li class=\"meeting\"><h4>"+room['name']+"</h4><div class=\"meeting-info\">";
 				if (room['description']) {
 					html += "<div class=\"meeting-description\">";
 					html += room['description'];
@@ -29,9 +34,11 @@ jQuery.fn.meetingtools = function(options) {
 				html += "<div class=\"meeting-url\">" + room['url'] + "</a></div>";
 				html += "</div>";
 				html += "</li>";
+				div.append(html);
+				options.onAdd();
 			});
-			html += "</ul>";
-			div.html(html);
+			div.append("</ul>");
+			options.onUpdate();
 		});
 		
 		
