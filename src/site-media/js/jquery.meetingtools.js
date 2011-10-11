@@ -17,9 +17,9 @@ jQuery.fn.meetingtools = function(options) {
 		var url = options.url;
 		var url = options.url+'/room/+'+tags+'.json';
 		var div = $(this);
-		div.html(''); // stop any spinners;
 		$.getJSON(url,function(data) {
-			div.append("<ul class=\"meeting-list\">");
+			div.html("<ul class=\"meeting-list\">");
+			ul = div.find('ul.meeting-list');
 			$.each(data,function(i,room) {
 				var html = "<li class=\"meeting\"><h4>"+room['name']+"</h4><div class=\"meeting-info\">";
 				if (room['description']) {
@@ -34,10 +34,9 @@ jQuery.fn.meetingtools = function(options) {
 				html += "<div class=\"meeting-url\">" + room['url'] + "</a></div>";
 				html += "</div>";
 				html += "</li>";
-				div.append(html);
+				ul.append(html);
 				options.onAdd();
 			});
-			div.append("</ul>");
 			options.onUpdate();
 		});
 		
