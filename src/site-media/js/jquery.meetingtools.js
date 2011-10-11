@@ -21,7 +21,7 @@ jQuery.fn.meetingtools = function(options) {
 		$.getJSON(url,function(data) {
 			div.append("<ul class=\"meeting-list\">");
 			$.each(data,function(i,room) {
-				var html += "<li class=\"meeting\"><h4>"+room['name']+"</h4><div class=\"meeting-info\">";
+				var html = "<li class=\"meeting\"><h4>"+room['name']+"</h4><div class=\"meeting-info\">";
 				if (room['description']) {
 					html += "<div class=\"meeting-description\">";
 					html += room['description'];
