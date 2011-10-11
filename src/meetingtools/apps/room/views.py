@@ -17,7 +17,8 @@ import logging
 from pprint import pformat
 from meetingtools.utils import session
 import time
-from meetingtools.settings import GRACE, BASE_URL, DEFAULT_TEMPLATE_SCO
+from meetingtools.settings import GRACE, BASE_URL, DEFAULT_TEMPLATE_SCO,\
+    IMPORT_TTL
 from django.utils.datetime_safe import datetime
 from django.http import HttpResponseRedirect
 from django.core.exceptions import ObjectDoesNotExist
@@ -245,6 +246,9 @@ def _import_room(request,acc,r):
         
     if not room:
         return None
+    
+    if abs(room.lastupdated - time.time()) < IMPORT_TTL:
+        return room
         
     api = ac_api_client(request,acc)
     userlist = api.request('meeting-usermanager-user-list',{'sco-id': room.sco_id},False)
