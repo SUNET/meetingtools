@@ -291,7 +291,7 @@ def user_rooms(request):
         r['folder_sco_id'] = my_meetings_sco_id
         room = _import_room(request,acc,r)
         
-    rooms = Room.objects.filter(creator=request.user).all()
+    rooms = Room.objects.filter(creator=request.user).order_by('name').all()
     return respond_to(request,
                       {'text/html':'apps/room/list.html'},
                       {'title':'Your Rooms','edit':True,'active':len(rooms) == 1,'rooms':rooms})
@@ -403,7 +403,7 @@ def _room2dict(room):
 # should not require login
 def list_by_tag(request,tn):
     tags = tn.split('+')
-    rooms = TaggedItem.objects.get_by_model(Room, tags).all()
+    rooms = TaggedItem.objects.get_by_model(Room, tags).order_by('name').all()
     for room in rooms:
         _import_room(request,room.acc,{'sco_id': room.sco_id})
     title = 'Rooms tagged with %s' % " and ".join(tags)
