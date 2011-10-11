@@ -18,7 +18,7 @@ from tagging.models import Tag
 
 class Room(models.Model):
     creator = ForeignKey(User,editable=False)
-    name = CharField(max_length=128,unique=True)
+    name = CharField(max_length=128) 
     urlpath = CharField(verbose_name="Custom URL",max_length=128,unique=True)
     acc =  ForeignKey(ACCluster,verbose_name="Adobe Connect Cluster",editable=False)
     self_cleaning = BooleanField(verbose_name="Clean-up when empty?")
@@ -34,7 +34,7 @@ class Room(models.Model):
     lastvisited = models.DateTimeField(blank=True,null=True)
     
     class Meta:
-        unique_together = ('acc','sco_id')
+        unique_together = (('acc','sco_id'),('name','folder_sco_id'))
     
     def __unicode__(self):
         return "%s (sco_id=%s,source_sco_id=%s,folder_sco_id=%s,urlpath=%s)" % (self.name,self.sco_id,self.source_sco_id,self.folder_sco_id,self.urlpath)

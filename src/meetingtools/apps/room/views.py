@@ -236,8 +236,15 @@ def update(request,id):
 def _import_room(request,acc,r):
     modified = False
     room = None
+    
+    if not r.has_key('name'):
+        return
+    
     try:
         room = Room.objects.get(sco_id=r['sco_id'],acc=acc)
+        if not room.name:
+            room.delete()
+            return
     except ObjectDoesNotExist:
         if r['folder_sco_id']:
             room = Room.objects.create(sco_id=r['sco_id'],acc=acc,creator=request.user,folder_sco_id=r['folder_sco_id'])
