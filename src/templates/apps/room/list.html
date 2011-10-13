@@ -48,10 +48,10 @@
 		   	  	 <li class="button"><a href="{% prefix %}/room/{{r.id}}/tag">Room Tags</a></li>
 		   	  	 <li class="button"><a href="{% prefix %}/room/{{r.id}}/recordings">Room Recordings</a></li>
 		   	     <li class="button"><a href="{% prefix %}/room/{{r.id}}/modify">Modify Room</a></li>
-		   	     <li class="button"><a href="{% prefix %}/room/{{r.id}}/unlock">Unlock Room</a></li> 
 		   	     {% if room.is_locked %}
-		   	     <li class="button"><a href="{% prefix %}/room/{{r.id}}/delete">Delete Room</a></li> 
-		   	  	 {% endif %}
+				 <li class="button"><a href="{% prefix %}/room/{{r.id}}/unlock">Unlock Room</a></li>
+		   	     {% endif %}
+		   	     <li class="button"><a href="{% prefix %}/room/{{r.id}}/delete">Delete Room</a></li>
 		   	  	 {% endif %}
 		   	  </ul>
 		   </div>
