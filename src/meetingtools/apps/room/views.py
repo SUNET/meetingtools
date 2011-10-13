@@ -314,6 +314,12 @@ def user_rooms(request):
                       {'title':'Your Rooms','edit':True,'active':len(rooms) == 1,'rooms':rooms})
 
 @login_required
+def unlock(request,id):
+    room = get_object_or_404(Room,pk=id)
+    room.unlock()
+    return redirect_to("/rooms#%d" % room.id)
+
+@login_required
 def delete(request,id):
     room = get_object_or_404(Room,pk=id)
     if request.method == 'POST':
