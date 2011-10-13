@@ -1,0 +1,13 @@
+{% load prefix %}
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<meta HTTP-EQUIV="REFRESH" content="{{wait}}; url={% prefix %}/go/{{room.urlpath}}"/>
+</head>
+<body>
+<h1>Room is temporarily locked</h1>
+<p>Retrying room in {{wait}} seconds...</p>
+<img src="{% prefix %}/site-media/img/ajax-loader.gif"/>
+</body>
+</html>

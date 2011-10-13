@@ -12,9 +12,28 @@ from django.contrib.auth.models import User
 from meetingtools.apps.cluster.models import ACCluster
 import time
 import tagging
-from meetingtools.settings import BASE_URL
+from meetingtools.settings import BASE_URL, LOCK_DIR
 from django.db.models.signals import post_save
 from tagging.models import Tag
+import os
+
+class FileLock(object):
+    
+    def __init__(self,obj):
+        self.obj = obj
+    
+    def __get__(self):
+        return os.access(LOCK_DIR+os.sep+self.obj.__class__+"_"+self.obj.id+".lock",os.F_OK)
+    def __set__(self,value):
+        if not isinstance(value,bool):
+            raise AttributeError
+        if value:
+            f = open(LOCK_DIR+os.sep+self.obj.__class__+"_"+self.obj.id+".lock")
+            f.close()
+        else:
+            os.remove(LOCK_DIR+os.sep+self.obj.__class__+"_"+self.obj.id+".lock")
+    def __delete__(self):
+        raise AttributeError
 
 class Room(models.Model):
     creator = ForeignKey(User,editable=False)
@@ -38,6 +57,19 @@ class Room(models.Model):
     
     def __unicode__(self):
         return "%s (sco_id=%s,source_sco_id=%s,folder_sco_id=%s,urlpath=%s)" % (self.name,self.sco_id,self.source_sco_id,self.folder_sco_id,self.urlpath)
+    
+    def _lockf(self):
+        return LOCK_DIR+os.sep+"room-"+self.id+".lock"
+    
+    def lock(self):
+        f = open(self._lockf())
+        f.close()
+        
+    def unlock(self):
+        os.remove(self._lockf())
+        
+    def is_locked(self):
+        os.access(self._lockf(),os.F_OK)
     
     def lastvisit(self):
         if not self.lastvisited:

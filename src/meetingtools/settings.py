@@ -16,6 +16,8 @@ PREFIX_URL = ""
 BASE_URL = "http://localhost:8000%s" % PREFIX_URL
 MANAGERS = ADMINS
 
+LOCK_DIR = "/var/lock"
+
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3', # Add 'postgresql_psycopg2', 'postgresql', 'mysql', 'sqlite3' or 'oracle'.

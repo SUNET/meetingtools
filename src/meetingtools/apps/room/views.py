@@ -362,6 +362,9 @@ def _random_key(length=20):
     return str().join(rg.choice(alphabet) for _ in range(length))
 
 def _goto(request,room,clean=True,promote=False):
+    if room.is_locked():
+        return respond_to(request, {"text/html": "apps/room/retry.html"}, {'room': room, 'wait': 10})
+    
     api = ac_api_client(request, room.acc)
     now = time.time()
     lastvisit = room.lastvisit()
@@ -381,10 +384,12 @@ def _goto(request,room,clean=True,promote=False):
         room.save()
         if room.self_cleaning:
             if (room.user_count == 0) and (abs(lastvisit - now) > GRACE):        
+                room.lock()
                 room = _clean(request,room)
+                room.unlock()
                 
-            if room.host_count == 0 and room.allow_host:
-                return respond_to(request, {"text/html": "apps/room/launch.html"}, {'room': room})
+        if room.host_count == 0 and room.allow_host:
+            return respond_to(request, {"text/html": "apps/room/launch.html"}, {'room': room})
     else:
         room.save()
     
@@ -401,10 +406,12 @@ def _goto(request,room,clean=True,promote=False):
     r = api.request('sco-info',{'sco-id':room.sco_id},True)
     urlpath = r.et.findtext('.//sco/url-path')
     if key:
-        user_client = ACPClient(room.acc.api_url, request.user.username, key, cache=False)
-        return user_client.redirect_to(room.acc.url+urlpath)
-    else:
-        return HttpResponseRedirect(room.acc.url+urlpath)
+        try:
+            user_client = ACPClient(room.acc.api_url, request.user.username, key, cache=False)
+            return user_client.redirect_to(room.acc.url+urlpath)
+        except Exception,e:
+            pass
+    return HttpResponseRedirect(room.acc.url+urlpath)
     
 ## Tagging
 
