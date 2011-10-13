@@ -377,21 +377,23 @@ def _goto(request,room,clean=True,promote=False):
     room.lastvisited = datetime.now()
     
     if clean:
-        userlist = api.request('meeting-usermanager-user-list',{'sco-id': room.sco_id},False)
-        room.user_count = 0
-        room.host_count = 0
+        room.user_count = None
+        room.host_count = None
+        userlist = api.request('meeting-usermanager-user-list',{'sco-id': room.sco_id},True)
         if userlist.status_code() == 'ok':
             room.user_count = int(userlist.et.xpath("count(.//userdetails)"))
             room.host_count = int(userlist.et.xpath("count(.//userdetails/role[text() = 'host'])"))
         
-        #session_info = api.request('report-meeting-sessions',{'sco-id':room.sco_id})
-        #room.user_count = _nusers(session_info)
         logging.debug("---------- nusers: %s" % room.user_count)
         room.save()
-        if room.self_cleaning:
+        if room.self_cleaning and userlist.status_code() == 'ok': # don't clean the room unless you get a good status code
             if (room.user_count == 0) and (abs(lastvisit - now) > GRACE):        
-                room.lock()
-                room = _clean(request,room)
+                room.lock("Locked for cleaning")
+                try:
+                    room = _clean(request,room)
+                except Exception,e:
+                    room.unlock()
+                    raise e
                 room.unlock()
                 
         if room.host_count == 0 and room.allow_host:
