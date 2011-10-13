@@ -1,7 +1,7 @@
 .meeting-list li { list-style: none; display: block; }
-.meeting { border: 1px solid #CECECE; width: 420px; padding: 2px 5px; margin: 2px 5px;}
-.meeting h4 { margin: 5px 0;}
-.meeting-description { border-bottom: 1px solid #CECECE; padding-bottom: 10px; }
+.meeting { width: 420px; padding: 2px 5px; margin: 2px 5px;}
+.meeting h4 { margin: 5px 0; }
+.meeting-description {  padding-bottom: 10px; }
 .meeting-participants { font-size: 80%; }
 .meeting-url { font-size: 80%; }
-.meeting-info { background-color: #ECECEC; padding: 2px 5px; }
+.meeting-info { padding: 2px 5px; }
