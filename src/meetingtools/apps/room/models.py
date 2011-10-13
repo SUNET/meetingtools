@@ -61,8 +61,10 @@ class Room(models.Model):
     def _lockf(self):
         return "%s%sroom-%d.lock" % (LOCK_DIR,os.sep,+self.id)
     
-    def lock(self):
-        f = open(self._lockf())
+    def lock(self,msg=None):
+        f = open(self._lockf(),'w')
+        if msg:
+            f.write(msg)
         f.close()
         
     def unlock(self):
