@@ -379,7 +379,7 @@ def _goto(request,room,clean=True,promote=False):
     if clean:
         room.user_count = None
         room.host_count = None
-        userlist = api.request('meeting-usermanager-user-list',{'sco-id': room.sco_id},True)
+        userlist = api.request('meeting-usermanager-user-list',{'sco-id': room.sco_id},False)
         if userlist.status_code() == 'ok':
             room.user_count = int(userlist.et.xpath("count(.//userdetails)"))
             room.host_count = int(userlist.et.xpath("count(.//userdetails/role[text() = 'host'])"))
