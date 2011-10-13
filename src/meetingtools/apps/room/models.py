@@ -59,7 +59,7 @@ class Room(models.Model):
         return "%s (sco_id=%s,source_sco_id=%s,folder_sco_id=%s,urlpath=%s)" % (self.name,self.sco_id,self.source_sco_id,self.folder_sco_id,self.urlpath)
     
     def _lockf(self):
-        return LOCK_DIR+os.sep+"room-"+self.id+".lock"
+        return "%s%sroom-%d.lock" % (LOCK_DIR,os.sep,+self.id)
     
     def lock(self):
         f = open(self._lockf())
