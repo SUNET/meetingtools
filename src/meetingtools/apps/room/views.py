@@ -265,7 +265,9 @@ def _import_room(request,acc,r):
         r['host_count'] = int(userlist.et.xpath("count(.//userdetails/role[text() = 'host'])"))
         modified = True
         
-    #logging.debug(pformat(room))
+    logging.debug("----------")
+    logging.debug(pformat(room))
+    logging.debug(pformat(r))
     
     if r.has_key('urlpath'):
         r['urlpath'] = r['urlpath'].strip('/')
@@ -277,8 +279,6 @@ def _import_room(request,acc,r):
                 setattr(room,key,r[key])
                 modified = True
     
-    #logging.debug(pformat(room))
-        
     if not room.name:
         room.delete()
         return None
