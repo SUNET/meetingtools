@@ -238,7 +238,7 @@ def _import_room(request,acc,r):
     modified = False
     room = None
     
-    if abs(room.lastupdate() - time.time()) < IMPORT_TTL:
+    if room and (abs(room.lastupdate() - time.time()) < IMPORT_TTL):
         return room
     
     if r.has_key('urlpath'):
