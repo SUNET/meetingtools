@@ -238,62 +238,48 @@ def _import_room(request,acc,r):
     modified = False
     room = None
     
-    try:
-        room = Room.objects.get(sco_id=r['sco_id'],acc=acc)
-    except ObjectDoesNotExist:
-        if r['folder_sco_id']:
-            try:
-                room = Room.objects.create(sco_id=r['sco_id'],acc=acc,creator=request.user,folder_sco_id=r['folder_sco_id'])
-            except Exception,e:
-                room = None
-                pass
-            
-    logging.debug("+++ after object create")
-    logging.debug(room)
-    if not room:
-        return None
-    
-    logging.debug("+++ room timers")
-    logging.debug(room.lastupdate())
-    logging.debug(room.lastupdate() - time.time())
-    if abs(room.lastupdate() - time.time()) < IMPORT_TTL:
-        return room
-    
-    logging.debug("+++ looking at user counts")
-    api = ac_api_client(request,acc)
-    userlist = api.request('meeting-usermanager-user-list',{'sco-id': room.sco_id},False)
-    r['user_count'] = 0
-    r['host_count'] = 0
-    if userlist.status_code() == 'ok':
-        r['user_count'] = int(userlist.et.xpath("count(.//userdetails)"))
-        r['host_count'] = int(userlist.et.xpath("count(.//userdetails/role[text() = 'host'])"))
-        modified = True
-        
-    logging.debug("+++ room before merge")
-    logging.debug(pformat(room))
-    logging.debug(pformat(r))
+    #if abs(room.lastupdate() - time.time()) < IMPORT_TTL:
+    #    return room
     
     if r.has_key('urlpath'):
         r['urlpath'] = r['urlpath'].strip('/')
     
-    for key in ('sco_id','name','source_sco_id','urlpath','description','user_count','host_count'):
-        if r.has_key(key) and hasattr(room,key):
-            rv = getattr(room,key)
-            if rv != r[key] and r[key] != None and r[key]:
-                setattr(room,key,r[key])
-                modified = True
-    
-    logging.debug("+++ room after merge")
-    logging.debug(pformat(room))
-    
-    if not room.name:
-        room.delete()
-        return None
+    try:
+        room = Room.objects.get(sco_id=r['sco_id'],acc=acc)
+        for key in ('sco_id','name','source_sco_id','urlpath','description','user_count','host_count'):
+            if r.has_key(key) and hasattr(room,key):
+                rv = getattr(room,key)
+                if rv != r[key] and r[key] != None and r[key]:
+                    setattr(room,key,r[key])
+                    modified = True
         
-    if modified:
-        logging.debug("+++ saving room ... %s" % pformat(room))
+        if modified:
+            logging.debug("+++ saving room ... %s" % pformat(room))
+            room.save()
+        
+    except ObjectDoesNotExist:
+        if r['folder_sco_id']:
+            try:
+                room = Room.objects.create(sco_id=r['sco_id'],
+                                           source_sco_id=r['source_sco_id'],
+                                           acc=acc,
+                                           name=r['name'],
+                                           urlpath=r['urlpath'],
+                                           description=r['description'],
+                                           creator=request.user,
+                                           folder_sco_id=r['folder_sco_id'])
+            except Exception,e:
+                room = None
+                pass
+            
+    logging.debug("+++ looking at user counts")
+    api = ac_api_client(request,acc)
+    userlist = api.request('meeting-usermanager-user-list',{'sco-id': room.sco_id},False)
+    if userlist.status_code() == 'ok':
+        room.user_count = int(userlist.et.xpath("count(.//userdetails)"))
+        room.host_count = int(userlist.et.xpath("count(.//userdetails/role[text() = 'host'])"))
         room.save()
-    
+        
     return room
 
 @login_required
