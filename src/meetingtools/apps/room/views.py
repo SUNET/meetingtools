@@ -242,8 +242,12 @@ def _import_room(request,acc,r):
         room = Room.objects.get(sco_id=r['sco_id'],acc=acc)
     except ObjectDoesNotExist:
         if r['folder_sco_id']:
-            room = Room.objects.create(sco_id=r['sco_id'],acc=acc,creator=request.user,folder_sco_id=r['folder_sco_id'])
-        
+            try:
+                room = Room.objects.create(sco_id=r['sco_id'],acc=acc,creator=request.user,folder_sco_id=r['folder_sco_id'])
+            except Exception,e:
+                room = None
+                pass
+            
     if not room:
         return None
     
