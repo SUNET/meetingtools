@@ -273,7 +273,7 @@ def _import_room(request,acc,r):
     for key in ('sco_id','name','source_sco_id','urlpath','description','user_count','host_count'):
         if r.has_key(key) and hasattr(room,key):
             rv = getattr(room,key)
-            if rv != r[key] and r[key] != None and r[key] != '':
+            if rv != r[key] and r[key] != None and r[key]:
                 setattr(room,key,r[key])
                 modified = True
     
@@ -286,8 +286,6 @@ def _import_room(request,acc,r):
     if modified:
         logging.debug("saving ... %s" % pformat(room))
         room.save()
-    
-    room.save()
     
     return room
 
