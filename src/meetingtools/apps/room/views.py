@@ -248,14 +248,18 @@ def _import_room(request,acc,r):
                 room = None
                 pass
             
+    logging.debug("+++ after object create")
+    logging.debug(room)
     if not room:
         return None
     
+    logging.debug("+++ room timers")
     logging.debug(room.lastupdate())
     logging.debug(room.lastupdate() - time.time())
     if abs(room.lastupdate() - time.time()) < IMPORT_TTL:
         return room
-        
+    
+    logging.debug("+++ looking at user counts")
     api = ac_api_client(request,acc)
     userlist = api.request('meeting-usermanager-user-list',{'sco-id': room.sco_id},False)
     r['user_count'] = 0
@@ -265,7 +269,7 @@ def _import_room(request,acc,r):
         r['host_count'] = int(userlist.et.xpath("count(.//userdetails/role[text() = 'host'])"))
         modified = True
         
-    logging.debug("----------")
+    logging.debug("+++ room before merge")
     logging.debug(pformat(room))
     logging.debug(pformat(r))
     
@@ -279,12 +283,15 @@ def _import_room(request,acc,r):
                 setattr(room,key,r[key])
                 modified = True
     
+    logging.debug("+++ room after merge")
+    logging.debug(pformat(room))
+    
     if not room.name:
         room.delete()
         return None
         
     if modified:
-        logging.debug("saving ... %s" % pformat(room))
+        logging.debug("+++ saving room ... %s" % pformat(room))
         room.save()
     
     return room
