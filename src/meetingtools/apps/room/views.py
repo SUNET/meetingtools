@@ -272,6 +272,9 @@ def _import_room(request,acc,r):
                 room = None
                 pass
             
+    if not room:
+        return None
+            
     logging.debug("+++ looking at user counts")
     api = ac_api_client(request,acc)
     userlist = api.request('meeting-usermanager-user-list',{'sco-id': room.sco_id},False)
@@ -442,7 +445,7 @@ def list_by_tag(request,tn):
                        'edit':False,
                        'active':len(rooms) == 1,
                        'baseurl': BASE_URL,
-                       'tags': tn,
+                       'tagstring': tn,
                        'rooms':rooms})
     
 def widget(request,tags=None):
@@ -482,9 +485,11 @@ def tag(request,rid):
     else:
         form = TagRoomForm()
     
+    tags = Tag.objects.get_for_object(room)
+    tn = "+".join([t.name for t in tags])
     return respond_to(request, 
                       {'text/html': "apps/room/tag.html"}, 
-                      {'form': form,'formtitle': 'Add Tag','cancelname':'Done','submitname': 'Add Tag','room': room, 'tags': Tag.objects.get_for_object(room)})
+                      {'form': form,'formtitle': 'Add Tag','cancelname':'Done','submitname': 'Add Tag','room': room, 'tagstring': tn,'tags': tags})
 
 
 from time import mktime
