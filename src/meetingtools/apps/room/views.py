@@ -466,12 +466,13 @@ def tag(request,rid):
     if request.method == 'POST':
         form = TagRoomForm(request.POST)
         if form.is_valid():
-            tag = form.cleaned_data['tag']
-            ok,reason = _can_tag(request,tag)
-            if ok:
-                Tag.objects.add_tag(room, tag)
-            else:
-                form._errors['tag'] = form.error_class([u'%s ... please choose another tag!' % reason])
+            for tag in form.cleaned_data['tag'].split(','):
+                tag = tag.strip()
+                ok,reason = _can_tag(request,tag)
+                if ok:
+                    Tag.objects.add_tag(room, tag)
+                else:
+                    form._errors['tag'] = form.error_class([u'%s ... please choose another tag!' % reason])
     else:
         form = TagRoomForm()
     
