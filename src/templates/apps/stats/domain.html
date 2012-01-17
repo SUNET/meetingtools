@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% load datehumanize %}
+{% load prefix %}
+{% block widgets %}
+$.ajax({
+	url: '{% prefix %}/api/stats/domain/{{domain}}',
+	method: 'GET',
+	success: function (resp) {
+	    var graph = $('#graph');
+	    series = [{label: 'Meeting minutes for {{domain}}',data: resp['data']}];
+		$.plot(graph,series,{
+        	lines: { show: true },
+        	points: { show: true },
+        	xaxis: { mode: "time" }
+    	});
+    	$('#minutes').append(resp['minutes']);
+    	$('#rooms').append(resp['rooms']);
+	}
+});
+{% endblock %}
+{% block content %}
+<h1>Meeting statistics for {{domain}}</h1>
+<div id="graph" style="width:600px;height:300px; display: block; float: left; margin-right: 30px;"></div>
+<div>
+<h2>Summary</h2>
+<table>
+	<tr><td><b>Total minutes:</b></td><td id="minutes"></td></tr>
+	<tr><td><b>Total rooms:</b></td><td id="rooms"></td></tr>
+</table>
+<a href="/stats">Look at your own statistics</a>
+</div>
+{% endblock %}
