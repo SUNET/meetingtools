@@ -39,7 +39,7 @@
 		          {% if r.self_cleaning %}<li>&raquo;&nbsp;Room will be reset when empty.</li>{%else%}<li>&raquo;&nbsp;Room state is preserved between sessions.</li>{% endif %}
 		          {% if r.allow_host %}<li>&raquo;&nbsp;First participant can elect to become host.</li>{% endif %}
 		          {% if r.lastvisited %}<li>&raquo;&nbsp;Last visited {{r.lastvisited|datehumanize}}</li>{%endif%} 
-		  	      <li>&raquo;&nbsp;Hosted on {{r.acc.name}}</li>
+		  	      <li>&raquo;&nbsp;Hosted on {{r.acc.name}} <a href="{% prefix %}/stats/room/{{r.id}}">(usage statistics)</a></li>
 		  	   </ul>
 		   	  <br/>
 		   	  <ul class="ilist">

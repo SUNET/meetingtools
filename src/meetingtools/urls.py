@@ -42,9 +42,11 @@ urlpatterns = patterns('',
     # Uncomment the admin/doc line below to enable admin documentation:
     # (r'^admin/doc/', include('django.contrib.admindocs.urls')),
     (r'^api/stats/user/(.*)$','meetingtools.apps.stats.views.user_minutes_api'),
-    (r'^api/stats/domain/(.*)$','meetingtools.apps.stats.views.domain_minutes_api'),
+    (r'^api/stats/domain/(.+)$','meetingtools.apps.stats.views.domain_minutes_api'),
+    (r'^api/stats/room/(\d+)$','meetingtools.apps.stats.views.room_minutes_api'),
     (r'^stats$','meetingtools.apps.stats.views.user'),
-    (r'^stats/(.+)$','meetingtools.apps.stats.views.domain'),
+    (r'^stats/domain/(.+)$','meetingtools.apps.stats.views.domain'),
+    (r'^stats/room/(\d+)$','meetingtools.apps.stats.views.room'),
     # Uncomment the next line to enable the admin:
     (r'^admin/', include(admin.site.urls))
 )
