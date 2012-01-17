@@ -69,7 +69,7 @@ def join_group(group,**kwargs):
             
 def leave_group(group,**kwargs):
     user = kwargs['user']
-    acc = _acc_for_user(user)
+    acc = acc_for_user(user)
     connect_api = ac_api(acc)
     
     principal = connect_api.find_principal("login", user.username, "user")
@@ -122,7 +122,7 @@ def accounts_login_federated(request):
         #profile.lastupdated = datetime.datetime.now()    
         profile.save()
 
-        acc = _acc_for_user(request.user)
+        acc = acc_for_user(request.user)
         connect_api = ac_api_client(request, acc)
         # make sure the principal is created before shooting off 
         principal = connect_api.find_or_create_principal("login", request.user.username, "user", 
