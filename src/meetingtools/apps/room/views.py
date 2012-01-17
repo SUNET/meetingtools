@@ -466,7 +466,7 @@ def tag(request,rid):
     if request.method == 'POST':
         form = TagRoomForm(request.POST)
         if form.is_valid():
-            for tag in form.cleaned_data['tag'].split(','):
+            for tag in form.cleaned_data['tag'].split('[,\s]+'):
                 tag = tag.strip()
                 ok,reason = _can_tag(request,tag)
                 if ok:
