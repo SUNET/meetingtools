@@ -1,21 +1,25 @@
 from meetingtools.ac.api import ACPClient
 import time
+from meetingtools.apps.cluster.models import acc_for_user
 
-def ac_api_client_cache(request,acc):
+def ac_api_client_cache(request,acc=None):
+    if acc == None:
+        acc = acc_for_user(request.user)
     tag = 'ac_api_client_%s' % acc.name
     if not request.session.has_key(tag):
         request.session[tag] = ACPClientWrapper(acc)
         
     return request.session[tag]
 
-def ac_api_client_nocache(request,acc):
+def ac_api_client_nocache(request,acc=None):
+    if acc == None:
+        acc = acc_for_user(request.user)
     return ACPClientWrapper(acc)
 
 ac_api_client = ac_api_client_cache
 
-def ac_api(request,acc):
+def ac_api(request,acc=None):
     return ACPClient(acc.api_url,acc.user,acc.password)
-    
 
 MAXCALLS = 10    
 MAXIDLE = 10

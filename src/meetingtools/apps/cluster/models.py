@@ -6,6 +6,7 @@ Created on Feb 3, 2011
 
 from django.db import models
 from django.db.models.fields import CharField, URLField, TextField, IntegerField
+import re
 
 class ACCluster(models.Model):
     api_url = URLField()
@@ -21,3 +22,14 @@ class ACCluster(models.Model):
     
     def make_url(self,path=""):
         return "%s%s" % (self.url,path)
+    
+def acc_for_user(user):
+    (local,domain) = user.username.split('@')
+    if not domain:
+        #raise Exception,"Improperly formatted user: %s" % user.username
+        domain = "nordu.net" # testing with local accts only
+    for acc in ACCluster.objects.all():
+        for regex in acc.domain_match.split():
+            if re.match(regex,domain):
+                return acc
+    raise Exception,"I don't know which cluster you belong to... (%s)" % user.username

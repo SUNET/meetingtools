@@ -28,17 +28,7 @@ from tagging.models import Tag, TaggedItem
 import random, string
 from django.utils.feedgenerator import rfc3339_date
 from django.views.decorators.cache import cache_control, never_cache
-
-def _acc_for_user(user):
-    (local,domain) = user.username.split('@')
-    if not domain:
-        #raise Exception,"Improperly formatted user: %s" % user.username
-        domain = "nordu.net" # testing with local accts only
-    for acc in ACCluster.objects.all():
-        for regex in acc.domain_match.split():
-            if re.match(regex,domain):
-                return acc
-    raise Exception,"I don't know which cluster you belong to... (%s)" % user.username
+from meetingtools.apps.cluster.models import acc_for_user
 
 def _user_meeting_folder(request,acc):
     if not session(request,'my_meetings_sco_id'):
@@ -191,7 +181,7 @@ def _update_room(request, room, form=None):
 @never_cache
 @login_required
 def create(request):
-    acc = _acc_for_user(request.user)
+    acc = acc_for_user(request.user)
     my_meetings_sco_id = _user_meeting_folder(request,acc)
     template_sco_id = acc.default_template_sco_id
     if not template_sco_id:
@@ -287,7 +277,7 @@ def _import_room(request,acc,r):
 
 @login_required
 def user_rooms(request):
-    acc = _acc_for_user(request.user)
+    acc = acc_for_user(request.user)
     my_meetings_sco_id = _user_meeting_folder(request,acc)
     user_rooms = _user_rooms(request,acc,my_meetings_sco_id)
     

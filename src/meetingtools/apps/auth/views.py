@@ -10,12 +10,12 @@ from django.views.decorators.cache import never_cache
 import logging
 from meetingtools.apps.userprofile.models import UserProfile
 from meetingtools.multiresponse import redirect_to, make_response_dict
-from meetingtools.apps.room.views import _acc_for_user
 from meetingtools.ac import ac_api_client, ac_api
 from django.shortcuts import render_to_response
 from django.contrib import auth
 from django_co_connector.models import co_import_from_request, add_member,\
     remove_member
+from meetingtools.apps.cluster.models import acc_for_user
 
 def meta(request,attr):
     v = request.META.get(attr)
@@ -58,7 +58,7 @@ def login(request):
 
 def join_group(group,**kwargs):
     user = kwargs['user']
-    acc = _acc_for_user(user)
+    acc = acc_for_user(user)
     connect_api = ac_api(acc)    
     principal = connect_api.find_principal("login", user.username, "user")
     if principal:
