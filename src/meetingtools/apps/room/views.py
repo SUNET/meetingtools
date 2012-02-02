@@ -29,6 +29,7 @@ import random, string
 from django.utils.feedgenerator import rfc3339_date
 from django.views.decorators.cache import cache_control, never_cache
 from meetingtools.apps.cluster.models import acc_for_user
+from django.contrib.auth.models import User
 
 def _user_meeting_folder(request,acc):
     if not session(request,'my_meetings_sco_id'):
@@ -176,6 +177,8 @@ def _update_room(request, room, form=None):
         if principal_id:  
             api.request('permissions-update',{'acl-id': room.sco_id, 'principal-id': principal_id, 'permission-id': ace.permission},True)
 
+    room.deleted_sco_id = None # if we just cleaned a room we zero out the deleted_sco_id field to indicate the room is now ready for use
+    room.save() # a second save here to avoid races
     return room
 
 @never_cache
@@ -276,8 +279,28 @@ def _import_room(request,acc,r):
     return room
 
 @login_required
-def user_rooms(request):
-    acc = acc_for_user(request.user)
+def list_rooms(request,username=None):
+    user = request.user
+    if username:
+        try:
+            user = User.objects.get(username=username)
+        except ObjectDoesNotExist:
+            user = None
+            
+    rooms = []
+    if user:
+        rooms = Room.objects.filter(creator=user).order_by('name').all()
+    
+    return respond_to(request,
+                      {'text/html':'apps/room/list.html'},
+                      {'title':'Your Rooms','edit':True,'active':len(rooms) == 1,'rooms':rooms})
+
+@login_required
+def user_rooms(request,user=None):
+    if user is None:
+        user = request.user
+        
+    acc = acc_for_user(user)
     my_meetings_sco_id = _user_meeting_folder(request,acc)
     user_rooms = _user_rooms(request,acc,my_meetings_sco_id)
     
@@ -286,7 +309,7 @@ def user_rooms(request):
         logging.debug(pformat(r))
         ar.append(int(r['sco_id']))
     
-    for r in Room.objects.filter(creator=request.user).all():
+    for r in Room.objects.filter(creator=user).all():
         if (not r.sco_id in ar): # and (not r.self_cleaning): #XXX this logic isn't right!
             for t in Tag.objects.get_for_object(r):
                 t.delete()
@@ -296,7 +319,7 @@ def user_rooms(request):
         r['folder_sco_id'] = my_meetings_sco_id
         room = _import_room(request,acc,r)
         
-    rooms = Room.objects.filter(creator=request.user).order_by('name').all()
+    rooms = Room.objects.filter(creator=user).order_by('name').all()
     return respond_to(request,
                       {'text/html':'apps/room/list.html'},
                       {'title':'Your Rooms','edit':True,'active':len(rooms) == 1,'rooms':rooms})
@@ -326,6 +349,8 @@ def delete(request,id):
 
 def _clean(request,room):
     api = ac_api_client(request, room.acc)
+    room.deleted_sco_id = room.sco_id
+    room.save()
     api.request('sco-delete',{'sco-id':room.sco_id},raise_error=False)
     room.sco_id = None
     return _update_room(request, room)
@@ -422,6 +447,22 @@ def _room2dict(room):
 
 # should not require login
 def list_by_tag(request,tn):
+    tags = tn.split('+')
+    rooms = TaggedItem.objects.get_by_model(Room, tags).order_by('name').all()
+    title = 'Rooms tagged with %s' % " and ".join(tags)
+    return respond_to(request,
+                      {'text/html':'apps/room/list.html',
+                       'application/json': json_response([_room2dict(room) for room in rooms],request)},
+                      {'title':title,
+                       'description':title ,
+                       'edit':False,
+                       'active':len(rooms) == 1,
+                       'baseurl': BASE_URL,
+                       'tagstring': tn,
+                       'rooms':rooms})
+
+# should not require login
+def list_and_import_by_tag(request,tn):
     tags = tn.split('+')
     rooms = TaggedItem.objects.get_by_model(Room, tags).order_by('name').all()
     for room in rooms:
