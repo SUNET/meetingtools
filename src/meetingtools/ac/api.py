@@ -5,17 +5,15 @@ Created on Jan 31, 2011
 '''
 
 import httplib2
-from urllib import quote, urlencode, quote_plus
+from urllib import quote_plus
 import logging
 from pprint import pformat
 import os
 import tempfile
 from lxml import etree
-import pprint
 from meetingtools.site_logging import logger
 import lxml
 from django.http import HttpResponseRedirect
-import urllib
 
 class ACPException(Exception):
     def __init__(self, value):
@@ -54,14 +52,14 @@ def _enc(v):
             ev = ev.encode('iso-8859-1')
         return ev
 
-def _getset(dict,key,value=None):
+def _getset(d,key,value=None):
     if value:
-        if dict.has_key(key):
-            return dict[key]
+        if d.has_key(key):
+            return d[key]
         else:
             return None
     else:
-        dict[key] = value
+        d[key] = value
 
 class ACPClient():
     
@@ -120,39 +118,42 @@ class ACPClient():
             raise result.exception()
         return result
     
-    def find_or_create_principal(self,key,value,type,dict):
-        if not self._cache.has_key(type):
-            self._cache[type] = {}
-        cache = self._cache[type]
+    def find_or_create_principal(self,key,value,t,d):
+        if not self._cache.has_key(t):
+            self._cache[t] = {}
+        cache = self._cache[t]
         
+        # lxml etree Elements are not picklable
+        p = None
         if not cache.has_key(key):
-            p = self._find_or_create_principal(key,value,type,dict)
-            cache[key] = p
-            
-        return cache[key]
+            p = self._find_or_create_principal(key,value,t,d)
+            cache[key] = etree.tostring(p)
+        else:   
+            p = etree.parse(cache[key])
+        return p
         
-    def find_principal(self,key,value,type):
-        return self.find_or_create_principal(key,value,type,None)
+    def find_principal(self,key,value,t):
+        return self.find_or_create_principal(key,value,t,None)
     
-    def _find_or_create_principal(self,key,value,type,dict):
-        result = self.request('principal-list',{'filter-%s' % key: value,'filter-type': type}, True)
+    def _find_or_create_principal(self,key,value,t,d):
+        result = self.request('principal-list',{'filter-%s' % key: value,'filter-t': t}, True)
         principal = result.get_principal()
         if result.is_error():
             if result.status_code() != 'no_data':
                 result.exception()
-        elif principal and dict:
-            dict['principal-id'] = principal.get('principal-id')
+        elif principal and d:
+            d['principal-id'] = principal.get('principal-id')
         
         rp = principal
-        if dict:
-            update_result = self.request('principal-update',dict)
+        if d:
+            update_result = self.request('principal-update',d)
             rp = update_result.get_principal()
             if not rp:
                 rp = principal
         return rp
     
-    def find_builtin(self,type):
-        result = self.request('principal-list', {'filter-type': type}, True)
+    def find_builtin(self,t):
+        result = self.request('principal-list', {'filter-t': t}, True)
         return result.get_principal()
     
     def find_group(self,name):
