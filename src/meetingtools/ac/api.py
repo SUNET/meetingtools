@@ -136,7 +136,7 @@ class ACPClient():
         return self.find_or_create_principal(key,value,t,None)
     
     def _find_or_create_principal(self,key,value,t,d):
-        result = self.request('principal-list',{'filter-%s' % key: value,'filter-t': t}, True)
+        result = self.request('principal-list',{'filter-%s' % key: value,'filter-type': t}, True)
         principal = result.get_principal()
         if result.is_error():
             if result.status_code() != 'no_data':
@@ -153,7 +153,7 @@ class ACPClient():
         return rp
     
     def find_builtin(self,t):
-        result = self.request('principal-list', {'filter-t': t}, True)
+        result = self.request('principal-list', {'filter-type': t}, True)
         return result.get_principal()
     
     def find_group(self,name):
