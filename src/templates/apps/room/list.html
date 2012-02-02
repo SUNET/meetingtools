@@ -5,11 +5,9 @@
 {% load tagging_tags %}
 {% block widgets %}
     $("#rooms").accordion({
-   		header: 'h3',
-        active: true,
-        active: false,
+    	header: 'h3',
         event: "click",
-   		collapsible: true,
+        collapsible: true,
    		navigation: true,
    		animated: true,
    		autoHeight: false
@@ -27,7 +25,7 @@
 	<div id="rooms">
 		{% for r in rooms %}
 		<div id="{{r.id}}">
-		   <h3 class="listheader">{{r.name}}</h3>
+		   <h3><a href="#{{r.id}}" class="listheader">{{r.name}}</a></h3>
 		   <div>
 		       {% tags_for_object r as tags %}
 		       <p><a target="_connect" href="{{r|roomurl}}">{{r|roomurl}}<span style="vertical-align: bottom;" class="ui-icon ui-icon-extlink"></span></a></p>
