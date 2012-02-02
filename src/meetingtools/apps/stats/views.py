@@ -25,9 +25,11 @@ def _date_ts(date):
     return int(mktime((int(y),int(m),int(d),12,0,0,0,0,-1)))*1000 # high noon
 
 @login_required
-def user(request):
-    (local,domain) = request.user.username.split('@')
-    return respond_to(request,{'text/html': 'apps/stats/user.html'},{'domain': domain})
+def user(request,username=None):
+    if username == None:
+        username = request.user.username
+    (local,domain) = username.split('@')
+    return respond_to(request,{'text/html': 'apps/stats/user.html'},{'domain': domain,'username': username})
 
 @login_required
 def domain(request,domain):
@@ -47,8 +49,8 @@ def room(request,rid):
 
 @login_required
 def user_minutes_api(request,username=None):
-    if username and username != request.user.username:
-        return HttpResponseForbidden("You can't spy on others!")
+    #if username and username != request.user.username:
+    #    return HttpResponseForbidden("You can't spy on others!")
     
     if username == None:
         username = request.user.username

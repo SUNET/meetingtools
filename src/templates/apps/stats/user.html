@@ -3,11 +3,11 @@
 {% load prefix %}
 {% block widgets %}
 $.ajax({
-	url: '{% prefix %}/api/stats/user/{{user.username}}',
+	url: '{% prefix %}/api/stats/user/{{username}}',
 	method: 'GET',
 	success: function (resp) {
 	    var graph = $('#graph');
-	    series = [{label: 'Meeting minutes for {{user}}',data: resp['data']}];
+	    series = [{label: 'Meeting minutes for {{username}}',data: resp['data']}];
 		$.plot(graph,series,{
         	lines: { show: true },
         	points: { show: true },
@@ -19,7 +19,7 @@ $.ajax({
 });
 {% endblock %}
 {% block content %}
-<h1>Meeting statistics for {{user}}</h1>
+<h1>Meeting statistics for {{username}}</h1>
 <div id="graph" style="width:600px;height:300px; display: block; float: left; margin-right: 20px;"></div>
 <div>
 <h2>Summary</h2>
