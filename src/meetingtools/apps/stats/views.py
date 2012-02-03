@@ -12,6 +12,7 @@ from meetingtools.multiresponse import json_response, respond_to
 from meetingtools.apps.stats.forms import StatCaledarForm
 from django.shortcuts import get_object_or_404
 from meetingtools.apps.room.models import Room
+import logging
 
 def _iso2datesimple(iso):
     (date,rest) = iso.split("T")
@@ -20,9 +21,12 @@ def _iso2datesimple(iso):
 def _iso2ts(iso):
     return mktime(iso8601.parse_date(iso).timetuple())*1000
 
+def _iso2dt(iso):
+    return iso8601.parse_date(iso);
+
 def _date_ts(date):
     (y,m,d) = date.split("-")
-    return int(mktime((int(y),int(m),int(d),12,0,0,0,0,-1)))*1000 # high noon
+    return int(mktime((int(y),int(m),int(d),0,0,0,0,0,-1)))*1000 # midnight
 
 @login_required
 def user(request,username=None):
@@ -93,25 +97,34 @@ def user_minutes_api(request,username=None):
         if d_closed == None:
             d_closed = d2
             
+        #duration = _iso2dt(date_closed_str) - _iso2dt(date_created_str)
+        #sdiff = duration.total_seconds()
+          
         if curdate == None:
             curdate = d1
             
         if curdate != d1:
+            #logging.debug("  %s: %s - %s = %d %d" % (row.findtext("name"),date_created_str,date_closed_str,ms,sdiff*1000))
             series.append([_date_ts(curdate),int(ms/60000)])
             ms = 0
             curdate = d1
             
         if d1 == d2: #same date
             diff = (ts_closed - ts_created)
+            #logging.debug("ms:: %d + %d" % (ms,diff))
             ms = ms + diff
             t_ms = t_ms + diff
         else: # meeting spanned midnight
             ts_date_ts = _date_ts(d2)
+            #logging.debug("ms: %d + %d" % (ms,(ts_date_ts - ts_created)))
             ms = ms + (ts_date_ts - ts_created)
             series.append([_date_ts(d1),int(ms/60000)])
+            #logging.debug("* %s: %s - %s = %d %d" % (row.findtext("name"),date_created_str,date_closed_str,ms,sdiff*1000))
             t_ms = t_ms + ms
             curdate = d2
+            #logging.debug("midnight: %d (%d)" % (ts_date_ts,ts_closed))
             ms = (ts_closed - ts_date_ts)
+            #logging.debug("nms: %d" % ms)
             
     if curdate != None and ms > 0:
         series.append([_date_ts(curdate),int(ms/60000)])
