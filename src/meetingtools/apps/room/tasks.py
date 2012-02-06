@@ -179,8 +179,14 @@ def _import_meeting_sessions_acc(acc):
             _import_meeting_room_session(api,acc,room.sco_id,None,room)
         except Exception,ex:
             logging.error(ex)
-   
+            
+def _recheck_active_meetings_acc(acc):
+    api = ac_api_client_direct(acc)
+    for room in Room.objects.filter(acc=acc,user_count__gt=0):
+        _import_meeting_room_session(api,acc,room.sco_id,None,room)
+        
 @periodic_task(run_every=crontab(hour="*", minute="*/1", day_of_week="*"))
 def _import_meeting_sessions():
     for acc in ACCluster.objects.all():
         _import_meeting_sessions_acc(acc)
+        _recheck_active_meetings_acc(acc)
