@@ -38,6 +38,9 @@ class ACPResult():
 
     def status_code(self):
         return self.status.get('code')
+    
+    def subcode(self):
+        return self.status.get('subcode')
 
     def exception(self):
         raise ACPException,self.status

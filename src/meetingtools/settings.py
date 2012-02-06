@@ -69,9 +69,17 @@ LOGOUT_URL = "%s/accounts/logout" % PREFIX_URL
 # Make this unique, and don't share it with anybody.
 SECRET_KEY = 'tz78l!c=cl2=jic5$2#(bq)7-4s1ivtm*a+q0w1yi0$)hrmc7l'
 
-SESSION_ENGINE = "django.contrib.sessions.backends.file"
-SESSION_FILE_PATH = "/tmp"
+#SESSION_ENGINE = "django.contrib.sessions.backends.file"
+SESSION_ENGINE = "django.contrib.sessions.backends.cache"
+#SESSION_FILE_PATH = "/tmp"
 SESSION_EXPIRE_AT_BROWSER_CLOSE = True
+
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+        'LOCATION': 'unique-snowflake'
+    }
+}
 
 # List of callables that know how to import templates from various sources.
 TEMPLATE_LOADERS = (
@@ -86,7 +94,7 @@ MIDDLEWARE_CLASSES = (
     'meetingtools.django-crossdomainxhr-middleware.XsSharing',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
-    'django.contrib.auth.middleware.RemoteUserMiddleware'
+    #'django.contrib.auth.middleware.RemoteUserMiddleware'
 )
 
 AUTHENTICATION_BACKENDS = (
@@ -111,6 +119,10 @@ INSTALLED_APPS = (
     'django.contrib.admin',
     'django.contrib.humanize',
     'django_extensions',
+    'south',
+    'djcelery',
+    'ghettoq',
+    'djkombu',
     'django_co_connector',
     'django_co_acls',
     'tagging',
@@ -119,4 +131,10 @@ INSTALLED_APPS = (
     'meetingtools.apps.room',
     'meetingtools.apps.cluster',
     'meetingtools.apps.userprofile',
+    'meetingtools.apps.stats'
 )
+
+CARROT_BACKEND = "django"
+
+import djcelery 
+djcelery.setup_loader()

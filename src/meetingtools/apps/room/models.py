@@ -35,6 +35,12 @@ class FileLock(object):
     def __delete__(self):
         raise AttributeError
 
+class RoomLockedException(Exception):
+    def __init__(self, value):
+        self.value = value
+    def __str__(self):
+        return repr(self.value)
+
 class Room(models.Model):
     creator = ForeignKey(User,editable=False)
     name = CharField(max_length=128) 
@@ -44,6 +50,7 @@ class Room(models.Model):
     allow_host = BooleanField(verbose_name="Allow first participant to become host?",default=True)
     sco_id = IntegerField(verbose_name="Adobe Connect Room")
     source_sco_id = IntegerField(verbose_name="Template",blank=True,null=True)
+    deleted_sco_id = IntegerField(verbose_name="Previous Room ID",editable=False,blank=True,null=True)
     folder_sco_id = IntegerField(verbose_name="Adobe Connect Room Folder",editable=False)
     description = TextField(blank=True,null=True)
     user_count = IntegerField(verbose_name="User Count At Last Visit",editable=False,blank=True,null=True)
@@ -66,6 +73,15 @@ class Room(models.Model):
         if msg:
             f.write(msg)
         f.close()
+    
+    def trylock(self,raise_on_locked=True):
+        if self.is_locked():
+            if raise_on_locked:
+                raise RoomLockedException,"room %s is locked" % self.__unicode__()
+            else:
+                return False
+        self.lock() #race!! - must use flock
+        return True
         
     def unlock(self):
         os.remove(self._lockf())
