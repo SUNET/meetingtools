@@ -136,10 +136,11 @@ def import_all_rooms():
     for acc in ACCluster.objects.all():
         _import_acc(acc)
 
-def _import_meeting_room_session(api,acc,sco_id,row=None,room=None):
+def _import_meeting_room_usercount(api,acc,sco_id,row=None,room=None):
     try:
         if room == None:
             room = Room.objects.get(acc=acc,sco_id=sco_id)
+        
         if row and row.findtext("date-end"):
             room.user_count = 0
             room.host_count = 0
@@ -155,38 +156,14 @@ def _import_meeting_room_session(api,acc,sco_id,row=None,room=None):
     except ObjectDoesNotExist:
         pass
 
-def _import_meeting_sessions_acc(acc):
+def _import_user_counts_acc(acc):
     api = ac_api_client_direct(acc)
-    backthen = datetime.now()-timedelta(seconds=600000)
-    backthen = backthen.replace(microsecond=0)
-    logging.debug(backthen.isoformat())
-    r = api.request('report-meeting-sessions',{'filter-gt-date-created': backthen.isoformat()})
-    seen = {}
-    for row in r.et.xpath("//row"):
-        try:
-            sco_id = int(row.get('sco-id'))
-            _import_meeting_room_session(api,acc,sco_id,row,None)
-            seen[sco_id] = True
-        except Exception,ex:
-            logging.error(ex)
-   
     for room in Room.objects.filter(acc=acc,user_count=None):
-        logging.debug("checking sessions on room: %s" % room)
-        if seen.get(room.sco_id,False):
-            continue
-        try:
-            logging.debug("importing sessions")
-            _import_meeting_room_session(api,acc,room.sco_id,None,room)
-        except Exception,ex:
-            logging.error(ex)
-            
-def _recheck_active_meetings_acc(acc):
-    api = ac_api_client_direct(acc)
+        _import_meeting_room_usercount(api,acc,room.sco_id,None,room)
     for room in Room.objects.filter(acc=acc,user_count__gt=0):
-        _import_meeting_room_session(api,acc,room.sco_id,None,room)
-        
+        _import_meeting_room_usercount(api,acc,room.sco_id,None,room)    
+            
 @periodic_task(run_every=crontab(hour="*", minute="*/1", day_of_week="*"))
-def _import_meeting_sessions():
+def import_user_counts():
     for acc in ACCluster.objects.all():
-        _import_meeting_sessions_acc(acc)
-        _recheck_active_meetings_acc(acc)
+        _import_user_counts_acc(acc)
