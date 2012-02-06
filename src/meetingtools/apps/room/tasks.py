@@ -3,7 +3,7 @@ Created on Jan 18, 2012
 
 @author: leifj
 '''
-from celery.decorators import periodic_task
+from celery.task import periodic_task
 from celery.schedules import crontab
 from meetingtools.apps.cluster.models import ACCluster
 from meetingtools.ac import ac_api_client, ac_api_client_nocache,\
