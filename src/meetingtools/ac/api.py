@@ -14,6 +14,7 @@ from lxml import etree
 from meetingtools.site_logging import logger
 import lxml
 from django.http import HttpResponseRedirect
+from celery.execute import send_task
 
 class ACPException(Exception):
     def __init__(self, value):
@@ -177,3 +178,23 @@ class ACPClient():
     
     def remove_member(self,principal_id,group_id):
         return self.add_remove_member(principal_id, group_id, False)
+    
+    def user_counts(self,sco_id):
+        user_count = None
+        host_count = None
+        userlist = self.request('meeting-usermanager-user-list',{'sco-id': sco_id},False)
+        if userlist.status_code() == 'ok':
+            user_count = int(userlist.et.xpath("count(.//userdetails)"))
+            host_count = int(userlist.et.xpath("count(.//userdetails/role[text() = 'host'])"))
+        elif userlist.status_code() == 'no-access' and userlist.subcode() == 'not-available': #no active session
+            user_count = 0
+            host_count = 0
+        
+        return (user_count,host_count)
+    
+    def poll_user_counts(self,room,recheck=0):
+        (room.user_count,room.host_count) = self.user_counts(room.sco_id)
+        room.save()
+        if room.user_count > 0 or recheck > 0:
+            logging.debug("will recheck %d more times ..." % (recheck -1))
+            send_task('meetingtools.apps.room.tasks.poll_user_counts',[room],{'recheck': recheck-1},countdown=2)

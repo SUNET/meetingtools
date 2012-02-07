@@ -30,6 +30,8 @@ from django.utils.feedgenerator import rfc3339_date
 from django.views.decorators.cache import cache_control, never_cache
 from meetingtools.apps.cluster.models import acc_for_user
 from django.contrib.auth.models import User
+import iso8601
+from celery.execute import send_task
 
 def _user_meeting_folder(request,acc):
     if not session(request,'my_meetings_sco_id'):
@@ -389,17 +391,10 @@ def _goto(request,room,clean=True,promote=False):
     lastvisit = room.lastvisit()
     room.lastvisited = datetime.now()
     
+    api.poll_user_counts(room)
     if clean:
-        room.user_count = None
-        room.host_count = None
-        userlist = api.request('meeting-usermanager-user-list',{'sco-id': room.sco_id},False)
-        if userlist.status_code() == 'ok':
-            room.user_count = int(userlist.et.xpath("count(.//userdetails)"))
-            room.host_count = int(userlist.et.xpath("count(.//userdetails/role[text() = 'host'])"))
-        
-        logging.debug("---------- nusers: %s" % room.user_count)
-        room.save()
-        if room.self_cleaning and userlist.status_code() == 'ok': # don't clean the room unless you get a good status code
+        # don't clean the room unless you get a good status code from the call to the usermanager api above
+        if room.self_cleaning and room.user_count == 0:
             if (room.user_count == 0) and (abs(lastvisit - now) > GRACE):        
                 room.lock("Locked for cleaning")
                 try:
@@ -426,6 +421,7 @@ def _goto(request,room,clean=True,promote=False):
     
     r = api.request('sco-info',{'sco-id':room.sco_id},True)
     urlpath = r.et.findtext('.//sco/url-path')
+    api.poll_user_counts(room,recheck=5)
     if key:
         try:
             user_client = ACPClient(room.acc.api_url, request.user.username, key, cache=False)
@@ -523,10 +519,6 @@ def tag(request,rid):
                       {'text/html': "apps/room/tag.html"}, 
                       {'form': form,'formtitle': 'Add Tag','cancelname':'Done','submitname': 'Add Tag','room': room, 'tagstring': tn,'tags': tags})
 
-
-from time import mktime
-from feedparser import _parse_date as parse_date
-
 def room_recordings(request,room):
     api = ac_api_client(request, room.acc)
     r = api.request('sco-expanded-contents',{'sco-id': room.sco_id,'filter-icon':'archive'},True)
@@ -534,8 +526,8 @@ def room_recordings(request,room):
              'sco_id': sco.get('sco-id'),
              'url': room.acc.make_url(sco.findtext('url-path')),
              'description':  sco.findtext('description'),
-             'date_created': datetime.fromtimestamp(mktime(parse_date(sco.findtext('date-created')))),
-             'date_modified': datetime.fromtimestamp(mktime(parse_date(sco.findtext('date-modified'))))} for sco in r.et.findall(".//sco")]
+             'date_created': iso8601.parse_date(sco.findtext('date-created')),
+             'date_modified': iso8601.parse_date(sco.findtext('date-modified'))} for sco in r.et.findall(".//sco")]
 
 @login_required
 def recordings(request,rid):
