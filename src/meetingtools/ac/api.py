@@ -192,9 +192,7 @@ class ACPClient():
         
         return (user_count,host_count)
     
-    def poll_user_counts(self,room,recheck=0):
+    def poll_user_counts(self,room):
         (room.user_count,room.host_count) = self.user_counts(room.sco_id)
         room.save()
-        if room.user_count > 0 or recheck > 0:
-            logging.debug("will recheck %d more times ..." % (recheck -1))
-            send_task('meetingtools.apps.room.tasks.poll_user_counts',[room],{'recheck': recheck-1},countdown=2)
+        return (room.user_count,room.host_count)

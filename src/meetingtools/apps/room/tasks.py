@@ -17,6 +17,7 @@ import logging
 from datetime import datetime,timedelta
 from lxml import etree
 from django.db.models import Q
+import math
 
 def _owner_username(api,sco):
     logging.debug(sco)
@@ -131,11 +132,21 @@ def import_all_rooms():
     for acc in ACCluster.objects.all():
         _import_acc(acc)
   
+def start_user_counts_poll(room,niter):
+    poll_user_counts.apply_async(args=[room],kwargs={'niter': niter})
+  
 @task(name='meetingtools.apps.room.tasks.poll_user_counts',rate_limit="10/s")
-def poll_user_counts(room,recheck=0):
+def poll_user_counts(room,niter=0):
     logging.debug("rechecking user_counts for room %s" % room.name)
     api = ac_api_client_direct(room.acc)
-    api.poll_user_counts(room,recheck)
+    (nusers,nhosts) = api.poll_user_counts(room)
+    if nusers > 0:
+        logging.debug("room occupied by %d users and %d hosts, checking again in 20 ..." % (nusers,nhosts))
+        poll_user_counts.apply_async(args=[room],kwargs={'niter': 0},countdown=20)
+    elif niter > 0:
+        logging.debug("room empty, will check again in 5 for %d more times ..." % (niter -1))
+        poll_user_counts.apply_async(args=[room],kwargs={'niter': niter-1},countdown=5)
+    return (nusers,nhosts)
     
 # belts and suspenders - we setup polling for active rooms aswell...      
 @periodic_task(run_every=crontab(hour="*", minute="*/5", day_of_week="*"))

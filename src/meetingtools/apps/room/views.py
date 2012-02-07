@@ -32,6 +32,7 @@ from meetingtools.apps.cluster.models import acc_for_user
 from django.contrib.auth.models import User
 import iso8601
 from celery.execute import send_task
+from meetingtools.apps.room.tasks import start_user_counts_poll
 
 def _user_meeting_folder(request,acc):
     if not session(request,'my_meetings_sco_id'):
@@ -421,7 +422,7 @@ def _goto(request,room,clean=True,promote=False):
     
     r = api.request('sco-info',{'sco-id':room.sco_id},True)
     urlpath = r.et.findtext('.//sco/url-path')
-    api.poll_user_counts(room,recheck=5)
+    start_user_counts_poll(room,10)
     if key:
         try:
             user_client = ACPClient(room.acc.api_url, request.user.username, key, cache=False)
