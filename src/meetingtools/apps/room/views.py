@@ -9,7 +9,7 @@ from meetingtools.multiresponse import respond_to, redirect_to, json_response,\
 from meetingtools.apps.room.forms import DeleteRoomForm,\
     CreateRoomForm, ModifyRoomForm, TagRoomForm
 from django.shortcuts import get_object_or_404
-from meetingtools.ac import ac_api_client, api
+from meetingtools.ac import ac_api_client
 import re
 from meetingtools.apps import room
 from django.contrib.auth.decorators import login_required
@@ -36,54 +36,55 @@ from meetingtools.apps.room.tasks import start_user_counts_poll
 
 def _user_meeting_folder(request,acc):
     if not session(request,'my_meetings_sco_id'):
-        connect_api = ac_api_client(request, acc)
-        userid = request.user.username
-        folders = connect_api.request('sco-search-by-field',{'filter-type': 'folder','field':'name','query':userid}).et.xpath('//sco[folder-name="User Meetings"]')
-        logging.debug("user meetings folder: "+pformat(folders))
-        #folder = next((f for f in folders if f.findtext('.//folder-name') == 'User Meetings'), None)
-        if folders and len(folders) > 0:
-            session(request,'my_meetings_sco_id',folders[0].get('sco-id'))
+        with ac_api_client(acc) as api:
+            userid = request.user.username
+            folders = api.request('sco-search-by-field',{'filter-type': 'folder','field':'name','query':userid}).et.xpath('//sco[folder-name="User Meetings"]')
+            logging.debug("user meetings folder: "+pformat(folders))
+            #folder = next((f for f in folders if f.findtext('.//folder-name') == 'User Meetings'), None)
+            if folders and len(folders) > 0:
+                session(request,'my_meetings_sco_id',folders[0].get('sco-id'))
+    
     return session(request,'my_meetings_sco_id')
 
 def _shared_templates_folder(request,acc):
     if not session(request,'shared_templates_sco_id'):
-        connect_api = ac_api_client(request, acc)
-        shared = connect_api.request('sco-shortcuts').et.xpath('.//sco[@type="shared-meeting-templates"]')
-        logging.debug("shared templates folder: "+pformat(shared))
-        #folder = next((f for f in folders if f.findtext('.//folder-name') == 'User Meetings'), None)
-        if shared and len(shared) > 0:
-            session(request,'shared_templates_sco_id',shared[0].get('sco-id'))
+        with ac_api_client(acc) as api:
+            shared = api.request('sco-shortcuts').et.xpath('.//sco[@type="shared-meeting-templates"]')
+            logging.debug("shared templates folder: "+pformat(shared))
+            #folder = next((f for f in folders if f.findtext('.//folder-name') == 'User Meetings'), None)
+            if shared and len(shared) > 0:
+                session(request,'shared_templates_sco_id',shared[0].get('sco-id'))
     return session(request,'shared_templates_sco_id')
 
 def _user_rooms(request,acc,my_meetings_sco_id):
     rooms = []
     if my_meetings_sco_id:
-        connect_api = ac_api_client(request, acc)
-        meetings = connect_api.request('sco-expanded-contents',{'sco-id': my_meetings_sco_id,'filter-type': 'meeting'})
-        if meetings:
-            rooms = [{'sco_id': r.get('sco-id'),
-                     'name': r.findtext('name'),
-                     'source_sco_id': r.get('source-sco-id'),
-                     'urlpath': r.findtext('url-path'),
-                     'description': r.findtext('description')} for r in meetings.et.findall('.//sco')]
+        with ac_api_client(acc) as api:
+            meetings = api.request('sco-expanded-contents',{'sco-id': my_meetings_sco_id,'filter-type': 'meeting'})
+            if meetings:
+                rooms = [{'sco_id': r.get('sco-id'),
+                         'name': r.findtext('name'),
+                         'source_sco_id': r.get('source-sco-id'),
+                         'urlpath': r.findtext('url-path'),
+                         'description': r.findtext('description')} for r in meetings.et.findall('.//sco')]
     return rooms
 
 def _user_templates(request,acc,my_meetings_sco_id):
     templates = []
-    connect_api = ac_api_client(request, acc)
-    if my_meetings_sco_id:
-        my_templates = connect_api.request('sco-contents',{'sco-id': my_meetings_sco_id,'filter-type': 'folder'}).et.xpath('.//sco[folder-name="My Templates"][0]')
-        if my_templates and len(my_templates) > 0:
-            my_templates_sco_id = my_templates[0].get('sco_id')
-            meetings = connect_api.request('sco-contents',{'sco-id': my_templates_sco_id,'filter-type': 'meeting'})
-            if meetings:
-                templates = templates + [(r.get('sco-id'),r.findtext('name')) for r in meetings.et.findall('.//sco')]
-    
-    shared_templates_sco_id = _shared_templates_folder(request, acc)
-    if shared_templates_sco_id:
-        shared_templates = connect_api.request('sco-contents',{'sco-id': shared_templates_sco_id,'filter-type': 'meeting'})
-        if shared_templates:
-            templates = templates + [(r.get('sco-id'),r.findtext('name')) for r in shared_templates.et.findall('.//sco')]
+    with ac_api_client(acc) as api:
+        if my_meetings_sco_id:
+            my_templates = api.request('sco-contents',{'sco-id': my_meetings_sco_id,'filter-type': 'folder'}).et.xpath('.//sco[folder-name="My Templates"][0]')
+            if my_templates and len(my_templates) > 0:
+                my_templates_sco_id = my_templates[0].get('sco_id')
+                meetings = api.request('sco-contents',{'sco-id': my_templates_sco_id,'filter-type': 'meeting'})
+                if meetings:
+                    templates = templates + [(r.get('sco-id'),r.findtext('name')) for r in meetings.et.findall('.//sco')]
+        
+        shared_templates_sco_id = _shared_templates_folder(request, acc)
+        if shared_templates_sco_id:
+            shared_templates = api.request('sco-contents',{'sco-id': shared_templates_sco_id,'filter-type': 'meeting'})
+            if shared_templates:
+                templates = templates + [(r.get('sco-id'),r.findtext('name')) for r in shared_templates.et.findall('.//sco')]
             
     return templates
 
@@ -121,7 +122,6 @@ def _init_update_form(request,form,acc,my_meetings_sco_id):
         form.fields['source_sco_id'].widget.choices = [('','-- select template --')]+[r for r in _user_templates(request,acc,my_meetings_sco_id)]
 
 def _update_room(request, room, form=None):        
-    api = ac_api_client(request, room.acc)
     params = {'type':'meeting'}
     
     for attr,param in (('sco_id','sco-id'),('folder_sco_id','folder-id'),('source_sco_id','source-sco-id'),('urlpath','url-path'),('name','name'),('description','description')):
@@ -141,48 +141,48 @@ def _update_room(request, room, form=None):
                 params[param] = repr(v)
         
     logging.debug(pformat(params))
-    r = api.request('sco-update', params, True)
-    
-    sco_id = r.et.find(".//sco").get('sco-id')
-    if form:
-        form.cleaned_data['sco_id'] = sco_id
-        form.cleaned_data['source_sco_id'] = r.et.find(".//sco").get('sco-source-id')
-    
-    room.sco_id = sco_id
-    room.save()
-    
-    user_principal = api.find_user(room.creator.username)
-    #api.request('permissions-reset',{'acl-id': sco_id},True)
-    api.request('permissions-update',{'acl-id': sco_id,'principal-id': user_principal.get('principal-id'),'permission-id':'host'},True) # owner is always host
-    
-    if form:
-        if form.cleaned_data.has_key('access'):
-            access = form.cleaned_data['access']
-            if access == 'public':
-                allow(room,'anyone','view-hidden')
-            elif access == 'private':
-                allow(room,'anyone','remove')
-    
-    # XXX figure out how to keep the room permissions in sync with the AC permissions
-    for ace in acl(room):
-        principal_id = None
-        if ace.group:
-            principal = api.find_group(ace.group.name)
-            if principal:
-                principal_id = principal.get('principal-id')
-        elif ace.user:
-            principal = api.find_user(ace.user.username)
-            if principal:
-                principal_id = principal.get('principal-id')
-        else:
-            principal_id = "public-access"
+    with ac_api_client(room.acc) as api:
+        r = api.request('sco-update', params, True)
+        sco_id = r.et.find(".//sco").get('sco-id')
+        if form:
+            form.cleaned_data['sco_id'] = sco_id
+            form.cleaned_data['source_sco_id'] = r.et.find(".//sco").get('sco-source-id')
         
-        if principal_id:  
-            api.request('permissions-update',{'acl-id': room.sco_id, 'principal-id': principal_id, 'permission-id': ace.permission},True)
-
-    room.deleted_sco_id = None # if we just cleaned a room we zero out the deleted_sco_id field to indicate the room is now ready for use
-    room.save() # a second save here to avoid races
-    return room
+        room.sco_id = sco_id
+        room.save()
+        
+        user_principal = api.find_user(room.creator.username)
+        #api.request('permissions-reset',{'acl-id': sco_id},True)
+        api.request('permissions-update',{'acl-id': sco_id,'principal-id': user_principal.get('principal-id'),'permission-id':'host'},True) # owner is always host
+        
+        if form:
+            if form.cleaned_data.has_key('access'):
+                access = form.cleaned_data['access']
+                if access == 'public':
+                    allow(room,'anyone','view-hidden')
+                elif access == 'private':
+                    allow(room,'anyone','remove')
+        
+        # XXX figure out how to keep the room permissions in sync with the AC permissions
+        for ace in acl(room):
+            principal_id = None
+            if ace.group:
+                principal = api.find_group(ace.group.name)
+                if principal:
+                    principal_id = principal.get('principal-id')
+            elif ace.user:
+                principal = api.find_user(ace.user.username)
+                if principal:
+                    principal_id = principal.get('principal-id')
+            else:
+                principal_id = "public-access"
+            
+            if principal_id:  
+                api.request('permissions-update',{'acl-id': room.sco_id, 'principal-id': principal_id, 'permission-id': ace.permission},True)
+    
+        room.deleted_sco_id = None # if we just cleaned a room we zero out the deleted_sco_id field to indicate the room is now ready for use
+        room.save() # a second save here to avoid races
+        return room
 
 @never_cache
 @login_required
@@ -272,12 +272,12 @@ def _import_room(request,acc,r):
         return None
             
     logging.debug("+++ looking at user counts")
-    api = ac_api_client(request,acc)
-    userlist = api.request('meeting-usermanager-user-list',{'sco-id': room.sco_id},False)
-    if userlist.status_code() == 'ok':
-        room.user_count = int(userlist.et.xpath("count(.//userdetails)"))
-        room.host_count = int(userlist.et.xpath("count(.//userdetails/role[text() = 'host'])"))
-        room.save()
+    with ac_api_client(acc) as api:
+        userlist = api.request('meeting-usermanager-user-list',{'sco-id': room.sco_id},False)
+        if userlist.status_code() == 'ok':
+            room.user_count = int(userlist.et.xpath("count(.//userdetails)"))
+            room.host_count = int(userlist.et.xpath("count(.//userdetails/role[text() = 'host'])"))
+            room.save()
         
     return room
 
@@ -339,8 +339,8 @@ def delete(request,id):
     if request.method == 'POST':
         form = DeleteRoomForm(request.POST)
         if form.is_valid():
-            api = ac_api_client(request,room.acc)
-            api.request('sco-delete',{'sco-id':room.sco_id},raise_error=True)
+            with ac_api_client(room.acc) as api:
+                api.request('sco-delete',{'sco-id':room.sco_id},raise_error=True)
             clear_acl(room)
             room.delete()
             
@@ -351,11 +351,11 @@ def delete(request,id):
     return respond_to(request,{'text/html':'edit.html'},{'form':form,'formtitle': 'Delete %s' % room.name,'cancelname':'Cancel','submitname':'Delete Room'})      
 
 def _clean(request,room):
-    api = ac_api_client(request, room.acc)
-    room.deleted_sco_id = room.sco_id
-    room.save()
-    api.request('sco-delete',{'sco-id':room.sco_id},raise_error=False)
-    room.sco_id = None
+    with ac_api_client(room.acc) as api:
+        room.deleted_sco_id = room.sco_id
+        room.save()
+        api.request('sco-delete',{'sco-id':room.sco_id},raise_error=False)
+        room.sco_id = None
     return _update_room(request, room)
 
 def go_by_id(request,id):
@@ -387,12 +387,12 @@ def _goto(request,room,clean=True,promote=False):
     if room.is_locked():
         return respond_to(request, {"text/html": "apps/room/retry.html"}, {'room': room, 'wait': 10})
     
-    api = ac_api_client(request, room.acc)
     now = time.time()
     lastvisit = room.lastvisit()
     room.lastvisited = datetime.now()
     
-    api.poll_user_counts(room)
+    with ac_api_client(room.acc) as api:
+        api.poll_user_counts(room)
     if clean:
         # don't clean the room unless you get a good status code from the call to the usermanager api above
         if room.self_cleaning and room.user_count == 0:
@@ -415,10 +415,11 @@ def _goto(request,room,clean=True,promote=False):
         key = _random_key(20)
         user_principal = api.find_user(request.user.username)
         principal_id =  user_principal.get('principal-id')
-        api.request("user-update-pwd",{"user-id": principal_id, 'password': key,'password-verify': key},True)
-        if promote and room.self_cleaning:
-            if user_principal:
-                api.request('permissions-update',{'acl-id': room.sco_id,'principal-id': user_principal.get('principal-id'),'permission-id':'host'},True)
+        with ac_api_client(room.acc) as api:
+            api.request("user-update-pwd",{"user-id": principal_id, 'password': key,'password-verify': key},True)
+            if promote and room.self_cleaning:
+                if user_principal:
+                    api.request('permissions-update',{'acl-id': room.sco_id,'principal-id': user_principal.get('principal-id'),'permission-id':'host'},True)
     
     r = api.request('sco-info',{'sco-id':room.sco_id},True)
     urlpath = r.et.findtext('.//sco/url-path')
@@ -521,14 +522,14 @@ def tag(request,rid):
                       {'form': form,'formtitle': 'Add Tag','cancelname':'Done','submitname': 'Add Tag','room': room, 'tagstring': tn,'tags': tags})
 
 def room_recordings(request,room):
-    api = ac_api_client(request, room.acc)
-    r = api.request('sco-expanded-contents',{'sco-id': room.sco_id,'filter-icon':'archive'},True)
-    return [{'name': sco.findtext('name'),
-             'sco_id': sco.get('sco-id'),
-             'url': room.acc.make_url(sco.findtext('url-path')),
-             'description':  sco.findtext('description'),
-             'date_created': iso8601.parse_date(sco.findtext('date-created')),
-             'date_modified': iso8601.parse_date(sco.findtext('date-modified'))} for sco in r.et.findall(".//sco")]
+    with ac_api_client(room.acc) as api:
+        r = api.request('sco-expanded-contents',{'sco-id': room.sco_id,'filter-icon':'archive'},True)
+        return [{'name': sco.findtext('name'),
+                 'sco_id': sco.get('sco-id'),
+                 'url': room.acc.make_url(sco.findtext('url-path')),
+                 'description':  sco.findtext('description'),
+                 'date_created': iso8601.parse_date(sco.findtext('date-created')),
+                 'date_modified': iso8601.parse_date(sco.findtext('date-modified'))} for sco in r.et.findall(".//sco")]
 
 @login_required
 def recordings(request,rid):

@@ -10,6 +10,7 @@ import logging
 from pprint import pformat
 import os
 import tempfile
+import time
 from lxml import etree
 from meetingtools.site_logging import logger
 import lxml
@@ -67,15 +68,29 @@ def _getset(d,key,value=None):
 
 class ACPClient():
     
-    def __init__(self,url,username=None,password=None,cache=True):
+    def __init__(self,url,username=None,password=None,cache=True,cpool=None):
+        self._cpool = cpool
+        self.age = 0
+        self.createtime = time.time()
+        self.lastused = self.createtime
         self.url = url
         self.session = None
         if username and password:
             self.login(username,password)
         if cache:
             self._cache = {'login':{},'group':{}}
+            
+    def __exit__(self,type,value,traceback):
+        if self._cpool:
+            self._cpool._q.put_nowait(self)
+        
+    def __enter__(self):
+        return self
+
     
     def request(self,method,p={},raise_error=False):
+        self.age += 1
+        self.lastused = time.time()
         u = []
         u.append("action=%s" % method)
         if self.session:

@@ -1,53 +1,57 @@
 from meetingtools.ac.api import ACPClient
 import time
 from meetingtools.apps.cluster.models import acc_for_user
+from django.core.cache import cache
+from Queue import Queue
+import logging
+from django.contrib.auth.models import User
 
-def ac_api_client_cache(request,acc=None):
-    if acc == None:
-        acc = acc_for_user(request.user)
-    tag = 'ac_api_client_%s' % acc.name
-    if not request.session.has_key(tag):
-        request.session[tag] = ACPClientWrapper(acc)
-        
-    return request.session[tag]
-
-def ac_api_client_nocache(request,acc=None):
-    if acc == None:
-        acc = acc_for_user(request.user)
-    return ACPClientWrapper(acc)
-
-def ac_api_client_direct(acc):
-    return ACPClientWrapper(acc)
-
-ac_api_client = ac_api_client_cache
-
-def ac_api(request,acc=None):
-    return ACPClient(acc.api_url,acc.user,acc.password)
+_pools = {}
 
 MAXCALLS = 10    
 MAXIDLE = 10
 
-class ACPClientWrapper(object):
+class ClientPool(object):
     
-    def __init__(self,acc):
-        self.acc = acc
-        self._delegate = None
-        self.ncalls = 0
-        self.lastcall = time.time()
-        
-    def invalidate(self):
-        self._delegate = None
-        
-    def client_factory(self):
+    def __init__(self,acc,maxsize=0,increment=5):
+        self._q = Queue(maxsize)
+        self._acc = acc
+        self._increment = increment
+    
+    def allocate(self):
         now = time.time()
-        if self.ncalls > MAXCALLS or now - self.lastcall > MAXIDLE or not self._delegate:
-            self._delegate = ACPClient(self.acc.api_url,self.acc.user,self.acc.password)
-            self.ncalls = 0
-        self.ncalls += 1
-        self.lastcall = now
-        return self._delegate
+        api = None
+        while not api:
+            if self._q.empty():
+                for i in range(1,self._increment):
+                    logging.debug("adding instance %d" % i)
+                    api = ACPClient(self._acc.api_url,self._acc.user,self._acc.password,cpool=self)
+                    self._q.put_nowait(api)
+            
+            api = self._q.get()
+            if api and (api.age > MAXCALLS or now - api.lastused > MAXIDLE):
+                api = None
+        return api
+
+# with ac_api_client(acc) as api
+#    ...
+
+def ac_api_client(o):
+    acc = o
+    logging.debug("ac_api_client(%s)" % repr(o))
+    if hasattr(o,'user') and isinstance(getattr(o,'user'),User):
+        acc = acc_for_user(getattr(o,'user'))
+    elif hasattr(o,'acc'):
+        acc = getattr(o,'acc')
+    
+    tag = 'ac_api_client_%d' % acc.id
+    pool = _pools.get(tag)
+    if pool is None:
+        pool = ClientPool(acc,maxsize=30)
+        _pools[tag] = pool
         
-    def __getattr__(self,name):
-        client = self.client_factory()
-        return getattr(client,name)
+    return pool.allocate()
+
+
+
     
