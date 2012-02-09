@@ -66,7 +66,6 @@ def join_group(group,**kwargs):
             if gp:
                 api.add_member(principal.get('principal-id'),gp.get('principal-id'))
     
-            
 def leave_group(group,**kwargs):
     user = kwargs['user']
     acc = acc_for_user(user)

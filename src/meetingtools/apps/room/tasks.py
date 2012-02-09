@@ -154,3 +154,47 @@ def import_recent_user_counts():
             then = datetime.now()-timedelta(seconds=600)
             for room in Room.objects.filter((Q(lastupdated__gt=then) | Q(lastvisited__gt=then)) & Q(acc=acc)):
                 api.poll_user_counts(room)
+        
+# look for sessions that are newer than the one we know about for a room
+@periodic_task(run_every=crontab(hour="*", minute="*", day_of_week="*"))
+def import_sessions():
+    for room in Room.objects.all():
+        with ac_api_client(room.acc) as api:
+            p = {'sco-id': room.sco_id,'sort-date-created': 'asc'}
+            if room.lastvisited != None:
+                last = room.lastvisited
+                last.replace(microsecond=0)
+                p['filter-gt-date-created'] = last.isoformat()
+            r = api.request('report-meeting-sessions',p)
+            for row in r.et.xpath("//row"):
+                date_created = iso8601.parse_date(row.findtext("date-created"))
+                logging.debug("sco_id=%d lastvisited: %s" % (room.sco_id,date_created))
+                room.lastvisited = date_created
+                room.save()
+                break
+
+#@periodic_task(run_every=crontab(hour="*", minutes="*/5", day_of_week="*"))
+def import_transactions():
+    for acc in ACCluster.objects.all():
+        then = datetime.now() - timedelta(seconds=600)
+        then = then.replace(microsecond=0)
+        with ac_api_client(acc) as api:
+            seen = {}
+            r  = api.request('report-bulk-consolidated-transactions',{'filter-type':'meeting','sort-date-created': 'asc','filter-gt-date-created': then.isformat()})
+            for row in r.et.xpath("//row"):
+                sco_id = row.get('sco-id')
+                logging.debug("last session for sco_id=%d" % sco_id)
+                if not seen.get(sco_id,False): #pick the first session for each room - ie the one last created
+                    seen[sco_id] = True
+                    try:
+                        room = Room.objects.get(acc=acc,sco_id=sco_id)
+                        date_created = iso8601.parse_date(row.findtext("date-created"))
+                        room.lastvisited = date_created
+                        room.save()
+                    except ObjectDoesNotExist:
+                        pass # we only care about rooms we know about here
+                
+def clean_old_rooms():
+    for acc in ACCluster.objects.all():
+        then = datetime.now() - timedelta(days=365)
+        then = then.replace(microsecond=0)
