@@ -12,6 +12,15 @@
    		animated: true,
    		autoHeight: false
    	});
+   	$(".occupation").click(function(e) {
+   		$(this).find(".occupation-info").first().load("{% prefix %}/api/room/"+$(this).parents('.room').first().attr('id')+"/occupation")
+   	});
+   	$(".occupation").ajaxStart(function() {
+   		$(".occupation > span.ui-icon-refresh").removeClass("ui-icon-refresh").removeClass("ui-icon").addClass("spinner").spin("custom");
+   	}).ajaxStop(function() {
+   		$(".occupation > span.spinner").spin(false);
+   		$(".occupation > span.spinner").addClass("ui-icon-refresh").addClass("ui-icon").removeClass("spinner");
+   	});
 {% endblock %}
 {% block meta %}
 {% if tags %}
@@ -24,7 +33,7 @@
 	{% if rooms %}
 	<div id="rooms">
 		{% for r in rooms %}
-		<div id="{{r.id}}">
+		<div class="room" id="{{r.id}}">
 		   <h3><a href="#{{r.id}}" class="listheader">{{r.name}}</a></h3>
 		   <div>
 		       {% tags_for_object r as tags %}
@@ -33,7 +42,7 @@
 		  	   <ul class="nlist square" style="padding-left: 2px;">
 		  		  <li>&raquo;&nbsp;Tags: {% for tag in tags %}<a style="margin-right: 5px;" class="ui-widget" href="{% prefix %}/room/+{{tag}}">{{tag}}</a>{% endfor %} {%if edit %}<a style="font-size: 75%;" href="{% prefix %}/room/{{r.id}}/tag"><em>... manage room tags</em></a>{%endif%}</li>
 		          <li>&raquo;&nbsp;Created by {{r.creator}} {{r.timecreated|datehumanize}}.</li>
-                  <li>&raquo;&nbsp;{%if r.nusers%}There are {{r.nusers}} users present, {{r.nhosts}} of whom are hosts.{%else%}The room is currently unoccupied.{%endif%}</li>
+                  <li>&raquo;&nbsp;<span class="occupation"><span class="occupation-info">{%if r.nusers%}There are {{r.nusers}} users present, {{r.nhosts}} of whom are hosts.{%else%}The room is currently unoccupied.{%endif%}</span><span class="ui-icon ui-icon-refresh"></span></span></li>
 		          {% if r.self_cleaning %}<li>&raquo;&nbsp;Room will be reset when empty.</li>{%else%}<li>&raquo;&nbsp;Room state is preserved between sessions.</li>{% endif %}
 		          {% if r.allow_host %}<li>&raquo;&nbsp;First participant can elect to become host.</li>{% endif %}
 		          {% if r.lastvisited %}<li>&raquo;&nbsp;Last visited {{r.lastvisited|datehumanize}}</li>{%endif%} 

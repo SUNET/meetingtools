@@ -358,6 +358,16 @@ def _clean(request,room):
         room.sco_id = None
     return _update_room(request, room)
 
+def occupation(request,rid):
+    room = get_object_or_404(Room,pk=rid)
+    with ac_api_client(room.acc) as api:
+        api.poll_user_counts(room)
+        d = {'nusers': room.user_count, 'nhosts': room.host_count} 
+        return respond_to(request,
+                          {'text/html': 'apps/room/fragments/occupation.txt',
+                           'application/json': json_response(d, request)},
+                          d)
+
 def go_by_id(request,id):
     room = get_object_or_404(Room,pk=id)
     return goto(request,room)

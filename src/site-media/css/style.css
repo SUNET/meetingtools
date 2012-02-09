@@ -48,11 +48,14 @@ form fieldset { margin-left: 20px; }
 form fieldset input[type=text] { height: 25px; }
 form fieldset label {font-weight: bold; }
 .error { padding: 5px; }
+div.room { overflow-y: hidden; overflow-x: hidden; }
 ul.links { list-style: none inside; padding: 0; margin: 0; }
 li.links { padding: 0; margin: 0; }
 form .ui-widget ul { list-style: none inside; padding: 0; margin: 0; }
 form .ui-widget li { float: right; border-right: 1px solid #CECECE; padding-right: 5px; margin: 0; vertical-align: middle;}
-.ui-icon { display: inline-block !important; }
+.ui-icon { display: inline-block !important; vertical-align: bottom; }
+.spinner { margin-left: 10px; }
+.spinner > div { width: 16px; vertical-align: bottom; }
 .minipanel { padding-top: 5px; padding-bottom: 5px; padding-left: 6px; padding-right: 6px; }
 .right  { float: right; }
 .left { float: left; }
