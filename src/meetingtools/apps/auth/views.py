@@ -10,7 +10,7 @@ from django.views.decorators.cache import never_cache
 import logging
 from meetingtools.apps.userprofile.models import UserProfile
 from meetingtools.multiresponse import redirect_to, make_response_dict
-from meetingtools.ac import ac_api_client, ac_api
+from meetingtools.ac import ac_api_client
 from django.shortcuts import render_to_response
 from django.contrib import auth
 from django_co_connector.models import co_import_from_request, add_member,\
@@ -59,24 +59,23 @@ def login(request):
 def join_group(group,**kwargs):
     user = kwargs['user']
     acc = acc_for_user(user)
-    connect_api = ac_api(acc)    
-    principal = connect_api.find_principal("login", user.username, "user")
-    if principal:
-        gp = connect_api.find_group(group.name)
-        if gp:
-            connect_api.add_member(principal.get('principal-id'),gp.get('principal-id'))
+    with ac_api_client(acc) as api:    
+        principal = api.find_principal("login", user.username, "user")
+        if principal:
+            gp = api.find_group(group.name)
+            if gp:
+                api.add_member(principal.get('principal-id'),gp.get('principal-id'))
     
             
 def leave_group(group,**kwargs):
     user = kwargs['user']
     acc = acc_for_user(user)
-    connect_api = ac_api(acc)
-    
-    principal = connect_api.find_principal("login", user.username, "user")
-    if principal:
-        gp = connect_api.find_group(group.name)
-        if gp:
-            connect_api.remove_member(principal.get('principal-id'),gp.get('principal-id'))
+    with ac_api_client(acc) as api:
+        principal = api.find_principal("login", user.username, "user")
+        if principal:
+            gp = api.find_group(group.name)
+            if gp:
+                api.remove_member(principal.get('principal-id'),gp.get('principal-id'))
 
 add_member.connect(join_group,sender=Group)
 remove_member.connect(leave_group,sender=Group)
@@ -123,45 +122,45 @@ def accounts_login_federated(request):
         profile.save()
 
         acc = acc_for_user(request.user)
-        connect_api = ac_api_client(request, acc)
-        # make sure the principal is created before shooting off 
-        principal = connect_api.find_or_create_principal("login", request.user.username, "user", 
-                                                         {'type': "user",
-                                                          'has-children': "0",
-                                                          'first-name':fn,
-                                                          'last-name':ln,
-                                                          'email':mail,
-                                                          'send-email': 0,
-                                                          'login':request.user.username,
-                                                          'ext-login':request.user.username})
-        
-        
-        
-        co_import_from_request(request)
-        
-        member_or_employee = _is_member_or_employee(request.user)
-        for gn in ('live-admins','seminar-admins'):
-            group = connect_api.find_builtin(gn)
-            if group:
-                connect_api.add_remove_member(principal.get('principal-id'),group.get('principal-id'),member_or_employee)
-        
-        #(lp,domain) = uid.split('@')
-        #for a in ('student','employee','member'):
-        #    affiliation = "%s@%s" % (a,domain)
-        #    group = connect_api.find_or_create_principal('name',affiliation,'group',{'type': 'group','has-children':'1','name': affiliation})
-        #    member = affiliation in affiliations
-        #    connect_api.add_remove_member(principal.get('principal-id'),group.get('principal-id'),member)
+        with ac_api_client(request) as api:
+            # make sure the principal is created before shooting off 
+            principal = api.find_or_create_principal("login", request.user.username, "user", 
+                                                             {'type': "user",
+                                                              'has-children': "0",
+                                                              'first-name':fn,
+                                                              'last-name':ln,
+                                                              'email':mail,
+                                                              'send-email': 0,
+                                                              'login':request.user.username,
+                                                              'ext-login':request.user.username})
             
-        #for e in epe:
-        #    group = connect_api.find_or_create_principal('name',e,'group',{'type': 'group','has-children':'1','name': e})
-        #    if group:
-        #        connect_api.add_remove_member(principal.get('principal-id'),group.get('principal-id'),True)
             
-        next = request.session.get("after_login_redirect", None)
-        if not next and request.GET.has_key('next'):
-            next = request.GET['next']
-        if next is not None:
-            return redirect_to(next)
+            
+            co_import_from_request(request)
+            
+            member_or_employee = _is_member_or_employee(request.user)
+            for gn in ('live-admins','seminar-admins'):
+                group = api.find_builtin(gn)
+                if group:
+                    api.add_remove_member(principal.get('principal-id'),group.get('principal-id'),member_or_employee)
+            
+            #(lp,domain) = uid.split('@')
+            #for a in ('student','employee','member'):
+            #    affiliation = "%s@%s" % (a,domain)
+            #    group = connect_api.find_or_create_principal('name',affiliation,'group',{'type': 'group','has-children':'1','name': affiliation})
+            #    member = affiliation in affiliations
+            #    connect_api.add_remove_member(principal.get('principal-id'),group.get('principal-id'),member)
+                
+            #for e in epe:
+            #    group = connect_api.find_or_create_principal('name',e,'group',{'type': 'group','has-children':'1','name': e})
+            #    if group:
+            #        connect_api.add_remove_member(principal.get('principal-id'),group.get('principal-id'),True)
+                
+            next = request.session.get("after_login_redirect", None)
+            if not next and request.GET.has_key('next'):
+                next = request.GET['next']
+            if next is not None:
+                return redirect_to(next)
     else:
         pass
     return redirect_to("/")
