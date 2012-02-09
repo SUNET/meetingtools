@@ -81,7 +81,7 @@ class ACPClient():
             self._cache = {'login':{},'group':{}}
             
     def __exit__(self,type,value,traceback):
-        if self._cpool:
+        if self._cpool and not type:
             self._cpool._q.put_nowait(self)
         
     def __enter__(self):
