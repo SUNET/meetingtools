@@ -1,0 +1,1 @@
+{%if nusers %}There are {{nusers}} users present, {{nhosts}} of whom are hosts.{%else%}The room is currently unoccupied.{%endif%}

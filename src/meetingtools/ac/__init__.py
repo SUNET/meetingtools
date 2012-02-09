@@ -13,7 +13,7 @@ MAXIDLE = 10
 
 class ClientPool(object):
     
-    def __init__(self,acc,maxsize=0,increment=5):
+    def __init__(self,acc,maxsize=0,increment=2):
         self._q = Queue(maxsize)
         self._acc = acc
         self._increment = increment
