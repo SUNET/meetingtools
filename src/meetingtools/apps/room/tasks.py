@@ -209,6 +209,7 @@ def send_message(user,subject,message):
     except ObjectDoesNotExist:
         logging.info("User %s has no profile - email not sent" % user.username)
     except Exception,exc:
+        logging.error("Error while sending email: \n%s" % exc)
         send_message.retry(exc=exc)
                 
 @periodic_task(run_every=crontab(hour="*", minute="*", day_of_week="*"))
