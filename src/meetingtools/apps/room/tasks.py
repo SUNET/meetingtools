@@ -212,7 +212,7 @@ def send_message(user,subject,message):
         logging.error("Error while sending email: \n%s" % exc)
         send_message.retry(exc=exc)
                 
-@periodic_task(run_every=crontab(hour="*", minute="*", day_of_week="*"))
+@periodic_task(run_every=crontab(hour="1", minute="5", day_of_week="*"))
 def clean_old_rooms():
     for acc in ACCluster.objects.all():
         then = datetime.now() - timedelta(days=30)
