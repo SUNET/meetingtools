@@ -16,6 +16,10 @@ import logging
 from datetime import datetime,timedelta
 from lxml import etree
 from django.db.models import Q
+from django.contrib.humanize.templatetags import humanize
+from meetingtools.apps.userprofile.models import profile
+from django.core.mail import send_mail
+from meetingtools.settings import NOREPLY, BASE_URL
 
 def _owner_username(api,sco):
     logging.debug(sco)
@@ -194,7 +198,25 @@ def import_transactions():
                     except ObjectDoesNotExist:
                         pass # we only care about rooms we know about here
                 
+@task(name="meetingtools.apps.room.tasks.mail")
+def send_message(user,subject,message):
+    try:
+        p = user.get_profile()
+        if p and p.email:
+            send_mail(subject,message,NOREPLY,[p.email])
+        else:
+            logging.info("User %s has no email address - email not sent" % user.username)
+    except ObjectDoesNotExist:
+        logging.info("User %s has no profile - email not sent" % user.username)
+    except Exception,exc:
+        send_message.retry(exc=exc)
+                
+@periodic_task(run_every=crontab(hour="*", minute="*", day_of_week="*"))
 def clean_old_rooms():
     for acc in ACCluster.objects.all():
-        then = datetime.now() - timedelta(days=365)
+        then = datetime.now() - timedelta(days=30)
         then = then.replace(microsecond=0)
+        with ac_api_client(acc) as api:
+            for room in Room.objects.filter(lastvisited__lt=then):
+                logging.debug("room %s was last used %s" % (room.name,humanize.naturalday(room.lastvisited)))
+                send_message.apply_async([room.creator,"You have an unused meetingroom at %s" % BASE_URL,"Do you still need %s (%s)?" % (room.name,room.permalink())])

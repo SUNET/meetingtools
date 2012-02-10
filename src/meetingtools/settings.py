@@ -138,3 +138,6 @@ CARROT_BACKEND = "django"
 
 import djcelery 
 djcelery.setup_loader()
+
+NOREPLY = "no-reply@sunet.se"
+AUTH_PROFILE_MODULE = "userprofile.UserProfile"
