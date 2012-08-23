@@ -4,3 +4,4 @@
 .cache
 env
 admin-media
+celerybeat-schedule
