@@ -95,6 +95,7 @@ MIDDLEWARE_CLASSES = (
     'meetingtools.urlmiddleware.UrlMiddleware',
     'meetingtools.django-crossdomainxhr-middleware.XsSharing',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'django.contrib.messages.middleware.MessageMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     #'django.contrib.auth.middleware.RemoteUserMiddleware'
 )
