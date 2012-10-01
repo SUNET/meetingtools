@@ -10,7 +10,8 @@ ADMINS = (
     # ('Your Name', 'your_email@domain.com'),
 )
 
-BASE_DIR = '.'
+SRC_DIR = os.path.dirname(os.path.abspath(__file__))
+BASE_DIR = os.path.abspath(os.path.join(SRC_DIR, '..'))
 
 PREFIX_URL = ""
 BASE_URL = "http://localhost:8000%s" % PREFIX_URL
@@ -61,7 +62,8 @@ MEDIA_ROOT = "%s/site-media" % BASE_DIR
 ADMIN_MEDIA_ROOT = "%s/admin-media" % BASE_DIR
 MEDIA_URL = '%s/site-media/' % PREFIX_URL
 ADMIN_MEDIA_PREFIX = '%s/admin-media/' % PREFIX_URL
-
+STATIC_ROOT = "%s/static" % BASE_DIR
+STATIC_URL = "%s/static/" % PREFIX_URL
 
 LOGIN_URL = "%s/accounts/login" % PREFIX_URL
 LOGOUT_URL = "%s/accounts/logout" % PREFIX_URL

@@ -2,7 +2,7 @@ from django.conf.urls.defaults import patterns,include
 
 # Uncomment the next two lines to enable the admin:
 from django.contrib import admin
-from meetingtools.settings import ADMIN_MEDIA_ROOT, MEDIA_ROOT
+from meetingtools.settings import ADMIN_MEDIA_ROOT, MEDIA_ROOT, STATIC_ROOT
 from meetingtools.multiresponse import redirect_to
 from meetingtools.apps.room.feeds import RoomAtomTagFeed,RoomRSSTagField,\
     AtomRecordingFeed, RSSRecordingField
@@ -13,8 +13,8 @@ def welcome(request):
 
 urlpatterns = patterns('',
     (r'^$',welcome),
-    (r'^admin-media/(?P<path>.*)$','django.views.static.serve',{'document_root': ADMIN_MEDIA_ROOT}),
-    (r'^site-media/(?P<path>.*)$','django.views.static.serve',{'document_root': MEDIA_ROOT}),
+    (r'^admin/', include(admin.site.urls)),
+    (r'^static/(?P<path>.*)$','django.views.static.serve',{'document_root': STATIC_ROOT}),
     # Login/Logout
     (r'^accounts/login?$','meetingtools.apps.auth.views.login'),
     (r'^accounts/login-federated$','meetingtools.apps.auth.views.accounts_login_federated'),
@@ -50,6 +50,4 @@ urlpatterns = patterns('',
     (r'^stats/user/(.+)$','meetingtools.apps.stats.views.user'),
     (r'^stats/domain/(.+)$','meetingtools.apps.stats.views.domain'),
     (r'^stats/room/(\d+)$','meetingtools.apps.stats.views.room'),
-    # Uncomment the next line to enable the admin:
-    (r'^admin/', include(admin.site.urls))
 )
