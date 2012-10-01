@@ -1,4 +1,5 @@
 Django
+python-dateutil==1.5.0
 South
 Werkzeug
 anyjson
@@ -24,9 +25,9 @@ morbid
 mysql-connector-python
 odict
 ordereddict
-python-dateutil
 pySAML2
 suds
 uuid
 git+git://github.com/berggren/django-co-acls.git
 git+git://github.com/berggren/django-co-connector.git
+pytz
