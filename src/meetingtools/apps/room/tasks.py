@@ -68,7 +68,7 @@ def _import_one_room(acc,api,row):
     
     try:
         room = Room.objects.get(acc=acc,deleted_sco_id=sco_id)
-        if room != None:
+        if room is not None:
             return # We hit a room in the process of being cleaned - let it simmer until next pass
     except ObjectDoesNotExist:
         pass
@@ -79,7 +79,7 @@ def _import_one_room(acc,api,row):
     try:
         logging.debug("finding acc=%s,sco_id=%d in our DB" % (acc,sco_id))
         room = Room.objects.get(acc=acc,sco_id=sco_id)
-        if room.deleted_sco_id != None:
+        if room.deleted_sco_id is not None:
             return # We hit a room in the process of being cleaned - let it simmer until next pass
         room.trylock()
     except ObjectDoesNotExist:
@@ -97,42 +97,70 @@ def _import_one_room(acc,api,row):
         logging.debug("found room owned by %s time for and update" % username)
         if username is None:
             return
-        
+
+        logging.debug(etree.tostring(row))
+        logging.debug(etree.tostring(r))
         urlpath = row.findtext("url[0]").strip("/")
         name = row.findtext('name[0]')
         description = row.findtext('description[0]')
-        folder_sco_id = int(r.xpath('//sco[0]/@folder-id') or 0) or None
-        source_sco_id = int(r.xpath('//sco[0]/@source-sco-id') or 0) or None
-            
-        if room == None:   
-            user,created = User.objects.get_or_create(username=username)
-            if created:
-                user.set_unusable_password()
-            room = Room.objects.create(acc=acc,sco_id=sco_id,creator=user,name=name,description=description,folder_sco_id=folder_sco_id,source_sco_id=source_sco_id,urlpath=urlpath)
-            room.trylock()
+        folder_sco_id = 0
+        source_sco_id = 0
+
+        def _ior0(elt,a,dflt):
+            str = elt.get(a,None)
+            if str is None or not str:
+                return dflt
+            else:
+                return int(str)
+
+
+        for elt in r.findall(".//sco[0]"):
+            folder_sco_id = _ior0(elt,'folder-id',0)
+            source_sco_id = _ior0(elt,'source-sco-id',0)
+
+        logging.debug("urlpath=%s, name=%s, folder_sco_id=%s, source_sco_id=%s" % (urlpath,name,folder_sco_id,source_sco_id))
+
+        if room is None:
+            if folder_sco_id:
+                user,created = User.objects.get_or_create(username=username)
+                if created:
+                    user.set_unusable_password()
+                room = Room.objects.create(acc=acc,sco_id=sco_id,creator=user,name=name,description=description,folder_sco_id=folder_sco_id,source_sco_id=source_sco_id,urlpath=urlpath)
+                room.trylock()
         else:
-            room.folder_sco_id = folder_sco_id
+            if folder_sco_id:
+                room.folder_sco_id = folder_sco_id
             room.source_sco_id = source_sco_id
             room.description = description
             room.urlpath = urlpath
 
-        room.save()
-        room.unlock()
+        if room is not None:
+            room.save()
+            room.unlock()
     else:
-        room.unlock()
+        if room is not None:
+            room.unlock()
     
-def _import_acc(acc):
+def import_acc(acc,since=0):
     with ac_api_client(acc) as api:
-        then = datetime.now()-timedelta(seconds=3600)
-        then = then.replace(microsecond=0)
-        r = api.request('report-bulk-objects',{'filter-type': 'meeting','filter-gt-date-modified': then.isoformat()})
-        for row in r.et.xpath("//row"):
-            _import_one_room(acc,api,row)
+        r = None
+        if since > 0:
+            then = datetime.now()-timedelta(seconds=since)
+            then = then.replace(microsecond=0)
+            r = api.request('report-bulk-objects',{'filter-type': 'meeting','filter-gt-date-modified': then.isoformat()})
+        else:
+            r = api.request('report-bulk-objects',{'filter-type': 'meeting'})
 
-@periodic_task(run_every=crontab(hour="*", minute="*/5", day_of_week="*"))
+        for row in r.et.xpath("//row"):
+            try:
+                _import_one_room(acc,api,row)
+            except Exception,ex:
+                logging.error(ex)
+
+@periodic_task(run_every=crontab(hour="*", minute="*", day_of_week="*"))
 def import_all_rooms():
     for acc in ACCluster.objects.all():
-        _import_acc(acc)
+        import_acc(acc,since=3600)
   
 def start_user_counts_poll(room,niter):
     poll_user_counts.apply_async(args=[room],kwargs={'niter': niter})
