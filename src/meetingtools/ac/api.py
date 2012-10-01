@@ -91,7 +91,7 @@ class ACPClient():
     def request(self,method,p={},raise_error=False):
         self.age += 1
         self.lastused = time.time()
-        u = []
+        u = list()
         u.append("action=%s" % method)
         if self.session:
             u.append("session=%s" % self.session)
@@ -103,7 +103,7 @@ class ACPClient():
         
         url = self.url + '?' + '&'.join(u)
     
-        h = httplib2.Http(tempfile.gettempdir()+os.sep+".cache");
+        h = httplib2.Http(tempfile.gettempdir()+os.sep+".cache",disable_ssl_certificate_validation=True);
         logging.debug(url)
         resp, content = h.request(url, "GET")
         logging.debug(pformat(resp))
