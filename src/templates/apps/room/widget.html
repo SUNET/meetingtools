@@ -1,36 +1,39 @@
 {% extends "base.html" %}
 {% load prefix %}
 {% block widgets %}
-     SyntaxHighlighter.all()
+     //SyntaxHighlighter.all()
 {% endblock %}
 {% block meta %}
-<script type="text/javascript" src="{% prefix %}/site-media/js/xregexp-min.js"></script>
+<!-- script type="text/javascript" src="{% prefix %}/site-media/js/xregexp-min.js"></script>
 <script type="text/javascript" src="{% prefix %}/site-media/js/shCore.js"></script>
 <script type="text/javascript" src="{% prefix %}/site-media/js/shAutoloader.js"></script>
 <script type="text/javascript" src="{% prefix %}/site-media/js/shLegacy.js"></script>
 <script type="text/javascript" src="{% prefix %}/site-media/js/shBrushXml.js"></script>
 <link href="{% prefix %}/site-media/css/shCore.css" rel="stylesheet" type="text/css" />
-<link href="{% prefix %}/site-media/css/shThemeDefault.css" rel="stylesheet" type="text/css" />
+<link href="{% prefix %}/site-media/css/shThemeDefault.css" rel="stylesheet" type="text/css" / -->
 {% endblock %}
 {% block content %}
-<h1>{{title}}</h1>
+<div class="page-header">
+    <h1>{{title}}</h1>
+</div>
 
-<div class="ui-widget">
-	<div class="ui-state-highlight ui-corner-all" style="margin-top: 20px; padding: 0 .7em;"> 
-		<p><span class="ui-icon ui-icon-info" style="float: left; margin-right: .3em;"></span>
+<div class="alert">
+		<i class="icon-info-sign"></i>
 		The meetingtools jquery widget allows you to easily embed lists of meetings in your own
 		web page using the popular <a href="http://jquery.com">jQuery javascript library</a>.
-	</div>
 </div>
 
 <p>Copy the sample html below in order to list rooms tagged with <em>{{tags}}</em>.</p>
 
-<pre class="brush: xml">
+<pre class="pre-scrollable prettyprint linenums language-xml">
 &lt;html&gt;
    &lt;head&gt;
-      &lt;script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.1/jquery.min.js"&gt;&lt;/script&gt;
-      &lt;script type="text/javascript" src="{% baseurl %}/site-media/js/jquery.meetingtools.js"&gt;&lt;/script&gt;
-      &lt;link href="{% baseurl %}/site-media/css/jquery.meetingtools.css" rel="stylesheet" type="text/css" /&gt;
+      &lt;script type="text/javascript"
+                 src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"&gt;&lt;/script&gt;
+      &lt;script type="text/javascript"
+                 src="{% baseurl %}/site-media/js/jquery.meetingtools.js"&gt;&lt;/script&gt;
+      &lt;link href="{% baseurl %}/site-media/css/jquery.meetingtools.css"
+               rel="stylesheet" type="text/css" /&gt;
       &lt;script type="text/javascript"&gt;
          $(function() {
             $("#meetings").meetingtools({tags: '{{tags}}',url: '{% baseurl %}'});

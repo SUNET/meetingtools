@@ -4,7 +4,9 @@
 {% block widgets %}
 {% endblock %}
 {% block content %}
-	<h1>Entering {{room.name}}</h1>
+    <div class="page-header">
+	    <h1>Entering {{room.name}}</h1>
+    </div>
 	<div class="ui-widget">
 		<div class="ui-state-highlight ui-corner-all" style="margin-top: 20px; padding: 0 .7em; width: 80%"> 
 			<p><span class="ui-icon ui-icon-info" style="float: left; margin-right: .3em;"></span>
@@ -22,10 +24,12 @@
 		</div>
 	</div>
 	<br/>
-	<ul class="ilist">
+	<div>
+        <a class="btn btn-large" href="{% prefix %}/rooms#{{room.id}}">Cancel</a>
 	    {%if room.nhosts == 0 %}
-		<li class="button"><a href="{% prefix %}/accounts/login-federated?next=/promote/{{room.id}}">Enter as Host</a></li>
+		<a class="btn btn-large btn-success" href="{% prefix %}/accounts/login-federated?next=/promote/{{room.id}}">Enter as Host</a>
 		{% endif %}
-		<li class="button"><a href="{% prefix %}/launch/{{room.id}}">Enter</a></li>
-	</ul>
+		<a class="btn btn-large btn-primary" href="{% prefix %}/launch/{{room.id}}">Enter as Participant</a>
+
+	</div>
 {% endblock %}

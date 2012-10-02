@@ -3,6 +3,7 @@ Created on Jan 31, 2011
 
 @author: leifj
 '''
+from StringIO import StringIO
 
 import httplib2
 from urllib import quote_plus
@@ -148,7 +149,7 @@ class ACPClient():
             p = self._find_or_create_principal(key,value,t,d)
             cache[key] = etree.tostring(p)
         else:   
-            p = etree.parse(cache[key])
+            p = etree.parse(StringIO(cache[key]))
         return p
         
     def find_principal(self,key,value,t):

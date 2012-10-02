@@ -1,14 +1,3 @@
-{% extends "form.html" %}
+{% extends "edit.html" %}
 {% block widgets %}
-	$('#wizard').formwizard({
-	    	validationEnabled: true,
-	    	focusFirstInput: true,
-	    	textSubmit: "{{submitname}}",
-	    	validationOptions: {
-	    		rules: {
-	    		    name: 'required',
-	    		    urlpath: 'required'
-	    		}
-	    	}
-	    });
 {% endblock %}

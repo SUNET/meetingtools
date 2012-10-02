@@ -15,6 +15,7 @@ def datehumanize(value):
     from datetime import datetime
  
     if isinstance(value, datetime):
+        value = value.replace(tzinfo=None)
         delta = datetime.now() - value
         if delta.days > 6:
             return value.strftime("on %b %d")                    # May 15

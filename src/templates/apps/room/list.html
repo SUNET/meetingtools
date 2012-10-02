@@ -4,22 +4,15 @@
 {% load roomurl %}
 {% load tagging_tags %}
 {% block widgets %}
-    $("#rooms").accordion({
-    	header: 'h3',
-        event: "click",
-        collapsible: true,
-   		navigation: true,
-   		animated: true,
-   		autoHeight: false
-   	});
+    $(".collapse").collapse({'parent': '#rooms'});
    	$(".occupation").click(function(e) {
-   		$(this).find(".occupation-info").first().load("{% prefix %}/api/room/"+$(this).parents('.room').first().attr('id')+"/occupation")
+   		$(this).find(".occupation-info").first().load("{% prefix %}/api/room/"+$(this).parents('.accordion-body').attr('id')+"/occupation")
    	});
    	$(".occupation").ajaxStart(function() {
-   		$(".occupation > span.ui-icon-refresh").removeClass("ui-icon-refresh").removeClass("ui-icon").addClass("spinner").spin("custom");
+   		$(".occupation i.icon-refresh").removeClass("icon-refresh").addClass("spinner").spin("custom");
    	}).ajaxStop(function() {
-   		$(".occupation > span.spinner").spin(false);
-   		$(".occupation > span.spinner").addClass("ui-icon-refresh").addClass("ui-icon").removeClass("spinner");
+   		$(".occupation i.spinner").spin(false);
+   		$(".occupation i.spinner").addClass("icon-refresh").removeClass("spinner");
    	});
 {% endblock %}
 {% block meta %}
@@ -29,38 +22,42 @@
 {% endif %}
 {% endblock %}
 {% block content %}
-	<h1>{{title}}</h1>
+    <div class="page-header">
+	    <h1>{{title}}</h1>
+    </div>
 	{% if rooms %}
-	<div id="rooms">
+	<div id="rooms" class="accordion">
 		{% for r in rooms %}
-		<div class="room" id="{{r.id}}">
-		   <h3><a href="#{{r.id}}" class="listheader">{{r.name}}</a></h3>
-		   <div>
-		       {% tags_for_object r as tags %}
-		       <p><a target="_connect" href="{{r|roomurl}}">{{r|roomurl}}<span style="vertical-align: bottom;" class="ui-icon ui-icon-extlink"></span></a></p>
-		  	   <p class="infopanel ui-widget ui-corner-all ui-state-highlight">{% if r.description %}{{r.description|safe}}{% else %}<em>No description available...</em>{% endif %}</p>
-		  	   <ul class="nlist square" style="padding-left: 2px;">
-		  		  <li>&raquo;&nbsp;Tags: {% for tag in tags %}<a style="margin-right: 5px;" class="ui-widget" href="{% prefix %}/room/+{{tag}}">{{tag}}</a>{% endfor %} {%if edit %}<a style="font-size: 75%;" href="{% prefix %}/room/{{r.id}}/tag"><em>... manage room tags</em></a>{%endif%}</li>
-		          <li>&raquo;&nbsp;Created by {{r.creator}} {{r.timecreated|datehumanize}}.</li>
-                  <li>&raquo;&nbsp;<span class="occupation"><span class="occupation-info">{%if r.nusers%}There are {{r.nusers}} users present, {{r.nhosts}} of whom are hosts.{%else%}The room is currently unoccupied.{%endif%}</span><span class="ui-icon ui-icon-refresh"></span></span></li>
-		          {% if r.self_cleaning %}<li>&raquo;&nbsp;Room will be reset when empty.</li>{%else%}<li>&raquo;&nbsp;Room state is preserved between sessions.</li>{% endif %}
-		          {% if r.allow_host %}<li>&raquo;&nbsp;First participant can elect to become host.</li>{% endif %}
-		          {% if r.lastvisited %}<li>&raquo;&nbsp;Last visited {{r.lastvisited|datehumanize}}</li>{%endif%} 
-		  	      <li>&raquo;&nbsp;Hosted on {{r.acc.name}} - <a href="{% prefix %}/stats/room/{{r.id}}">room usage plot</a></li>
-		  	   </ul>
-		   	  <br/>
-		   	  <ul class="ilist">
-		   	  	 <li class="button"><a target="_blank" href="{% prefix %}/go/{{r.id}}">Enter Room</a></li>
-		   	  	 {% if edit %}
-		   	  	 <li class="button"><a href="{% prefix %}/room/{{r.id}}/tag">Room Tags</a></li>
-		   	  	 <li class="button"><a href="{% prefix %}/room/{{r.id}}/recordings">Room Recordings</a></li>
-		   	     <li class="button"><a href="{% prefix %}/room/{{r.id}}/modify">Modify Room</a></li>
-		   	     {% if room.is_locked %}
-				 <li class="button"><a href="{% prefix %}/room/{{r.id}}/unlock">Unlock Room</a></li>
-		   	     {% endif %}
-		   	     <li class="button"><a href="{% prefix %}/room/{{r.id}}/delete">Delete Room</a></li>
-		   	  	 {% endif %}
-		   	  </ul>
+		<div class="room accordion-group">
+		   <div class="accordion-heading"><a href="#{{r.id}}" class="accordion-toggle" data-toggle="collapse" data-parent="#rooms">{{r.name}}</a></div>
+		   <div id="{{r.id}}" class="accordion-body collapse in">
+               <div class="accordion-inner">
+                   {% tags_for_object r as tags %}
+                   <p><a target="_connect" href="{{r|roomurl}}">{{r|roomurl}}</a></p>
+                   <p class="well">{% if r.description %}{{r.description|safe}}{% else %}<em>No description available...</em>{% endif %}</p>
+                   <ul class="unstyled" style="padding-left: 2px;">
+                      <li>&raquo;&nbsp;Tags: {% for tag in tags %}<a style="margin-right: 5px;" href="{% prefix %}/room/+{{tag}}">{{tag}}</a>{% endfor %} {%if edit %}<a style="font-size: 75%;" href="{% prefix %}/room/{{r.id}}/tag"><em>... manage room tags</em></a>{%endif%}</li>
+                      <li>&raquo;&nbsp;Created by {{r.creator}} {{r.timecreated|datehumanize}}.</li>
+                      <li>&raquo;&nbsp;<span class="occupation"><span class="occupation-info">{%if r.nusers%}There are {{r.nusers}} users present, {{r.nhosts}} of whom are hosts.{%else%}The room is currently unoccupied.{%endif%}</span><a href="#" class="btn btn-mini btn-info"><i class="icon-refresh"> </i>refresh</a></span></li>
+                      {% if r.self_cleaning %}<li>&raquo;&nbsp;Room will be reset when empty.</li>{%else%}<li>&raquo;&nbsp;Room state is preserved between sessions.</li>{% endif %}
+                      {% if r.allow_host %}<li>&raquo;&nbsp;First participant can elect to become host.</li>{% endif %}
+                      {% if r.lastvisited %}<li>&raquo;&nbsp;Last visited {{r.lastvisited|datehumanize}}</li>{%endif%}
+                      <li>&raquo;&nbsp;Hosted on {{r.acc.name}} <a class="btn btn-mini btn-info" href="{% prefix %}/stats/room/{{r.id}}">room usage plot</a></li>
+                   </ul>
+                  <br/>
+                  <div class="btn-group">
+                     <a class="btn" target="_blank" href="{% prefix %}/go/{{r.id}}">Enter Room</a>
+                     {% if edit %}
+                     <a class="btn" href="{% prefix %}/room/{{r.id}}/tag">Room Tags</a>
+                     <a class="btn" href="{% prefix %}/room/{{r.id}}/recordings">Room Recordings</a>
+                     <a class="btn" href="{% prefix %}/room/{{r.id}}/modify">Modify Room</a>
+                     {% if room.is_locked %}
+                     <a class="btn" href="{% prefix %}/room/{{r.id}}/unlock">Unlock Room</a>
+                     {% endif %}
+                     <a class="btn btn-danger" href="{% prefix %}/room/{{r.id}}/delete">Delete Room</a>
+                     {% endif %}
+                  </div>
+               </div>
 		   </div>
 		</div>
 		{% endfor %}
@@ -70,9 +67,9 @@
 	{% endif %}
 	<br/>
 	{% if edit %}
-	<ul class="ilist">
-	   <li><div class="button"><a href="{% prefix %}/room/create">Create a New Room</a></div></li>
-	</ul>
+	<div class="btn-group">
+	   <a class="btn btn-success" href="{% prefix %}/room/create">Create a New Room</a>
+	</div>
 	{% endif %}
 {% endblock %}
 {% block validators %}

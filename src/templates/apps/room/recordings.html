@@ -4,39 +4,32 @@
 {% load roomurl %}
 {% load tagging_tags %}
 {% block widgets %}
-    $("#recordings").accordion({
-   		header: 'h3',
-        active: false,
-        event: "click", 
-   		collapsible: true,
-   		navigation: true,
-   		animated: true,
-   		autoHeight: false
-   	});
+$(".collapse").collapse({'parent': '#recordings'});
 {% endblock %}
 {% block meta %}
 <link rel="alternate" type="application/rss+xml" title="{{title}} recordings (RSS 2.0)" href="{% prefix %}/room/{{room.id}}/recordings.rss" />
 <link rel="alternate" type="application/atom+xml" title="{{title}} recordings (ATOM 1.0)" href="{% prefix %}/room/{{room.id}}/recordings.atom" />
 {% endblock %}
 {% block content %}
-	<h1>Recordings in '{{room.name}}'</h1>
+	<div class="page-header">
+        <h1>Recordings in '{{room.name}}'</h1>
+    </div>
 	{% if recordings %}
-	<div id="recordings">
+	<div id="recordings" class="accordion">
 		{% for r in recordings %}
-		<div id="{{r.sco_id}}">
-		   <h3 class="listheader">{{r.name}}</h3>
-		   <div>
-		      <p><a target="_connect" href="{{r.url}}">{{r.url}}<span style="vertical-align: bottom;" class="ui-icon ui-icon-extlink"></span></a></p>
-		   	  <p class="infopanel ui-widget ui-corner-all ui-state-highlight">{% if r.description %}{{r.description|safe}}{% else %}<em>No description available...</em>{% endif %}</p>
-		   	  <ul class="nlist square" style="padding-left: 2px;">
-		          <li>&raquo;&nbsp;Created {{r.date_created|datehumanize}}.</li>
-		          <li>&raquo;&nbsp;Modified {{r.date_modified|datehumanize}}.</li>
-		  	      <li>&raquo;&nbsp;Hosted on {{room.acc.name}}</li>
-		  	   </ul>
-		   	  <br/>
-		   	  <ul class="ilist">
-			   <li class="button"><a target="_connect" href="{{r.url}}">Play Recording</a></li>
-			</ul>
+		<div class="recording accordion-group">
+		   <div class="accordion-heading"><a class="accordion-toggle" data-toggle="collapse" href="#{{r.sco_id}}">{{r.name}}</a></div>
+		   <div id="{{r.sco_id}}" class="accordion-body collapse in">
+		      <div class="accordion-inner">
+                  <p><a target="_connect" href="{{r.url}}">{{r.url}}</a></p>
+                  <div class="well">{% if r.description %}{{r.description|safe}}{% else %}<em>No description available...</em>{% endif %}</div>
+                  <ul class="unstyled">
+                      <li>&raquo;&nbsp;Created {{r.date_created|datehumanize}}.</li>
+                      <li>&raquo;&nbsp;Modified {{r.date_modified|datehumanize}}.</li>
+                      <li>&raquo;&nbsp;Hosted on {{room.acc.name}}</li>
+                   </ul>
+                  <a class="btn btn-info" target="_connect" href="{{r.url}}">Play Recording</a>
+              </div>
 		   </div>
 		</div>
 		{% endfor %}
@@ -45,11 +38,9 @@
 	<p>No recordings right now...</p>
 	{% endif %}
 	<br/>
-	<ul class="ilist">
-	   <li class="button"><a href="{%prefix%}/room#{{room.id}}">Back to '{{room.name}}'</a></li>
-	</ul>
+	<a class="btn" href="{%prefix%}/room#{{room.id}}">Back to '{{room.name}}'</a>
 {% endblock %}
 {% block validators %}
-<a href="http://feed1.w3.org/check.cgi?url={% baseurl %}{% prefix %}/room/{{room.id}}/recordings.atom"><img src="{% prefix %}/site-media/img/valid-atom.png" alt="[Valid Atom 1.0]" title="Validate my Atom 1.0 feed" /></a>
-<a href="http://feed1.w3.org/check.cgi?url={% baseurl %}{% prefix %}/room/{{room.id}}/recordings.rss"><img src="{% prefix %}/site-media/img/valid-rss-rogers.png" alt="[Valid RSS]" title="Validate my RSS feed" /></a>
+<a href="http://feed1.w3.org/check.cgi?url={% baseurl %}{% prefix %}/room/{{room.id}}/recordings.atom"><img src="{% prefix %}/static/img/valid-atom.png" alt="[Valid Atom 1.0]" title="Validate my Atom 1.0 feed" /></a>
+<a href="http://feed1.w3.org/check.cgi?url={% baseurl %}{% prefix %}/room/{{room.id}}/recordings.rss"><img src="{% prefix %}/static/img/valid-rss-rogers.png" alt="[Valid RSS]" title="Validate my RSS feed" /></a>
 {% endblock %}

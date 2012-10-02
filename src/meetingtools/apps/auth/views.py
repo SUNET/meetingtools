@@ -120,6 +120,10 @@ def accounts_login_federated(request):
         #profile.lastupdated = datetime.datetime.now()    
         profile.save()
 
+        next = request.session.get("after_login_redirect", None)
+        if not next and request.GET.has_key('next'):
+            next = request.GET['next']
+
         acc = acc_for_user(request.user)
         with ac_api_client(request) as api:
             # make sure the principal is created before shooting off 
@@ -154,12 +158,9 @@ def accounts_login_federated(request):
             #    group = connect_api.find_or_create_principal('name',e,'group',{'type': 'group','has-children':'1','name': e})
             #    if group:
             #        connect_api.add_remove_member(principal.get('principal-id'),group.get('principal-id'),True)
-                
-            next = request.session.get("after_login_redirect", None)
-            if not next and request.GET.has_key('next'):
-                next = request.GET['next']
+
             if next is not None:
                 return redirect_to(next)
     else:
         pass
-    return redirect_to("/")
+    return redirect_to(next)

@@ -6,27 +6,29 @@
 {% block widgets %}
 
 {% endblock %}
-{% block beforefields %}
-<div class="ui-widget">
-	<div class="ui-state-highlight ui-corner-all" style="margin-top: 20px; padding: 0 .7em;"> 
-		<p><span class="ui-icon ui-icon-info" style="float: left; margin-right: .3em;"></span>
-		<strong>Note Well</strong> Tags are a way to group related rooms together. Tagging your 
-		room makes your room show up in public lists of rooms hosted on this service and it
-		therefore makes your room more visible.</p>
-	</div>
-</div>
-<br/>
+{% block formstyle %}
+class="form-inline"
 {% endblock %}
-{% block beforeform %}
-<h1>Current tags for {{room.name}}</h1>
-{% if tags %}
-<ul class="ilist">
-  {% for tag in tags %}
-    <li class="ui-widget ui-state-highlight ui-corner-all" style="padding: 6px 10px;"><a href="{%prefix%}/room/+{{tag}}">{{tag}}</a>&nbsp;<a href="{% prefix %}/room/{{room.id}}/untag/{{tag}}"><span style="vertical-align: middle;" class="ui-icon ui-icon-closethick"></span></a></li>
-  {% endfor %}
-</ul>
-{% else %}
-<em>There are no tags yet...</em>
-{% endif %}
-<br/>
+{% block justbeforeform %}
+<div>
+    <div class="alert">
+        <i class="icon-info-sign"> </i>
+        <strong>Note Well</strong> Tags are a way to group related rooms together. Tagging your
+        room makes your room show up in public lists of rooms hosted on this service and it
+        therefore makes your room visible. This does <em>not</em> mean that anyone can access
+        your room.
+    </div>
+    {% if tags %}
+    <div>
+        {% for tag in tags %}
+        <span class="btn-group">
+            <a class="btn btn-small" href="{%prefix%}/room/+{{tag}}">{{tag}}</a>&nbsp;
+            <a class="btn btn-small btn-warning" href="{% prefix %}/room/{{room.id}}/untag/{{tag}}"><i class="icon-remove"></i></a>
+        </span>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="alert">There are no tags yet...</div>
+</div>
+    {% endif %}
 {% endblock %}

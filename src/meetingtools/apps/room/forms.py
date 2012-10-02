@@ -5,7 +5,7 @@ Created on Feb 1, 2011
 '''
 
 from meetingtools.apps.room.models import Room
-from django.forms.widgets import Select, TextInput, RadioSelect
+from django.forms.widgets import Select, TextInput, RadioSelect, Textarea
 from django.forms.fields import BooleanField, ChoiceField, CharField
 from django.forms.forms import Form
 from form_utils.forms import BetterModelForm
@@ -22,16 +22,18 @@ class PrefixTextInput(TextInput):
         self.prefix = prefix
 
     def render(self, name, value, attrs=None):
-        return mark_safe("<b>"+self.prefix+"</b>&nbsp;"+super(PrefixTextInput, self).render(name, value, attrs))
+        return mark_safe("<div class=\"input-prepend\"><span class=\"add-on\">"+self.prefix+"</span>"+
+                         super(PrefixTextInput, self).render(name, value, attrs)+"</span></div>")
         
 class ModifyRoomForm(ModelForm):
     class Meta:
         model = Room
         fields = ['name','description','source_sco_id','self_cleaning','allow_host']
         widgets = {'source_sco_id': Select(),
+                   'description': Textarea(attrs={'rows': 4, 'cols': 50}),
                    'name': TextInput(attrs={'size': '40'})}
-        
-        
+
+
 class CreateRoomForm(BetterModelForm):
 
     access = ChoiceField(choices=(('public','Public'),('private','Private')))
@@ -69,7 +71,8 @@ class CreateRoomForm(BetterModelForm):
                                     }),               
                     ]
         widgets = {'access': RadioSelect(),
-                   'urlpath': PrefixTextInput(attrs={'size': '15'}),
+                   'urlpath': PrefixTextInput(attrs={'size': '10'}),
+                   'description': Textarea(attrs={'rows': 4, 'cols': 50}),
                    'name': TextInput(attrs={'size': '40'})}
         
 class DeleteRoomForm(Form):

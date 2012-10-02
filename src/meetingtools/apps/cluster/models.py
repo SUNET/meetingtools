@@ -30,6 +30,6 @@ def acc_for_user(user):
         domain = "nordu.net" # testing with local accts only
     for acc in ACCluster.objects.all():
         for regex in acc.domain_match.split():
-            if re.match(regex,domain):
+            if re.match(regex.strip(),domain):
                 return acc
     raise Exception,"I don't know which cluster you belong to... (%s)" % user.username

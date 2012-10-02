@@ -2,25 +2,30 @@
 {% load prefix %}
 {% block content %}
 {% block beforeform %}{% endblock %}
-<h1>{{formtitle}}</h1>
-<form method="POST" class="ui-widget ui-corner-all ui-state-highlight bbq infopanel" style="width: 66%">
-{% block beforefields %}{% endblock %}
-<ul class="links">
-  {% for field in form %}
-    {% if field.is_hidden %}
-      {{ field }}
-    {% else %}
-      <li class="links {% if field.field.required %}required{% endif %}" {{ field.row_attrs }} style="margin-bottom: 10px;">
-        {{ field.errors }}
-        <label for="id_{{ field.html_name }}" class="fieldlabel" style="border-bottom: 1px solid #CECECE;"><em>{{ field.label }}{% if field.field.required %}<b>*</b>{% endif %}</em></label>
-        <div class="fieldinput">{{ field }}</div>
-      </li>
-    {% endif %}
-  {% endfor %}
-</ul>
-<ul class="ilist" style="padding-top: 10px; padding-bottom: 5px;">
-    <li class="button"><input type="submit" value="{{submitname}}" /></li>
-    <li class="button right"><input type="button" onClick="document.location='{% prefix %}/rooms'" value="{{cancelname}}"/></li>
-</ul>
-</form>
+<div class="page-header">
+    <h1>{{formtitle}}</h1>
+</div>
+<div class="well" style="width: 70%;">
+    {% block justbeforeform %}{% endblock %}
+    <div>
+        <form method="POST" class="form-horizontal">
+        {% block beforefields %}{% endblock %}
+          {% for field in form %}
+            {% if field.is_hidden %}
+              {{ field }}
+            {% else %}
+              <div class="control-group {% if field.field.required %}required{% endif %}" {{ field.row_attrs }}>
+                {{ field.errors }}
+                <label for="id_{{ field.html_name }}" class="control-label" ><em>{{ field.label }}{% if field.field.required %}<b>*</b>{% endif %}</em></label>
+                <div class="controls">{{ field }}</div>
+              </div>
+            {% endif %}
+          {% endfor %}
+        <div class="form-actions">
+            <input type="button" class="btn" onClick="document.location='{% prefix %}/rooms'" value="{{cancelname}}"/>
+            <input class="btn btn-success" type="submit" value="{{submitname}}" />
+        </div>
+        </form>
+    </div>
+</div>
 {% endblock %}
