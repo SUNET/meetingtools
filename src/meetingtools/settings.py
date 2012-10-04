@@ -1,4 +1,5 @@
 # Django settings for meetingtools project.
+from django.conf.global_settings import TEMPLATE_CONTEXT_PROCESSORS
 
 import meetingtools.site_logging
 import os
@@ -13,8 +14,6 @@ ADMINS = (
 SRC_DIR = os.path.dirname(os.path.abspath(__file__))
 BASE_DIR = os.path.abspath(os.path.join(SRC_DIR, '..'))
 
-PREFIX_URL = ""
-BASE_URL = "http://localhost:8000%s" % PREFIX_URL
 MANAGERS = ADMINS
 
 LOCK_DIR = "/var/lock"
@@ -58,15 +57,12 @@ USE_I18N = True
 # calendars according to the current locale
 USE_L10N = True
 
-MEDIA_ROOT = "%s/site-media" % BASE_DIR
-ADMIN_MEDIA_ROOT = "%s/admin-media" % BASE_DIR
-MEDIA_URL = '%s/site-media/' % PREFIX_URL
-ADMIN_MEDIA_PREFIX = '%s/admin-media/' % PREFIX_URL
 STATIC_ROOT = "%s/static" % BASE_DIR
-STATIC_URL = "%s/static/" % PREFIX_URL
+STATIC_URL = "/static/"
 
-LOGIN_URL = "%s/accounts/login" % PREFIX_URL
-LOGOUT_URL = "%s/accounts/logout" % PREFIX_URL
+LOGIN_URL = "/accounts/login"
+LOGOUT_URL = "/accounts/logout"
+DEFAULT_URL = "/"
 
 # Make this unique, and don't share it with anybody.
 SECRET_KEY = 'tz78l!c=cl2=jic5$2#(bq)7-4s1ivtm*a+q0w1yi0$)hrmc7l'
@@ -81,6 +77,11 @@ CACHES = {
         'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
         'LOCATION': 'unique-snowflake'
     }
+}
+
+THEMES = {
+    '__default__': {'base': "%s/themes/default" % STATIC_URL },
+    'meetingtools.nordu.net': {'base': "%s/themes/meetingtools.nordu.net" % STATIC_URL}
 }
 
 # List of callables that know how to import templates from various sources.

@@ -13,9 +13,9 @@ from meetingtools.multiresponse import redirect_to, make_response_dict
 from meetingtools.ac import ac_api_client
 from django.shortcuts import render_to_response
 from django.contrib import auth
-from django_co_connector.models import co_import_from_request, add_member,\
-    remove_member
+from django_co_connector.models import co_import_from_request, add_member,remove_member
 from meetingtools.apps.cluster.models import acc_for_user
+from django.conf import settings
 
 def meta(request,attr):
     v = request.META.get(attr)
@@ -123,6 +123,8 @@ def accounts_login_federated(request):
         next = request.session.get("after_login_redirect", None)
         if not next and request.GET.has_key('next'):
             next = request.GET['next']
+        else:
+            next = settings.DEFAULT_URL
 
         acc = acc_for_user(request.user)
         with ac_api_client(request) as api:
@@ -163,4 +165,5 @@ def accounts_login_federated(request):
                 return redirect_to(next)
     else:
         pass
-    return redirect_to(next)
+
+    return redirect_to(settings.LOGIN_URL)

@@ -1,6 +1,5 @@
 {% extends "base.html" %}
 {% load datehumanize %}
-{% load prefix %}
 {% block widgets %}
 {% endblock %}
 {% block content %}
@@ -25,11 +24,11 @@
 	</div>
 	<br/>
 	<div>
-        <a class="btn btn-large" href="{% prefix %}/rooms#{{room.id}}">Cancel</a>
+        <a class="btn btn-large" href="/rooms#{{room.id}}">Cancel</a>
 	    {%if room.nhosts == 0 %}
-		<a class="btn btn-large btn-success" href="{% prefix %}/accounts/login-federated?next=/promote/{{room.id}}">Enter as Host</a>
+		<a class="btn btn-large btn-success" href="/accounts/login-federated?next=/promote/{{room.id}}">Enter as Host</a>
 		{% endif %}
-		<a class="btn btn-large btn-primary" href="{% prefix %}/launch/{{room.id}}">Enter as Participant</a>
+		<a class="btn btn-large btn-primary" href="/launch/{{room.id}}">Enter as Participant</a>
 
 	</div>
 {% endblock %}

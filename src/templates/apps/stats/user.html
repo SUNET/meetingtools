@@ -1,9 +1,8 @@
 {% extends "base.html" %}
 {% load datehumanize %}
-{% load prefix %}
 {% block widgets %}
 $.ajax({
-	url: '{% prefix %}/api/stats/user/{{username}}',
+	url: '/api/stats/user/{{username}}',
 	method: 'GET',
 	success: function (resp) {
 	    var graph = $('#graph');
@@ -26,7 +25,7 @@ $.ajax({
 <table>
 	<tr><td><b>Total minutes:</b></td><td id="minutes"></td></tr>
 	<tr><td><b>Total rooms:</b></td><td id="rooms"></td></tr>
-	<tr><td colspan="2" style="padding-top: 10px;"><a href="{% prefix %}/stats/domain/{{domain}}">Look at statistics for {{domain}}</a></td></tr>
+	<tr><td colspan="2" style="padding-top: 10px;"><a href="/stats/domain/{{domain}}">Look at statistics for {{domain}}</a></td></tr>
 </table>
 </div>
 {% endblock %}

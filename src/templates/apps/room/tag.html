@@ -1,8 +1,6 @@
 {% extends "edit.html" %}
-{% load prefix %}
 {% load datehumanize %}
 {% load roomurl %}
-{% load prefix %}
 {% block widgets %}
 
 {% endblock %}
@@ -22,8 +20,8 @@ class="form-inline"
     <div>
         {% for tag in tags %}
         <span class="btn-group">
-            <a class="btn btn-small" href="{%prefix%}/room/+{{tag}}">{{tag}}</a>&nbsp;
-            <a class="btn btn-small btn-warning" href="{% prefix %}/room/{{room.id}}/untag/{{tag}}"><i class="icon-remove"></i></a>
+            <a class="btn btn-small" href="/room/+{{tag}}">{{tag}}</a>&nbsp;
+            <a class="btn btn-small btn-warning" href="/room/{{room.id}}/untag/{{tag}}"><i class="icon-remove"></i></a>
         </span>
         {% endfor %}
     </div>

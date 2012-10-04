@@ -4,8 +4,7 @@ Created on Jan 31, 2011
 @author: leifj
 '''
 from meetingtools.apps.room.models import Room, ACCluster
-from meetingtools.multiresponse import respond_to, redirect_to, json_response,\
-    timeAsrfc822
+from meetingtools.multiresponse import respond_to, redirect_to, json_response
 from meetingtools.apps.room.forms import DeleteRoomForm,\
     CreateRoomForm, ModifyRoomForm, TagRoomForm
 from django.shortcuts import get_object_or_404
@@ -15,10 +14,9 @@ from meetingtools.apps import room
 from django.contrib.auth.decorators import login_required
 import logging
 from pprint import pformat
-from meetingtools.utils import session
+from meetingtools.utils import session, base_url
 import time
-from meetingtools.settings import GRACE, BASE_URL, DEFAULT_TEMPLATE_SCO,\
-    IMPORT_TTL
+from django.conf import settings
 from django.utils.datetime_safe import datetime
 from django.http import HttpResponseRedirect
 from django.core.exceptions import ObjectDoesNotExist
@@ -27,7 +25,7 @@ from meetingtools.ac.api import ACPClient
 from tagging.models import Tag, TaggedItem
 import random, string
 from django.utils.feedgenerator import rfc3339_date
-from django.views.decorators.cache import cache_control, never_cache
+from django.views.decorators.cache import never_cache
 from meetingtools.apps.cluster.models import acc_for_user
 from django.contrib.auth.models import User
 import iso8601
@@ -111,13 +109,14 @@ def view(request,id):
                       {'user':request.user,
                        'rooms':[room],
                        'title': room.name,
+                       'baseurl': base_url(request),
                        'active': True,
                        })
 
 def _init_update_form(request,form,acc,my_meetings_sco_id):
     if form.fields.has_key('urlpath'):
-        url = BASE_URL
-        form.fields['urlpath'].widget.prefix = url.rstrip('/')+"/"
+        url = base_url(request)
+        form.fields['urlpath'].widget.prefix = url
     if form.fields.has_key('source_sco_id'):
         form.fields['source_sco_id'].widget.choices = [('','-- select template --')]+[r for r in _user_templates(request,acc,my_meetings_sco_id)]
 
@@ -234,7 +233,7 @@ def _import_room(request,acc,r):
     modified = False
     room = None
     
-    if room and (abs(room.lastupdate() - time.time()) < IMPORT_TTL):
+    if room and (abs(room.lastupdate() - time.time()) < settings.IMPORT_TTL):
         return room
     
     if r.has_key('urlpath'):
@@ -406,7 +405,7 @@ def _goto(request,room,clean=True,promote=False):
     if clean:
         # don't clean the room unless you get a good status code from the call to the usermanager api above
         if room.self_cleaning and room.user_count == 0:
-            if (room.user_count == 0) and (abs(lastvisit - now) > GRACE):        
+            if (room.user_count == 0) and (abs(lastvisit - now) > settings.GRACE):
                 room.lock("Locked for cleaning")
                 try:
                     room = _clean(request,room)
@@ -465,7 +464,7 @@ def list_by_tag(request,tn):
                        'description':title ,
                        'edit':False,
                        'active':len(rooms) == 1,
-                       'baseurl': BASE_URL,
+                       'baseurl': base_url(request),
                        'tagstring': tn,
                        'rooms':rooms})
 
@@ -483,7 +482,7 @@ def list_and_import_by_tag(request,tn):
                        'description':title ,
                        'edit':False,
                        'active':len(rooms) == 1,
-                       'baseurl': BASE_URL,
+                       'baseurl': base_url(request),
                        'tagstring': tn,
                        'rooms':rooms})
     

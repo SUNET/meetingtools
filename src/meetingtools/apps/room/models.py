@@ -12,7 +12,7 @@ from django.contrib.auth.models import User
 from meetingtools.apps.cluster.models import ACCluster
 import time
 import tagging
-from meetingtools.settings import BASE_URL, LOCK_DIR
+from meetingtools.settings import LOCK_DIR
 from django.db.models.signals import post_save
 from tagging.models import Tag
 import os
@@ -102,16 +102,16 @@ class Room(models.Model):
             return int(time.mktime(self.lastupdated.timetuple()))
         
     def go_url(self):
-        return "%s/go/%s" % (BASE_URL,self.urlpath)
+        return "/go/%s" % self.urlpath
         
     def go_url_internal(self):
-        return "%s/go/%d" % (BASE_URL,self.id)
+        return "/go/%d" % self.id
     
     def permalink(self):
-        return "%s/room/%d" % (BASE_URL,self.id)
+        return "/room/%d" % self.id
     
     def recordings_url(self):
-        return "%s/room/%d/recordings" % (BASE_URL,self.id)
+        return "/room/%d/recordings" % self.id
         
     def nusers(self):
         if self.user_count == None:

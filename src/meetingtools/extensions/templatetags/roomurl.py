@@ -1,5 +1,4 @@
 from django import template
-from meetingtools.settings import BASE_URL
  
 register = template.Library()
  
@@ -14,7 +13,7 @@ def roomurl(room):
     if room.urlpath:
         path = room.urlpath
     
-    return "%s/go/%s" % (BASE_URL,path)
+    return "/go/%s" % path
     
 roomurl.is_safe = True
 register.filter(roomurl)

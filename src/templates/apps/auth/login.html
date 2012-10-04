@@ -1,16 +1,11 @@
 {% extends "base.html" %}
-{% load prefix %}
 {% block headline %}Login{% endblock %}
 {% block title %}SUNET Meeting Tools{% endblock %}
 {% block content %}
-<div id="welcome">
-	<p>The SUNET meetingtools is an alternative interface to Adobe Connect. With this tool you can...</p>
-	<ul>
-		<li>Create self-cleaning rooms.</li>
-		<li>Tag rooms to provide easy access to lists of rooms for your university or research group.</li>
-		<li>Display lists of rooms on your own website.</li>
-		<li>Manage recordings for your rooms.</li>
-	</ul>
-	<div class="button"><a href="{% prefix %}/accounts/login-federated">Login</a></div>
+<div class="hero-unit">
+    <h1>Online Meetings</h1>
+	<p>Welcome to the meeting tools. Either <a class="btn btn-small btn-primary" href="/accounts/login-federated">Login</a> to manage
+        your meeting rooms and recordings, or ...</p>
+	<a class="btn btn-large btn-success pull-right" href="/accounts/login-federated?next=/user/myroom">Click here to Start a Meeting Now &raquo;&raquo;</a>
 </div>
 {% endblock %}

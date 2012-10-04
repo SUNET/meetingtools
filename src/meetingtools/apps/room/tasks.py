@@ -17,9 +17,8 @@ from datetime import datetime,timedelta
 from lxml import etree
 from django.db.models import Q
 from django.contrib.humanize.templatetags import humanize
-from meetingtools.apps.userprofile.models import profile
+from django.conf import settings
 from django.core.mail import send_mail
-from meetingtools.settings import NOREPLY, BASE_URL
 
 def _owner_username(api,sco):
     logging.debug(sco)
@@ -231,7 +230,7 @@ def send_message(user,subject,message):
     try:
         p = user.get_profile()
         if p and p.email:
-            send_mail(subject,message,NOREPLY,[p.email])
+            send_mail(subject,message,settings.NOREPLY,[p.email])
         else:
             logging.info("User %s has no email address - email not sent" % user.username)
     except ObjectDoesNotExist:
@@ -248,4 +247,4 @@ def clean_old_rooms():
         with ac_api_client(acc) as api:
             for room in Room.objects.filter(lastvisited__lt=then):
                 logging.debug("room %s was last used %s" % (room.name,humanize.naturalday(room.lastvisited)))
-                send_message.apply_async([room.creator,"You have an unused meetingroom at %s" % BASE_URL,"Do you still need %s (%s)?" % (room.name,room.permalink())])
+                send_message.apply_async([room.creator,"You have an unused meetingroom at %s" % acc.name ,"Do you still need %s (%s)?" % (room.name,room.permalink())])

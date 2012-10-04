@@ -1,3 +1,4 @@
+from meetingtools import context_processors
 import meetingtools.mimeparse as mimeparse
 import re
 import rfc822
@@ -6,8 +7,7 @@ from django.shortcuts import render_to_response
 from django.http import HttpResponse, HttpResponseForbidden,\
     HttpResponseRedirect
 from django.utils import simplejson
-from django.template import loader
-from meetingtools.settings import PREFIX_URL
+from django.template import loader, RequestContext
 
 default_suffix_mapping = {"\.htm(l?)$": "text/html",
                           "\.json$": "application/json",
@@ -30,9 +30,10 @@ def make_response_dict(request,d={}):
  
     if request.user.is_authenticated():
         d['user'] = request.user
-        d['prefix'] = PREFIX_URL
 
-    return d
+    ctx = RequestContext(request,d,[context_processors.theme])
+    print repr(ctx['theme'])
+    return ctx
 
 def json_response(data,request=None):
     response_data = None
@@ -73,4 +74,4 @@ def respond_to(request, template_mapping, dict={}, suffix_mapping=default_suffix
     return response
 
 def redirect_to(path):
-    return HttpResponseRedirect("%s%s" % (PREFIX_URL,path))
+    return HttpResponseRedirect(path)

@@ -2,7 +2,7 @@ from django.conf.urls.defaults import patterns,include
 
 # Uncomment the next two lines to enable the admin:
 from django.contrib import admin
-from meetingtools.settings import ADMIN_MEDIA_ROOT, MEDIA_ROOT, STATIC_ROOT
+from meetingtools.settings import STATIC_ROOT
 from meetingtools.multiresponse import redirect_to
 from meetingtools.apps.room.feeds import RoomAtomTagFeed,RoomRSSTagField,\
     AtomRecordingFeed, RSSRecordingField

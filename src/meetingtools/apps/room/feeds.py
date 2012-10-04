@@ -7,7 +7,6 @@ Created on May 13, 2011
 from django.contrib.syndication.views import Feed
 from meetingtools.apps.room.models import Room
 from tagging.models import TaggedItem
-from meetingtools.settings import BASE_URL
 from django.utils.feedgenerator import Atom1Feed, Rss201rev2Feed
 from meetingtools.apps.room.views import room_recordings
 from django.shortcuts import get_object_or_404
@@ -25,7 +24,7 @@ class TagsWrapper(object):
         return self.title()
     
     def link(self,ext):
-        return "%s/room/+%s.%s" % (BASE_URL,"+".join(self.tags),ext)
+        return "/room/+%s.%s" % ("+".join(self.tags),ext)
 
 class MeetingToolsFeed(Feed):
     

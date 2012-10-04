@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% load prefix %}
+
 {% load datehumanize %}
 {% load roomurl %}
 {% load tagging_tags %}
@@ -7,8 +7,8 @@
 $(".collapse").collapse({'parent': '#recordings'});
 {% endblock %}
 {% block meta %}
-<link rel="alternate" type="application/rss+xml" title="{{title}} recordings (RSS 2.0)" href="{% prefix %}/room/{{room.id}}/recordings.rss" />
-<link rel="alternate" type="application/atom+xml" title="{{title}} recordings (ATOM 1.0)" href="{% prefix %}/room/{{room.id}}/recordings.atom" />
+<link rel="alternate" type="application/rss+xml" title="{{title}} recordings (RSS 2.0)" href="/room/{{room.id}}/recordings.rss" />
+<link rel="alternate" type="application/atom+xml" title="{{title}} recordings (ATOM 1.0)" href="/room/{{room.id}}/recordings.atom" />
 {% endblock %}
 {% block content %}
 	<div class="page-header">
@@ -38,9 +38,9 @@ $(".collapse").collapse({'parent': '#recordings'});
 	<p>No recordings right now...</p>
 	{% endif %}
 	<br/>
-	<a class="btn" href="{%prefix%}/room#{{room.id}}">Back to '{{room.name}}'</a>
+	<a class="btn" href="/room#{{room.id}}">Back to '{{room.name}}'</a>
 {% endblock %}
 {% block validators %}
-<a href="http://feed1.w3.org/check.cgi?url={% baseurl %}{% prefix %}/room/{{room.id}}/recordings.atom"><img src="{% prefix %}/static/img/valid-atom.png" alt="[Valid Atom 1.0]" title="Validate my Atom 1.0 feed" /></a>
-<a href="http://feed1.w3.org/check.cgi?url={% baseurl %}{% prefix %}/room/{{room.id}}/recordings.rss"><img src="{% prefix %}/static/img/valid-rss-rogers.png" alt="[Valid RSS]" title="Validate my RSS feed" /></a>
+<a href="http://feed1.w3.org/check.cgi?url={% baseurl %}/room/{{room.id}}/recordings.atom"><img src="{{STATIC_URL}}/img/valid-atom.png" alt="[Valid Atom 1.0]" title="Validate my Atom 1.0 feed" /></a>
+<a href="http://feed1.w3.org/check.cgi?url={% baseurl %}/room/{{room.id}}/recordings.rss"><img src="{{STATIC_URL}}/img/valid-rss-rogers.png" alt="[Valid RSS]" title="Validate my RSS feed" /></a>
 {% endblock %}

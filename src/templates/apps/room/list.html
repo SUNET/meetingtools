@@ -1,12 +1,11 @@
 {% extends "base.html" %}
-{% load prefix %}
 {% load datehumanize %}
 {% load roomurl %}
 {% load tagging_tags %}
 {% block widgets %}
     $(".collapse").collapse({'parent': '#rooms'});
    	$(".occupation").click(function(e) {
-   		$(this).find(".occupation-info").first().load("{% prefix %}/api/room/"+$(this).parents('.accordion-body').attr('id')+"/occupation")
+   		$(this).find(".occupation-info").first().load("/api/room/"+$(this).parents('.accordion-body').attr('id')+"/occupation")
    	});
    	$(".occupation").ajaxStart(function() {
    		$(".occupation i.icon-refresh").removeClass("icon-refresh").addClass("spinner").spin("custom");
@@ -17,8 +16,8 @@
 {% endblock %}
 {% block meta %}
 {% if tags %}
-<link rel="alternate" type="application/rss+xml" title="{{title}} (RSS 2.0)" href="{% prefix %}/room/+{{tags}}.rss" />
-<link rel="alternate" type="application/atom+xml" title="{{title}} (ATOM 1.0)" href="{% prefix %}/room/+{{tags}}.atom" />
+<link rel="alternate" type="application/rss+xml" title="{{title}} (RSS 2.0)" href="/room/+{{tags}}.rss" />
+<link rel="alternate" type="application/atom+xml" title="{{title}} (ATOM 1.0)" href="/room/+{{tags}}.atom" />
 {% endif %}
 {% endblock %}
 {% block content %}
@@ -36,25 +35,25 @@
                    <p><a target="_connect" href="{{r|roomurl}}">{{r|roomurl}}</a></p>
                    <p class="well">{% if r.description %}{{r.description|safe}}{% else %}<em>No description available...</em>{% endif %}</p>
                    <ul class="unstyled" style="padding-left: 2px;">
-                      <li>&raquo;&nbsp;Tags: {% for tag in tags %}<a style="margin-right: 5px;" href="{% prefix %}/room/+{{tag}}">{{tag}}</a>{% endfor %} {%if edit %}<a style="font-size: 75%;" href="{% prefix %}/room/{{r.id}}/tag"><em>... manage room tags</em></a>{%endif%}</li>
+                      {% if tags %}<li>&raquo;&nbsp;{% for tag in tags %}<a class="badge" href="/room/+{{tag}}">{{tag}}</a>{% endfor %}{%if edit %}&nbsp;<a class="btn btn-mini btn-info" href="/room/{{r.id}}/tag">manage room tags</a>{%endif%}</li>{% endif %}
                       <li>&raquo;&nbsp;Created by {{r.creator}} {{r.timecreated|datehumanize}}.</li>
                       <li>&raquo;&nbsp;<span class="occupation"><span class="occupation-info">{%if r.nusers%}There are {{r.nusers}} users present, {{r.nhosts}} of whom are hosts.{%else%}The room is currently unoccupied.{%endif%}</span><a href="#" class="btn btn-mini btn-info"><i class="icon-refresh"> </i>refresh</a></span></li>
                       {% if r.self_cleaning %}<li>&raquo;&nbsp;Room will be reset when empty.</li>{%else%}<li>&raquo;&nbsp;Room state is preserved between sessions.</li>{% endif %}
                       {% if r.allow_host %}<li>&raquo;&nbsp;First participant can elect to become host.</li>{% endif %}
                       {% if r.lastvisited %}<li>&raquo;&nbsp;Last visited {{r.lastvisited|datehumanize}}</li>{%endif%}
-                      <li>&raquo;&nbsp;Hosted on {{r.acc.name}} <a class="btn btn-mini btn-info" href="{% prefix %}/stats/room/{{r.id}}">room usage plot</a></li>
+                      <li>&raquo;&nbsp;Hosted on {{r.acc.name}} <a class="btn btn-mini btn-info" href="/stats/room/{{r.id}}">room usage plot</a></li>
                    </ul>
                   <br/>
                   <div class="btn-group">
-                     <a class="btn" target="_blank" href="{% prefix %}/go/{{r.id}}">Enter Room</a>
+                     <a class="btn" target="_blank" href="/go/{{r.id}}">Enter Room</a>
                      {% if edit %}
-                     <a class="btn" href="{% prefix %}/room/{{r.id}}/tag">Room Tags</a>
-                     <a class="btn" href="{% prefix %}/room/{{r.id}}/recordings">Room Recordings</a>
-                     <a class="btn" href="{% prefix %}/room/{{r.id}}/modify">Modify Room</a>
+                     <a class="btn" href="/room/{{r.id}}/tag">Room Tags</a>
+                     <a class="btn" href="/room/{{r.id}}/recordings">Room Recordings</a>
+                     <a class="btn" href="/room/{{r.id}}/modify">Modify Room</a>
                      {% if room.is_locked %}
-                     <a class="btn" href="{% prefix %}/room/{{r.id}}/unlock">Unlock Room</a>
+                     <a class="btn" href="/room/{{r.id}}/unlock">Unlock Room</a>
                      {% endif %}
-                     <a class="btn btn-danger" href="{% prefix %}/room/{{r.id}}/delete">Delete Room</a>
+                     <a class="btn btn-danger" href="/room/{{r.id}}/delete">Delete Room</a>
                      {% endif %}
                   </div>
                </div>
@@ -68,13 +67,13 @@
 	<br/>
 	{% if edit %}
 	<div class="btn-group">
-	   <a class="btn btn-success" href="{% prefix %}/room/create">Create a New Room</a>
+	   <a class="btn btn-success" href="/room/create">Create a New Room</a>
 	</div>
 	{% endif %}
 {% endblock %}
 {% block validators %}
 {% if tags %}
-<a href="http://feed1.w3.org/check.cgi?url={% baseurl %}{% prefix %}/room/+{{tags}}.atom"><img src="{% prefix %}/site-media/img/valid-atom.png" alt="[Valid Atom 1.0]" title="Validate my Atom 1.0 feed" /></a>
-<a href="http://feed1.w3.org/check.cgi?url={% baseurl %}{% prefix %}/room/+{{tags}}.rss"><img src="{% prefix %}/site-media/img/valid-rss-rogers.png" alt="[Valid RSS]" title="Validate my RSS feed" /></a>
+<a href="http://feed1.w3.org/check.cgi?url=/room/+{{tags}}.atom"><img src="{{STATIC_URL}}/img/valid-atom.png" alt="[Valid Atom 1.0]" title="Validate my Atom 1.0 feed" /></a>
+<a href="http://feed1.w3.org/check.cgi?url=/room/+{{tags}}.rss"><img src="{{STATIC_URL}}/img/valid-rss-rogers.png" alt="[Valid RSS]" title="Validate my RSS feed" /></a>
 {% endif %}
 {% endblock %}
