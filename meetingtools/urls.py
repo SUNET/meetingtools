@@ -13,6 +13,7 @@ def welcome(request):
 
 urlpatterns = patterns('',
     (r'^$',welcome),
+    (r'^saml2/sp/',include('djangosaml2.urls')),
     (r'^admin/', include(admin.site.urls)),
     (r'^static/(?P<path>.*)$','django.views.static.serve',{'document_root': STATIC_ROOT}),
     # Login/Logout
