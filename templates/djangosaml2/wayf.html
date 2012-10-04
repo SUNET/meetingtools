@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block headline %}Login{% endblock %}
+{% block title %}Meeting Tools{% endblock %}
+{% block content %}
+    <h1>Authentication Required</h1>
+    <p>Please select your <strong>Identity Provider</strong> from the following list:</p>
+    <form action="{% url djangosaml2.views.login %}" method="GET">
+    	<select id="idp" name="idp">
+    		{% for url, idp in available_idps %}
+    		<option value="{{url}}">{{idp.0}}</option>
+    		{% endfor %}
+    	</select>
+    	<input type="submit" value="Select"/>
+    </form>
+{% endblock %}
