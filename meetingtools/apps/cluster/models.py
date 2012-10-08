@@ -16,13 +16,16 @@ class ACCluster(models.Model):
     name = CharField(max_length=128,blank=True,unique=True)
     default_template_sco_id = IntegerField(blank=True,unique=True)
     domain_match = TextField()
-    
+
     def __unicode__(self):
         return self.url
-    
+
     def make_url(self,path=""):
         return "%s%s" % (self.url,path)
-    
+
+    def make_dl_url(self,path=""):
+        return "%s%s/output/%s.zip?download=zip" % (self,path.strip("/"),path.strip("/"))
+
 def acc_for_user(user):
     (local,domain) = user.username.split('@')
     if not domain:

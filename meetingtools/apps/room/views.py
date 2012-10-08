@@ -152,7 +152,9 @@ def _update_room(request, room, form=None):
         
         user_principal = api.find_user(room.creator.username)
         #api.request('permissions-reset',{'acl-id': sco_id},True)
-        api.request('permissions-update',{'acl-id': sco_id,'principal-id': user_principal.get('principal-id'),'permission-id':'host'},True) # owner is always host
+        api.request('permissions-update',{'acl-id': sco_id,
+                                          'principal-id': user_principal.get('principal-id'),
+                                          'permission-id':'host'},True) # owner is always host
         
         if form:
             if form.cleaned_data.has_key('access'):
@@ -409,10 +411,8 @@ def _goto(request,room,clean=True,promote=False):
                 room.lock("Locked for cleaning")
                 try:
                     room = _clean(request,room)
-                except Exception,e:
+                finally:
                     room.unlock()
-                    raise e
-                room.unlock()
                 
         if room.host_count == 0 and room.allow_host:
             return respond_to(request, {"text/html": "apps/room/launch.html"}, {'room': room})
@@ -496,6 +496,7 @@ def _can_tag(request,tag):
     # XXX implement access model for tags here soon
     return True,""
 
+@never_cache
 @login_required
 def untag(request,rid,tag):
     room = get_object_or_404(Room,pk=rid)
@@ -536,6 +537,7 @@ def room_recordings(request,room):
         return [{'name': sco.findtext('name'),
                  'sco_id': sco.get('sco-id'),
                  'url': room.acc.make_url(sco.findtext('url-path')),
+                 'dl': room.acc.make_dl_url(sco.findtext('url-path')),
                  'description':  sco.findtext('description'),
                  'date_created': iso8601.parse_date(sco.findtext('date-created')),
                  'date_modified': iso8601.parse_date(sco.findtext('date-modified'))} for sco in r.et.findall(".//sco")]
