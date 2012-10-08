@@ -149,7 +149,7 @@ class ACPClient():
             p = self._find_or_create_principal(key,value,t,d)
             cache[key] = etree.tostring(p)
         else:   
-            p = etree.parse(StringIO(cache[key]))
+            p = etree.parse(StringIO(cache[key])).getroot()
         return p
         
     def find_principal(self,key,value,t):
