@@ -25,6 +25,7 @@
 	<script type="text/javascript" src="{{STATIC_URL}}/js/spin.min.js"></script>
 	<script type="text/javascript" src="{{STATIC_URL}}/js/jquery.spin.js"></script>
     <script type="text/javascript" src="{{STATIC_URL}}/js/prettify.js"></script>
+    <script type="text/javascript" src="{{STATIC_URL}}/js/jquery.submitter.js"></script>
 
     {% block meta %}{% endblock %}
 	<!-- style>
@@ -41,6 +42,7 @@
 	<script type="text/javascript">
 	$(function() {
         prettyPrint();
+        $(".submitter").submitter()
 	    {% block widgets %}{% endblock %}
 	});
 	</script>

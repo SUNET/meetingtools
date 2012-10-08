@@ -1,7 +1,5 @@
 {% extends "base.html" %}
 {% load datehumanize %}
-{% block widgets %}
-{% endblock %}
 {% block content %}
     <div class="page-header">
 	    <h1>Entering {{room.name}}</h1>
@@ -24,11 +22,18 @@
 	</div>
 	<br/>
 	<div>
-        <a class="btn btn-large" href="/rooms#{{room.id}}">Cancel</a>
-	    {%if room.nhosts == 0 %}
-		<a class="btn btn-large btn-success" href="/accounts/login-federated?next=/promote/{{room.id}}">Enter as Host</a>
-		{% endif %}
-		<a class="btn btn-large btn-primary" href="/launch/{{room.id}}">Enter as Participant</a>
-
+        <form id="launch" method="GET">
+            <a class="btn btn-large" href="/rooms#{{room.id}}">Cancel</a>
+            {%if room.nhosts == 0 %}
+            <a class="btn btn-large btn-success submitter" data-form="#launch" href="/promote/{{room.id}}">Enter as Host</a>
+            {% endif %}
+            <a class="btn btn-large btn-primary submitter" data-form="#launch" href="/launch/{{room.id}}">Enter as Participant</a>
+            <br/>
+            <div>
+                <span class="inline" style="vertical-align: bottom;">Try to use add-in? </span>
+                <label class="radio inline" for="launcher_true"><input id="launcher_true" checked="checked" type="radio" name="launcher" value="true"/>Yes</label>
+                <label class="radio inline" for="launcher_false"><input id="launcher_false" type="radio" name="launcher" value="true"/>No</label>
+            </div>
+        </form>
 	</div>
 {% endblock %}
