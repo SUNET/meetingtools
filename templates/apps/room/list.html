@@ -3,7 +3,6 @@
 {% load roomurl %}
 {% load tagging_tags %}
 {% block widgets %}
-    $(".collapse").collapse({'parent': '#rooms'});
    	$(".occupation").click(function(e) {
    		$(this).find(".occupation-info").first().load("/api/room/"+$(this).parents('.accordion-body').attr('id')+"/occupation")
    	});
@@ -28,8 +27,8 @@
 	<div id="rooms" class="accordion">
 		{% for r in rooms %}
 		<div class="room accordion-group">
-		   <div class="accordion-heading"><a href="#{{r.id}}" class="accordion-toggle" data-toggle="collapse" data-parent="#rooms">{{r.name}}</a></div>
-		   <div id="{{r.id}}" class="accordion-body collapse in">
+		   <div class="accordion-heading"><a href="#{{r.id}}" class="accordion-toggle" data-toggle="collapse" data-target="#{{r.id}}" data-parent="#rooms">{{r.name}}</a></div>
+		   <div id="{{r.id}}" class="accordion-body collapse">
                <div class="accordion-inner">
                    {% tags_for_object r as tags %}
                    <p><a target="_connect" href="{{r|roomurl}}">{{r|roomurl}}</a></p>
