@@ -21,3 +21,6 @@ def theme(request):
             ctx.update(settings.THEMES['__default__'])
 
     return _w(ctx)
+
+def misc_urls(request):
+    return {'LOGIN_URL': settings.LOGIN_URL}

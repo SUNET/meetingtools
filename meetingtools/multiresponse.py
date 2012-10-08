@@ -31,7 +31,7 @@ def make_response_dict(request,d={}):
     if request.user.is_authenticated():
         d['user'] = request.user
 
-    ctx = RequestContext(request,d,[context_processors.theme])
+    ctx = RequestContext(request,d,[context_processors.theme,context_processors.misc_urls])
     print repr(ctx['theme'])
     return ctx
 
