@@ -27,7 +27,10 @@
                       <li>&raquo;&nbsp;Modified {{r.date_modified|datehumanize}}.</li>
                       <li>&raquo;&nbsp;Hosted on {{room.acc.name}}</li>
                    </ul>
-                  <a class="btn btn-info" target="_connect" href="{{r.url}}">Play Recording</a>
+                  <div class="btn-group">
+                    <a class="btn btn-info" target="_connect" href="{{r.url}}">Play Recording</a>
+                    <a class="btn btn-info" href="{{r.dl}}">Download Recording</a>
+                  </div>
               </div>
 		   </div>
 		</div>
