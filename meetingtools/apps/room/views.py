@@ -1,8 +1,8 @@
-'''
+"""
 Created on Jan 31, 2011
 
 @author: leifj
-'''
+"""
 from meetingtools.apps.room.models import Room, ACCluster
 from meetingtools.multiresponse import respond_to, redirect_to, json_response
 from meetingtools.apps.room.forms import DeleteRoomForm,\
@@ -120,7 +120,7 @@ def _init_update_form(request,form,acc,my_meetings_sco_id):
     if form.fields.has_key('source_sco_id'):
         form.fields['source_sco_id'].widget.choices = [('','-- select template --')]+[r for r in _user_templates(request,acc,my_meetings_sco_id)]
 
-def _update_room(request, room, data={}):
+def _update_room(request, room, data=dict()):
     params = {'type':'meeting'}
     
     for attr,param in (('sco_id','sco-id'),('folder_sco_id','folder-id'),('source_sco_id','source-sco-id'),('urlpath','url-path'),('name','name'),('description','description')):
@@ -277,7 +277,7 @@ def _import_room(request,acc,r):
         for key in ('sco_id','name','source_sco_id','urlpath','description','user_count','host_count'):
             if r.has_key(key) and hasattr(room,key):
                 rv = getattr(room,key)
-                if rv != r[key] and r[key] != None and r[key]:
+                if rv != r[key] and r[key] is not None and r[key]:
                     setattr(room,key,r[key])
                     modified = True
         
@@ -345,7 +345,7 @@ def user_rooms(request,user=None):
         ar.append(int(r['sco_id']))
     
     for r in Room.objects.filter(creator=user).all():
-        if (not r.sco_id in ar): # and (not r.self_cleaning): #XXX this logic isn't right!
+        if not r.sco_id in ar: # and (not r.self_cleaning): #XXX this logic isn't right!
             for t in Tag.objects.get_for_object(r):
                 t.delete()
             r.delete() 
