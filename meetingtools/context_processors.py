@@ -1,10 +1,8 @@
-from django.core.exceptions import ImproperlyConfigured
 from utils import base_url
 
 __author__ = 'leifj'
 
 from django.conf import settings
-import logging
 
 def theme(request):
 
