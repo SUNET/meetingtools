@@ -26,8 +26,7 @@ def _accept_types(request, suffix):
 def timeAsrfc822 ( theTime ) :
     return rfc822 . formatdate ( rfc822 . mktime_tz ( rfc822 . parsedate_tz ( theTime . strftime ( "%a, %d %b %Y %H:%M:%S" ) ) ) )
 
-def make_response_dict(request,d={}):
- 
+def make_response_dict(request,d=dict()):
     if request.user.is_authenticated():
         d['user'] = request.user
 
@@ -52,11 +51,11 @@ def json_response(data,request=None):
 def render500(request):
     return render_to_response("500.html",RequestContext(request,{},[context_processors.misc_urls]))
 
-def render403(message="You don't seem to have enough rights for what you are trying to do....",dict={}):
+def render403(message="You don't seem to have enough rights for what you are trying to do....",dict=dict()):
     dict['message'] = message
     return HttpResponseForbidden(loader.render_to_string("403.html",dict))
     
-def respond_to(request, template_mapping, dict={}, suffix_mapping=default_suffix_mapping):
+def respond_to(request, template_mapping, dict=dict(), suffix_mapping=default_suffix_mapping):
     accept = _accept_types(request, suffix_mapping)
     if accept is None:
         accept = (request.META['HTTP_ACCEPT'].split(','))[0]
