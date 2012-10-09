@@ -1,8 +1,9 @@
-'''
+"""
 Created on Jan 16, 2012
 
 @author: leifj
-'''
+"""
+
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponseForbidden, HttpResponseBadRequest
 from meetingtools.ac import ac_api_client
@@ -12,7 +13,6 @@ from meetingtools.multiresponse import json_response, respond_to
 from meetingtools.apps.stats.forms import StatCaledarForm
 from django.shortcuts import get_object_or_404
 from meetingtools.apps.room.models import Room
-import logging
 
 def _iso2datesimple(iso):
     (date,rest) = iso.split("T")
@@ -22,7 +22,7 @@ def _iso2ts(iso):
     return mktime(iso8601.parse_date(iso).timetuple())*1000
 
 def _iso2dt(iso):
-    return iso8601.parse_date(iso);
+    return iso8601.parse_date(iso)
 
 def _date_ts(date):
     (y,m,d) = date.split("-")
@@ -30,7 +30,7 @@ def _date_ts(date):
 
 @login_required
 def user(request,username=None):
-    if username == None:
+    if username is None:
         username = request.user.username
     (local,domain) = username.split('@')
     return respond_to(request,{'text/html': 'apps/stats/user.html'},{'domain': domain,'username': username})
@@ -56,7 +56,7 @@ def user_minutes_api(request,username=None):
     #if username and username != request.user.username:
     #    return HttpResponseForbidden("You can't spy on others!")
     
-    if username == None:
+    if username is None:
         username = request.user.username
     
     with ac_api_client(request) as api:
@@ -69,9 +69,9 @@ def user_minutes_api(request,username=None):
         begin = form.cleaned_data['begin']
         end = form.cleaned_data['end']
         
-        if begin != None:
+        if begin is not None:
             p['filter-gte-date-created'] = begin
-        if end != None:
+        if end is not None:
             p['filter-lt-date-created'] = end
         r = api.request('report-bulk-consolidated-transactions',p)
         
@@ -90,17 +90,17 @@ def user_minutes_api(request,username=None):
             ts_closed = _iso2ts(date_closed_str)
             
             d1 = _iso2datesimple(date_created_str)
-            if d_created == None:
+            if d_created is None:
                 d_created = d1
                 
             d2 = _iso2datesimple(date_closed_str)
-            if d_closed == None:
+            if d_closed is None:
                 d_closed = d2
                 
             #duration = _iso2dt(date_closed_str) - _iso2dt(date_created_str)
             #sdiff = duration.total_seconds()
               
-            if curdate == None:
+            if curdate is None:
                 curdate = d1
                 
             if curdate != d1:
@@ -112,21 +112,21 @@ def user_minutes_api(request,username=None):
             if d1 == d2: #same date
                 diff = (ts_closed - ts_created)
                 #logging.debug("ms:: %d + %d" % (ms,diff))
-                ms = ms + diff
-                t_ms = t_ms + diff
+                ms += diff
+                t_ms += diff
             else: # meeting spanned midnight
                 ts_date_ts = _date_ts(d2)
                 #logging.debug("ms: %d + %d" % (ms,(ts_date_ts - ts_created)))
-                ms = ms + (ts_date_ts - ts_created)
+                ms += ts_date_ts - ts_created
                 series.append([_date_ts(d1),int(ms/60000)])
                 #logging.debug("* %s: %s - %s = %d %d" % (row.findtext("name"),date_created_str,date_closed_str,ms,sdiff*1000))
-                t_ms = t_ms + ms
+                t_ms += ms
                 curdate = d2
                 #logging.debug("midnight: %d (%d)" % (ts_date_ts,ts_closed))
                 ms = (ts_closed - ts_date_ts)
                 #logging.debug("nms: %d" % ms)
                 
-        if curdate != None and ms > 0:
+        if curdate is not None and ms > 0:
             series.append([_date_ts(curdate),int(ms/60000)])
         
         return json_response({'data': sorted(series,key=lambda x: x[0]), 'rooms': len(rc.keys()), 'minutes': int(t_ms/60000)},request)
@@ -143,9 +143,9 @@ def domain_minutes_api(request,domain):
         begin = form.cleaned_data['begin']
         end = form.cleaned_data['end']
         
-        if begin != None:
+        if begin is not None:
             p['filter-gte-date-created'] = begin
-        if end != None:
+        if end is not None:
             p['filter-lt-date-created'] = end
         r = api.request('report-bulk-consolidated-transactions',p)
         
@@ -170,14 +170,14 @@ def domain_minutes_api(request,domain):
             ts_closed = _iso2ts(date_closed_str)
             
             d1 = _iso2datesimple(date_created_str)
-            if d_created == None:
+            if d_created is None:
                 d_created = d1
                 
             d2 = _iso2datesimple(date_closed_str)
-            if d_closed == None:
+            if d_closed is None:
                 d_closed = d2
                 
-            if curdate == None:
+            if curdate is None:
                 curdate = d1
                 
             if curdate != d1:
@@ -187,17 +187,17 @@ def domain_minutes_api(request,domain):
                 
             if d1 == d2: #same date
                 diff = (ts_closed - ts_created)
-                ms = ms + diff
-                t_ms = t_ms + diff
+                ms += diff
+                t_ms += diff
             else: # meeting spanned midnight
                 ts_date_ts = _date_ts(d2)
-                ms = ms + (ts_date_ts - ts_created)
+                ms += ts_date_ts - ts_created
                 series.append([_date_ts(d1),int(ms/60000)])
-                t_ms = t_ms + ms
+                t_ms += ms
                 curdate = d2
                 ms = (ts_closed - ts_date_ts)
                 
-        if curdate != None and ms > 0:
+        if curdate is not None and ms > 0:
             series.append([_date_ts(curdate),int(ms/60000)])
         
         return json_response({'data': sorted(series,key=lambda x: x[0]), 'rooms': len(rc.keys()), 'users': len(uc.keys()), 'minutes': int(t_ms/60000)},request)
@@ -219,9 +219,9 @@ def room_minutes_api(request,rid):
         begin = form.cleaned_data['begin']
         end = form.cleaned_data['end']
         
-        if begin != None:
+        if begin is not None:
             p['filter-gte-date-created'] = begin
-        if end != None:
+        if end is not None:
             p['filter-lt-date-created'] = end
         r = api.request('report-bulk-consolidated-transactions',p)
         
@@ -240,14 +240,14 @@ def room_minutes_api(request,rid):
             ts_closed = _iso2ts(date_closed_str)
             
             d1 = _iso2datesimple(date_created_str)
-            if d_created == None:
+            if d_created is None:
                 d_created = d1
                 
             d2 = _iso2datesimple(date_closed_str)
-            if d_closed == None:
+            if d_closed is None:
                 d_closed = d2
                 
-            if curdate == None:
+            if curdate is None:
                 curdate = d1
                 
             if curdate != d1:
@@ -257,17 +257,17 @@ def room_minutes_api(request,rid):
                 
             if d1 == d2: #same date
                 diff = (ts_closed - ts_created)
-                ms = ms + diff
-                t_ms = t_ms + diff
+                ms += diff
+                t_ms += diff
             else: # meeting spanned midnight
                 ts_date_ts = _date_ts(d2)
-                ms = ms + (ts_date_ts - ts_created)
+                ms += ts_date_ts - ts_created
                 series.append([_date_ts(d1),int(ms/60000)])
-                t_ms = t_ms + ms
+                t_ms += ms
                 curdate = d2
                 ms = (ts_closed - ts_date_ts)
                 
-        if curdate != None and ms > 0:
+        if curdate is not None and ms > 0:
             series.append([_date_ts(curdate),int(ms/60000)])
         
         return json_response({'data': sorted(series,key=lambda x: x[0]), 'users': len(uc.keys()), 'minutes': int(t_ms/60000)},request)
