@@ -4,8 +4,8 @@
 {% block content %}
 <div class="hero-unit">
     <h1>Online Meetings</h1>
-	<p>Welcome to the meeting tools. Either <a class="btn btn-small btn-primary" href="/accounts/login-federated">Login</a> to manage
+	<p>Welcome to the meeting tools. Either <a class="btn btn-small btn-primary" href="{{LOGIN_URL}}?next=/rooms">Login</a> to manage
         your meeting rooms and recordings, or ...</p>
-	<a class="btn btn-large btn-success pull-right" href="/accounts/login-federated?next=/user/myroom">Click here to Start a Meeting Now &raquo;&raquo;</a>
+	<a class="btn btn-large btn-success pull-right" href="/myroom">Click here to Start a Meeting Now &raquo;&raquo;</a>
 </div>
 {% endblock %}

@@ -43,6 +43,12 @@
 	$(function() {
         prettyPrint();
         $(".submitter").submitter()
+        $(".cancel").each(function(that) {
+            that.click(function(ev) {
+                ev.preventDefault();
+                document.location = document.referrer;
+            })
+        });
 	    {% block widgets %}{% endblock %}
 	});
 	</script>

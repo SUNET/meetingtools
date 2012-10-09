@@ -18,12 +18,15 @@
 				If you are hosting this meeting and are comfortable with the Adobe Connect software you may press 'Enter as Host' below to become the first host.
 				{% endif %}
 			</p>
+            <p>
+                The public URL of this room is <code>{{BASE_URL}}go/{{room.id}}</code>. Give this to other participants.
+            </p>
 		</div>
 	</div>
 	<br/>
 	<div>
         <form id="launch" method="GET">
-            <a class="btn btn-large" href="/rooms#{{room.id}}">Cancel</a>
+            <button class="btn btn-large cancel" href="#">Cancel</button>
             {%if room.nhosts == 0 %}
             <a class="btn btn-large btn-success submitter" data-form="#launch" href="/promote/{{room.id}}">Enter as Host</a>
             {% endif %}

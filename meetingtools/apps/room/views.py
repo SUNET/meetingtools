@@ -19,7 +19,7 @@ import time
 from django.conf import settings
 from django.utils.datetime_safe import datetime
 from django.http import HttpResponseRedirect
-from django.core.exceptions import ObjectDoesNotExist
+from django.core.exceptions import ObjectDoesNotExist, MultipleObjectsReturned
 from django_co_acls.models import allow, deny, acl, clear_acl
 from meetingtools.ac.api import ACPClient
 from tagging.models import Tag, TaggedItem
@@ -120,7 +120,7 @@ def _init_update_form(request,form,acc,my_meetings_sco_id):
     if form.fields.has_key('source_sco_id'):
         form.fields['source_sco_id'].widget.choices = [('','-- select template --')]+[r for r in _user_templates(request,acc,my_meetings_sco_id)]
 
-def _update_room(request, room, form=None):        
+def _update_room(request, room, data={}):
     params = {'type':'meeting'}
     
     for attr,param in (('sco_id','sco-id'),('folder_sco_id','folder-id'),('source_sco_id','source-sco-id'),('urlpath','url-path'),('name','name'),('description','description')):
@@ -128,8 +128,8 @@ def _update_room(request, room, form=None):
         if hasattr(room,attr):
             v = getattr(room,attr) 
         logging.debug("%s,%s = %s" % (attr,param,v))
-        if form and form.cleaned_data.has_key(attr) and form.cleaned_data[attr]:
-            v = form.cleaned_data[attr]
+        if data.has_key(attr) and data[attr]:
+            v = data[attr]
         
         if v:
             if isinstance(v,(str,unicode)):
@@ -142,27 +142,31 @@ def _update_room(request, room, form=None):
     logging.debug(pformat(params))
     with ac_api_client(room.acc) as api:
         r = api.request('sco-update', params, True)
-        sco_id = r.et.find(".//sco").get('sco-id')
-        if form:
-            form.cleaned_data['sco_id'] = sco_id
-            form.cleaned_data['source_sco_id'] = r.et.find(".//sco").get('sco-source-id')
-        
-        room.sco_id = sco_id
-        room.save()
-        
+        sco = r.et.find(".//sco")
+        if sco:
+            sco_id = sco.get('sco-id')
+            if sco_id:
+                data['sco_id'] = sco_id
+                data['source_sco_id'] = r.et.find(".//sco").get('sco-source-id')
+                room.sco_id = sco_id
+                room.save()
+
+        sco_id = room.sco_id
+
+        assert(sco_id is not None and sco_id > 0)
+
         user_principal = api.find_user(room.creator.username)
         #api.request('permissions-reset',{'acl-id': sco_id},True)
         api.request('permissions-update',{'acl-id': sco_id,
                                           'principal-id': user_principal.get('principal-id'),
                                           'permission-id':'host'},True) # owner is always host
-        
-        if form:
-            if form.cleaned_data.has_key('access'):
-                access = form.cleaned_data['access']
-                if access == 'public':
-                    allow(room,'anyone','view-hidden')
-                elif access == 'private':
-                    allow(room,'anyone','remove')
+
+        if data.has_key('access'):
+            access = data['access']
+            if access == 'public':
+                allow(room,'anyone','view-hidden')
+            elif access == 'private':
+                allow(room,'anyone','remove')
         
         # XXX figure out how to keep the room permissions in sync with the AC permissions
         for ace in acl(room):
@@ -192,7 +196,7 @@ def create(request):
     my_meetings_sco_id = _user_meeting_folder(request,acc)
     template_sco_id = acc.default_template_sco_id
     if not template_sco_id:
-        template_sco_id = DEFAULT_TEMPLATE_SCO
+        template_sco_id = settings.DEFAULT_TEMPLATE_SCO
     room = Room(creator=request.user,acc=acc,folder_sco_id=my_meetings_sco_id,source_sco_id=template_sco_id)
     what = "Create"
     title = "Create a new room"
@@ -201,7 +205,7 @@ def create(request):
         form = CreateRoomForm(request.POST,instance=room)
         _init_update_form(request, form, acc, room.folder_sco_id)
         if form.is_valid():
-            _update_room(request, room, form)
+            _update_room(request, room, form.cleaned_data)
             room = form.save()
             return redirect_to("/rooms#%d" % room.id)
     else:
@@ -209,6 +213,33 @@ def create(request):
         _init_update_form(request, form, acc, room.folder_sco_id)
         
     return respond_to(request,{'text/html':'apps/room/create.html'},{'form':form,'formtitle': title,'cancelname':'Cancel','submitname':'%s Room' % what})
+
+@never_cache
+@login_required
+def myroom(request):
+    acc = acc_for_user(request.user)
+    my_meetings_sco_id = _user_meeting_folder(request,acc)
+    template_sco_id = acc.default_template_sco_id
+    if not template_sco_id:
+        template_sco_id = settings.DEFAULT_TEMPLATE_SCO
+
+    room = None
+    try:
+        room = Room.objects.get(acc=acc,name=request.user.username)
+    except MultipleObjectsReturned:
+        raise ValueError("Oops - there seem to be multiple rooms with name '%s'" % request.user.username)
+    except ObjectDoesNotExist:
+        room = Room(creator=request.user,
+                    acc=acc,
+                    folder_sco_id=my_meetings_sco_id,
+                    name=request.user.username,
+                    source_sco_id=template_sco_id)
+        _update_room(request,room,dict(access='public'))
+
+    if not room:
+        raise ValueError("Opps - can't find your room")
+
+    return _goto(request,room)
 
 @never_cache
 @login_required
@@ -222,7 +253,7 @@ def update(request,id):
         form = ModifyRoomForm(request.POST,instance=room)
         _init_update_form(request, form, acc, room.folder_sco_id)
         if form.is_valid():
-            _update_room(request, room, form)
+            _update_room(request, room, form.cleaned_data)
             room = form.save()
             return redirect_to("/rooms#%d" % room.id)
     else:
