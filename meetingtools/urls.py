@@ -1,6 +1,5 @@
-from django.conf.urls.defaults import patterns,include
+from django.conf.urls import patterns,include
 
-# Uncomment the next two lines to enable the admin:
 from django.contrib import admin
 from meetingtools.settings import STATIC_ROOT
 from meetingtools.multiresponse import redirect_to
