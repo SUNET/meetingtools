@@ -50,7 +50,11 @@ def _is_member_or_employee(user):
 @never_cache
 def logout(request):
     auth.logout(request)
-    return HttpResponseRedirect('/Shibboleth.sso/Logout')
+    post_logout= "/"
+    if hasattr(settings,'POST_LOGOUT'):
+        post_logout = settings.POST_LOGOUT
+
+    return HttpResponseRedirect(post_logout)
 
 @never_cache
 def login(request):
