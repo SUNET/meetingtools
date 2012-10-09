@@ -1,1 +1,11 @@
-.spinner { vertical-align: botton; margin-left: 8px; }
+.spinner { vertical-align: bottom; margin-left: 8px; }
+.error-page {
+    margin-top:50px;
+    height: 480px;
+    background-repeat:no-repeat;
+    background-image: url('http://openclipart.org/people/hatso1/cartoon_crab.svg');
+    background-position: right bottom;
+}
+.error-page h1 { font-size: 70px; }
+.error-page p { font-size: large; font-weight: bold;}
+.error-retry p { font-size: large; font-weight: bold;}

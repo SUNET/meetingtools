@@ -11,6 +11,11 @@ admin.autodiscover()
 def welcome(request):
     return redirect_to('/rooms')
 
+def crap(request):
+    raise ValueError("Bad crab!")
+
+handler500 = "meetingtools.multiresponse.render500"
+
 urlpatterns = patterns('',
     (r'^$',welcome),
     (r'^saml2/sp/',include('djangosaml2.urls')),
@@ -21,6 +26,8 @@ urlpatterns = patterns('',
     (r'^accounts/login-federated$','meetingtools.apps.auth.views.accounts_login_federated'),
     (r'^accounts/logout$','meetingtools.apps.auth.views.logout'),
     (r'^user/?(.*)$','meetingtools.apps.room.views.list_rooms'),
+    (r'^crab/',crap),
+    ('^myroom/?','meetingtools.apps.room.views.myroom'),
     (r'^(?:room|rooms)$','meetingtools.apps.room.views.list_rooms'),
     (r'^go/(\d+)$','meetingtools.apps.room.views.go_by_id'),
     (r'^go/(.+)$','meetingtools.apps.room.views.go_by_path'),

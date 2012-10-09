@@ -49,6 +49,9 @@ def json_response(data,request=None):
     
     return r
 
+def render500(request):
+    return render_to_response("500.html",RequestContext(request,{},[context_processors.misc_urls]))
+
 def render403(message="You don't seem to have enough rights for what you are trying to do....",dict={}):
     dict['message'] = message
     return HttpResponseForbidden(loader.render_to_string("403.html",dict))

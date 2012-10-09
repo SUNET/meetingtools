@@ -1,4 +1,5 @@
 from django.core.exceptions import ImproperlyConfigured
+from utils import base_url
 
 __author__ = 'leifj'
 
@@ -23,4 +24,4 @@ def theme(request):
     return _w(ctx)
 
 def misc_urls(request):
-    return {'LOGIN_URL': settings.LOGIN_URL}
+    return {'LOGIN_URL': settings.LOGIN_URL,'BASE_URL':base_url(request)}

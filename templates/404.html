@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+{% block meta %}
+<link href='http://fonts.googleapis.com/css?family=Mrs+Saint+Delafield' rel='stylesheet' type='text/css'>
+<style type="text/css">
+.magritte {
+    font-family: 'Mrs Saint Delafield', cursive;
+    font-size: 30px;
+    padding-top: 20px;
+}
+.magritte-outer {
+    font-size: 48px;
+    text-align: center;
+    width: 50%;
+}
+.url {
+    font-family: Courier, monospace;
+    margin-top: 20px;
+    margin-bottom: 20px;
+    font-weight: bold;
+    padding: 20px;
+    border-bottom: 1px solid #dddddd;
+}
+.explain {
+    margin-top: 50px;
+    text-align: center;
+    font-size: larger;
+}
+</style>
+{% endblock %}
+{% block content %}
+<div>
+    <div class="page-header">
+        <h1>404 - Page Not Found</h1>
+    </div>
+    <div class="row">
+        <div class="span3">
+
+        </div>
+        <div class="magritte-outer span4 well">
+            <div class="url">{{request_path}}</div>
+
+            <div class="magritte">Ceci n'est pas une url</div>
+        </div>
+        <div class="span2">
+
+        </div>
+    </div>
+
+    <div class="explain row">
+        <p>
+            The page you are looking for does not seem to be here. Please <a href="/">go back and try again</a> or
+            <a class="btn btn-small btn-success" href="/myroom">Click Here To Start an Online Meeting Now</a>
+        </p>
+    </div>
+</div>
+{% endblock %}
