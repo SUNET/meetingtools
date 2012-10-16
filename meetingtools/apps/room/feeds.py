@@ -39,7 +39,6 @@ class MeetingToolsFeed(Feed):
         
         return "rss"
 
-
 class RoomTagFeed(MeetingToolsFeed):
     
     def get_object(self,request,tn):
