@@ -28,8 +28,8 @@ class PrefixTextInput(TextInput):
 class ModifyRoomForm(ModelForm):
     class Meta:
         model = Room
-        fields = ['name','description','source_sco_id','self_cleaning','allow_host']
-        widgets = {'source_sco_id': Select(),
+        fields = ('name','description','source_sco','self_cleaning','allow_host')
+        widgets = {'source_sco': Select(),
                    'description': Textarea(attrs={'rows': 4, 'cols': 50}),
                    'name': TextInput(attrs={'size': '40'})}
 

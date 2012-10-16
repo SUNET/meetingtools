@@ -4,7 +4,7 @@ from django.conf.global_settings import TEMPLATE_CONTEXT_PROCESSORS
 import meetingtools.site_logging
 import os
 
-DEBUG = False
+DEBUG = True
 TEMPLATE_DEBUG = DEBUG
 
 ADMINS = (
@@ -135,7 +135,9 @@ INSTALLED_APPS = (
     'meetingtools.apps.room',
     'meetingtools.apps.cluster',
     'meetingtools.apps.userprofile',
-    'meetingtools.apps.stats'
+    'meetingtools.apps.stats',
+    'meetingtools.apps.sco',
+    'meetingtools.apps.archive'
 )
 
 CARROT_BACKEND = "django"

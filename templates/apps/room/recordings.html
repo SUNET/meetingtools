@@ -17,19 +17,30 @@
 	<div id="recordings" class="accordion">
 		{% for r in recordings %}
 		<div class="recording accordion-group">
-		   <div class="accordion-heading"><a class="accordion-toggle" data-toggle="collapse" data-target="#{{r.sco_id}}" data-parent="#recordings" href="#{{r.sco_id}}">{{r.name}}</a></div>
-		   <div id="{{r.sco_id}}" class="accordion-body collapse">
+		   <div class="accordion-heading"><a class="accordion-toggle" data-toggle="collapse" data-target="#{{r.sco.sco_id}}" data-parent="#recordings" href="#{{r.sco_id}}">{{r.name}}</a></div>
+		   <div id="{{r.sco.sco_id}}" class="accordion-body collapse">
 		      <div class="accordion-inner">
+
                   <p><a target="_connect" href="{{r.url}}">{{r.url}}</a></p>
                   <div class="well">{% if r.description %}{{r.description|safe}}{% else %}<em>No description available...</em>{% endif %}</div>
                   <ul class="unstyled">
                       <li>&raquo;&nbsp;Created {{r.date_created|datehumanize}}.</li>
                       <li>&raquo;&nbsp;Modified {{r.date_modified|datehumanize}}.</li>
-                      <li>&raquo;&nbsp;Hosted on {{room.acc.name}}</li>
-                   </ul>
+                      <li>&raquo;&nbsp;Hosted on {{room.sco.acc.name}}</li>
+                      {% if r.published %}
+                        {% tags_for_object r.ar as tags %}
+                        {% if tags %}<li>&raquo;&nbsp;{% for tag in tags %}<a class="badge" href="/archive/+{{tag}}">{{tag}}</a>{% endfor %}{%if edit %}&nbsp;<a class="btn btn-mini btn-info" href="/archive/{{r.id}}/tag">manage archive tags</a>{%endif%}</li>{% endif %}
+                      {% endif %}
+                  </ul>
+
                   <div class="btn-group">
-                    <a class="btn btn-info" target="_connect" href="{{r.url}}">Play Recording</a>
-                    <a class="btn btn-info" href="{{r.dl}}">Download Recording</a>
+                    <a class="btn" target="_connect" href="{{r.url}}"><i class="icon-play"> </i> Play</a>
+                    <a class="btn" href="{{r.dl}}"><i class="icon-download"> </i> Download</a>
+                    {% if not r.published %}
+                    <a class="btn btn-success" href="/room/{{room.id}}/publish/{{r.sco.sco_id}}"><i class="icon-upload"> </i> Publish</a>
+                    {% else %}
+                    <a class="btn" href="/archive/{{r.ar.id}}/tag">Manage Tags</a>
+                    {% endif %}
                   </div>
               </div>
 		   </div>
@@ -40,7 +51,7 @@
 	<p>No recordings right now...</p>
 	{% endif %}
 	<br/>
-	<a class="btn" href="/room#{{room.id}}">Back to '{{room.name}}'</a>
+	<a class="btn" href="/room#{{room.id}}"><i class="icon-step-backward"> </i> Back to '{{room.name}}'</a>
 {% endblock %}
 {% block validators %}
 <a href="http://feed1.w3.org/check.cgi?url=/room/{{room.id}}/recordings.atom"><img src="{{STATIC_URL}}/img/valid-atom.png" alt="[Valid Atom 1.0]" title="Validate my Atom 1.0 feed" /></a>

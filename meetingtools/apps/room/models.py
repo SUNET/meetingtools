@@ -9,7 +9,7 @@ from django.db.models.fields import CharField, BooleanField, IntegerField,\
     TextField
 from django.db.models.fields.related import ForeignKey
 from django.contrib.auth.models import User
-from meetingtools.apps.cluster.models import ACCluster
+from meetingtools.apps.sco.models import ACObject, get_sco
 import time
 import tagging
 from meetingtools.settings import LOCK_DIR
@@ -43,15 +43,14 @@ class RoomLockedException(Exception):
 
 class Room(models.Model):
     creator = ForeignKey(User,editable=False)
-    name = CharField(max_length=128) 
+    name = CharField(max_length=128)
+    sco = ForeignKey(ACObject,editable=False,null=True)
+    folder_sco = ForeignKey(ACObject,null=True,related_name="folders")
+    source_sco = ForeignKey(ACObject,null=True,related_name="sources")
+    deleted_sco = ForeignKey(ACObject,null=True,related_name="deleted")
     urlpath = CharField(verbose_name="Custom URL",max_length=128,unique=True)
-    acc =  ForeignKey(ACCluster,verbose_name="Adobe Connect Cluster",editable=False)
     self_cleaning = BooleanField(verbose_name="Clean-up when empty?")
     allow_host = BooleanField(verbose_name="Allow first participant to become host?",default=True)
-    sco_id = IntegerField(verbose_name="Adobe Connect Room")
-    source_sco_id = IntegerField(verbose_name="Template",blank=True,null=True)
-    deleted_sco_id = IntegerField(verbose_name="Previous Room ID",editable=False,blank=True,null=True)
-    folder_sco_id = IntegerField(verbose_name="Adobe Connect Room Folder",editable=False)
     description = TextField(blank=True,null=True)
     user_count = IntegerField(verbose_name="User Count At Last Visit",editable=False,blank=True,null=True)
     host_count = IntegerField(verbose_name="Host Count At Last Visit",editable=False,blank=True,null=True)
@@ -60,11 +59,24 @@ class Room(models.Model):
     lastvisited = models.DateTimeField(blank=True,null=True)
     
     class Meta:
-        unique_together = (('acc','sco_id'),('name','folder_sco_id'))
-    
+        unique_together = (('name','folder_sco'))
+
     def __unicode__(self):
-        return "%s (sco_id=%s,source_sco_id=%s,folder_sco_id=%s,urlpath=%s)" % (self.name,self.sco_id,self.source_sco_id,self.folder_sco_id,self.urlpath)
-    
+        return "%s (sco_id=%s,source_sco_id=%s,folder_sco_id=%s,urlpath=%s)" % \
+               (self.name,self.sco.sco_id,self.source_sco.sco_id,self.folder_sco.sco_id,self.urlpath)
+
+    @staticmethod
+    def by_sco(sco):
+        return Room.objects.get(sco=sco)
+
+    @staticmethod
+    def by_id(acc,sco_id):
+        return Room.by_sco(get_sco(acc,sco_id))
+
+    @staticmethod
+    def by_name(acc,name):
+        Room.objects.get(sco__acc=acc,name=name)
+
     def _lockf(self):
         return "%s%sroom-%d.lock" % (LOCK_DIR,os.sep,+self.id)
     
@@ -114,13 +126,13 @@ class Room(models.Model):
         return "/room/%d/recordings" % self.id
         
     def nusers(self):
-        if self.user_count == None:
+        if self.user_count is None:
             return "unknown many"
         else:
             return self.user_count
         
     def nhosts(self):
-        if self.host_count == None:
+        if self.host_count is None:
             return "unknown many"
         else:
             return self.host_count

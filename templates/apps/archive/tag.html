@@ -1,0 +1,32 @@
+{% extends "edit.html" %}
+{% load datehumanize %}
+{% load roomurl %}
+{% block widgets %}
+
+{% endblock %}
+{% block formstyle %}
+class="form-inline"
+{% endblock %}
+{% block justbeforeform %}
+<div>
+    <div class="alert">
+        <i class="icon-info-sign"> </i>
+        <strong>Note Well</strong> Tags are a way to group related recordings together. Tagging your
+        recording makes your recording show up in public lists of recordings hosted on this service and it
+        therefore makes your recording visible. This does <em>not</em> mean that anyone can access
+        your recording.
+    </div>
+    {% if tags %}
+    <div style="margin-bottom: 20px;">
+        {% for tag in tags %}
+        <span class="btn-group">
+            <a class="btn btn-small" href="/archive/+{{tag}}">{{tag}}</a>&nbsp;
+            <a class="btn btn-small btn-warning" href="/archive/{{archive.id}}/untag/{{tag}}"><i class="icon-remove"></i></a>
+        </span>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="alert">There are no tags yet...</div>
+</div>
+    {% endif %}
+{% endblock %}

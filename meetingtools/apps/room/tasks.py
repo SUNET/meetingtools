@@ -5,6 +5,7 @@ Created on Jan 18, 2012
 '''
 from celery.task import periodic_task,task
 from celery.schedules import crontab
+from meetingtools.apps.sco.models import get_sco
 from meetingtools.apps.cluster.models import ACCluster
 from meetingtools.ac import ac_api_client
 from meetingtools.apps.room.models import Room
@@ -58,7 +59,7 @@ def _extended_info(api,sco_id):
     r = api.request('sco-info',{'sco-id':sco_id},False)
     if r.status_code == 'no-data':
         return None
-    return (r.et,_owner_username(api,r.et.xpath('//sco')[0]))
+    return r.et,_owner_username(api,r.et.xpath('//sco')[0])
     
 def _import_one_room(acc,api,row):
     sco_id = int(row.get('sco-id'))
@@ -66,7 +67,7 @@ def _import_one_room(acc,api,row):
     room = None
     
     try:
-        room = Room.objects.get(acc=acc,deleted_sco_id=sco_id)
+        room = Room.objects.get(deleted_sco__acc=acc,deleted_sco__sco_id=sco_id)
         if room is not None:
             return # We hit a room in the process of being cleaned - let it simmer until next pass
     except ObjectDoesNotExist:
@@ -77,7 +78,7 @@ def _import_one_room(acc,api,row):
     
     try:
         logging.debug("finding acc=%s,sco_id=%d in our DB" % (acc,sco_id))
-        room = Room.objects.get(acc=acc,sco_id=sco_id)
+        room = Room.objects.get(sco__acc=acc,sco__sco_id=sco_id)
         if room.deleted_sco_id is not None:
             return # We hit a room in the process of being cleaned - let it simmer until next pass
         room.trylock()
@@ -112,7 +113,6 @@ def _import_one_room(acc,api,row):
             else:
                 return int(str)
 
-
         for elt in r.findall(".//sco[0]"):
             folder_sco_id = _ior0(elt,'folder-id',0)
             source_sco_id = _ior0(elt,'source-sco-id',0)
@@ -124,7 +124,12 @@ def _import_one_room(acc,api,row):
                 user,created = User.objects.get_or_create(username=username)
                 if created:
                     user.set_unusable_password()
-                room = Room.objects.create(acc=acc,sco_id=sco_id,creator=user,name=name,description=description,folder_sco_id=folder_sco_id,source_sco_id=source_sco_id,urlpath=urlpath)
+                room = Room.objects.create(sco=get_sco(acc,sco_id),
+                    creator=user,name=name,
+                    description=description,
+                    folder_sco=get_sco(acc,folder_sco_id),
+                    source_sco=get_sco(acc,source_sco_id)
+                    ,urlpath=urlpath)
                 room.trylock()
         else:
             if folder_sco_id:
@@ -167,7 +172,7 @@ def start_user_counts_poll(room,niter):
 @task(name='meetingtools.apps.room.tasks.poll_user_counts',rate_limit="10/s")
 def poll_user_counts(room,niter=0):
     logging.debug("polling user_counts for room %s" % room.name)
-    with ac_api_client(room.acc) as api:
+    with ac_api_client(room.sco.acc) as api:
         (nusers,nhosts) = api.poll_user_counts(room)
         if nusers > 0:
             logging.debug("room occupied by %d users and %d hosts, checking again in 20 ..." % (nusers,nhosts))
@@ -183,7 +188,7 @@ def import_recent_user_counts():
     for acc in ACCluster.objects.all():
         with ac_api_client(acc) as api:
             then = datetime.now()-timedelta(seconds=600)
-            for room in Room.objects.filter((Q(lastupdated__gt=then) | Q(lastvisited__gt=then)) & Q(acc=acc)):
+            for room in Room.objects.filter((Q(lastupdated__gt=then) | Q(lastvisited__gt=then)) & Q(sco__acc=acc)):
                 api.poll_user_counts(room)
         
 # look for sessions that are newer than the one we know about for a room
@@ -192,7 +197,7 @@ def import_sessions():
     for room in Room.objects.all():
         with ac_api_client(room.acc) as api:
             p = {'sco-id': room.sco_id,'sort-date-created': 'asc'}
-            if room.lastvisited != None:
+            if room.lastvisited is not None:
                 last = room.lastvisited
                 last.replace(microsecond=0)
                 p['filter-gt-date-created'] = last.isoformat()
@@ -218,7 +223,7 @@ def import_transactions():
                 if not seen.get(sco_id,False): #pick the first session for each room - ie the one last created
                     seen[sco_id] = True
                     try:
-                        room = Room.objects.get(acc=acc,sco_id=sco_id)
+                        room = Room.objects.get(sco__acc=acc,sco__sco_id=sco_id)
                         date_created = iso8601.parse_date(row.findtext("date-created"))
                         room.lastvisited = date_created
                         room.save()
