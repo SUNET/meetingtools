@@ -130,6 +130,7 @@ INSTALLED_APPS = (
     'django_co_connector',
     'django_co_acls',
     'tagging',
+    'djangosaml2',
     'meetingtools.extensions',
     'meetingtools.apps.auth',
     'meetingtools.apps.room',
@@ -148,7 +149,19 @@ djcelery.setup_loader()
 NOREPLY = "no-reply@sunet.se"
 AUTH_PROFILE_MODULE = "userprofile.UserProfile"
 
+from django.conf import settings
+from saml2 import BINDING_HTTP_POST, BINDING_HTTP_REDIRECT
+
+LOGIN_URL = '/saml2/sp/login/'
+LOGIN_REDIRECT_URL = "/rooms"
+
+AUTHENTICATION_BACKENDS += ('asgard.saml.Saml2Backend',)
+
+AUTO_REMOTE_SUPERUSERS = ['leifj@nordu.net']
+
 try:
     from asgard.loader import *
+
+
 except ImportError:
     pass
