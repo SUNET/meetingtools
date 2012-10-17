@@ -1,3 +1,4 @@
 {
-"type": "django"
+"type": "django",
+"name": "meetingtools"
 }
