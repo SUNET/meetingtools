@@ -147,3 +147,8 @@ djcelery.setup_loader()
 
 NOREPLY = "no-reply@sunet.se"
 AUTH_PROFILE_MODULE = "userprofile.UserProfile"
+
+try:
+    from asgard.loader import *
+except ImportError:
+    pass
