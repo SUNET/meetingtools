@@ -161,7 +161,6 @@ AUTO_REMOTE_SUPERUSERS = ['leifj@nordu.net']
 
 try:
     from asgard.loader import *
-
-
-except ImportError:
-    pass
+    DEBUG=True
+except ImportError,ex:
+    print ex
