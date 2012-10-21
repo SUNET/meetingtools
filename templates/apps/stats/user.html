@@ -4,7 +4,7 @@
     $.ajax({
         url: '/api/stats/user/{{username}}',
         method: 'GET',
-        beforeSend: function() { $('#graph').spin("large"); },
+        beforeSend: function() { $('#graph').spin("flotload"); },
         success: function (resp) {
             var graph = $('#graph');
             graph.spin(false);
