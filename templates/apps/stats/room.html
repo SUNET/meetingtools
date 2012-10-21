@@ -1,21 +1,23 @@
 {% extends "base.html" %}
 {% load datehumanize %}
 {% block widgets %}
-$.ajax({
-	url: '/api/stats/room/{{room.id}}',
-	method: 'GET',
-	success: function (resp) {
-	    var graph = $('#graph');
-	    series = [{label: 'Meeting minutes for {{room.name}}',data: resp['data']}];
-		$.plot(graph,series,{
-        	lines: { show: true },
-        	points: { show: true },
-        	xaxis: { mode: "time" }
-    	});
-    	$('#minutes').append(resp['minutes']);
-    	$('#users').append(resp['users']);
-	}
-});
+    $.ajax({
+        url: '/api/stats/room/{{room.id}}',
+        method: 'GET',
+        beforeSend: function() { $('#graph').spin("flotload"); },
+        success: function (resp) {
+            var graph = $('#graph');
+            graph.spin(false);
+            series = [{label: 'Meeting minutes for {{room.name}}',data: resp['data']}];
+            $.plot(graph,series,{
+                lines: { show: true },
+                points: { show: true },
+                xaxis: { mode: "time" }
+            });
+            $('#minutes').append(resp['minutes']);
+            $('#users').append(resp['users']);
+        }
+    });
 {% endblock %}
 {% block content %}
 <h1>Meeting statistics for {{room.name}}</h1>
