@@ -94,8 +94,9 @@ def _import_one_room(acc,api,row):
     #logging.debug("lastupdated %s" % lastupdated)
     if not room or lastupdated < last:
         (r,username) = _extended_info(api, sco_id)
-        logging.debug("found room owned by %s time for and update" % username)
+        logging.debug("found room owned by %s. Time for an update" % username)
         if username is None:
+            logging.warning("username not found for sco-id=%s while importing" % sco_id)
             return
 
         logging.debug(etree.tostring(row))
@@ -103,6 +104,11 @@ def _import_one_room(acc,api,row):
         urlpath = row.findtext("url[0]").strip("/")
         name = row.findtext('name[0]')
         description = row.findtext('description[0]')
+        date_created = None
+        try:
+            date_created = iso8601.parse_date(row.findtext("date-created[0]"))
+        except Exception:
+            pass
         folder_sco_id = 0
         source_sco_id = 0
 
@@ -125,11 +131,11 @@ def _import_one_room(acc,api,row):
                 if created:
                     user.set_unusable_password()
                 room = Room.objects.create(sco=get_sco(acc,sco_id),
-                    creator=user,name=name,
-                    description=description,
-                    folder_sco=get_sco(acc,folder_sco_id),
-                    source_sco=get_sco(acc,source_sco_id)
-                    ,urlpath=urlpath)
+                                        creator=user,name=name,
+                                        description=description,
+                                        folder_sco=get_sco(acc,folder_sco_id),
+                                        source_sco=get_sco(acc,source_sco_id),
+                                        urlpath=urlpath)
                 room.trylock()
         else:
             if folder_sco_id:
@@ -137,6 +143,8 @@ def _import_one_room(acc,api,row):
             room.source_sco_id = source_sco_id
             room.description = description
             room.urlpath = urlpath
+            if date_created is not None:
+                room.timecreated = date_created
 
         if room is not None:
             room.save()
