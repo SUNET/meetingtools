@@ -18,24 +18,26 @@
       &lt;script type="text/javascript"
                  src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"&gt;&lt;/script&gt;
       &lt;script type="text/javascript"
-                 src="{% baseurl %}/site-media/js/jquery.meetingtools.js"&gt;&lt;/script&gt;
-      &lt;link href="{% baseurl %}/site-media/css/jquery.meetingtools.css"
+                 src="/statc/js/jquery.meetingtools.js"&gt;&lt;/script&gt;
+      &lt;link href="/static/css/jquery.meetingtools.css"
                rel="stylesheet" type="text/css" /&gt;
       &lt;script type="text/javascript"&gt;
          $(function() {
-            $("#meetings").meetingtools({tags: '{{tags}}',url: '{% baseurl %}'});
+            $("#meetings").meetingtools({tags: '{{tags}}',url: '{{BASE_URL}}'});
          });
       &lt;/script&gt;
    &lt;/head&gt;
    &lt;body&gt;
       &lt;h1&gt;Meetings...&lt;/h1&gt;
-      &lt;div id="meetings"&gt;&lt;img src="{% baseurl %}/site-media/img/ajax-loader.gif"/&gt;&lt;/div&gt;
+      &lt;div id="meetings"&gt;&lt;img src="/static/img/ajax-loader.gif"/&gt;&lt;/div&gt;
    &lt;/body&gt;
 &lt;/html&gt;
 </pre>
 
 <p>
 	Change the tags option in the call to 'meetingtools' in order to list other rooms. Override 
-	the CSS elements in jquery.meetingtools.css in order to apply your own skin to the generated html. 
+	the CSS elements in jquery.meetingtools.css in order to apply your own skin to the generated html.
+    Also remember to change <code>http</code> to <code>https</code> if you are serving your widget
+    over TLS since most browsers will otherwize block insecure content.
 </p>
 {% endblock %}
