@@ -4,8 +4,8 @@
 $.ajax({
 	url: '/api/stats/user/{{username}}',
 	method: 'GET',
-    start: $('#graph').spin("large"),
-    stop: $('#graph').spin(false),
+    start: function() { $('#graph').spin("large") },
+    stop: function() { $('#graph').spin(false) },
 	success: function (resp) {
 	    var graph = $('#graph');
 	    series = [{label: 'Meeting minutes for {{username}}',data: resp['data']}];
