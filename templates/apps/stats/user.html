@@ -4,7 +4,7 @@
     $.ajax({
         url: '/api/stats/user/{{username}}',
         method: 'GET',
-        ajaxStart: function() { $('#graph').spin("large"); }
+        ajaxStart: function() { $('#graph').spin("large"); },
         success: function (resp) {
             var graph = $('#graph');
             graph.spin(false);
