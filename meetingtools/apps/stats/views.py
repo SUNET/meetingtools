@@ -5,6 +5,7 @@ Created on Jan 16, 2012
 """
 
 from django.contrib.auth.decorators import login_required
+from django.contrib.humanize.templatetags.humanize import naturalday
 from django.http import HttpResponseForbidden, HttpResponseBadRequest
 from meetingtools.ac import ac_api_client
 from iso8601 import iso8601
@@ -142,11 +143,19 @@ def domain_minutes_api(request,domain):
         
         begin = form.cleaned_data['begin']
         end = form.cleaned_data['end']
+
+        if begin is None:
+            from datetime import datetime,timedelta
+            begin = datetime.now()-timedelta(seconds=48*3600)
+            begin = begin.replace(microsecond=0)
         
         if begin is not None:
             p['filter-gte-date-created'] = begin
         if end is not None:
             p['filter-lt-date-created'] = end
+        else:
+            end = datetime.now().replace(microsecond=0) # for display only
+
         r = api.request('report-bulk-consolidated-transactions',p)
         
         series = []
@@ -200,7 +209,12 @@ def domain_minutes_api(request,domain):
         if curdate is not None and ms > 0:
             series.append([_date_ts(curdate),int(ms/60000)])
         
-        return json_response({'data': sorted(series,key=lambda x: x[0]), 'rooms': len(rc.keys()), 'users': len(uc.keys()), 'minutes': int(t_ms/60000)},request)
+        return json_response({'data': sorted(series,key=lambda x: x[0]),
+                              'rooms': len(rc.keys()),
+                              'begin': naturalday(begin),
+                              'end': naturalday(end),
+                              'users': len(uc.keys()),
+                              'minutes': int(t_ms/60000)},request)
 
 
 @login_required

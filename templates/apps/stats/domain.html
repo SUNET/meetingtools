@@ -17,6 +17,8 @@
             $('#minutes').append(resp['minutes']);
             $('#rooms').append(resp['rooms']);
             $('#users').append(resp['users']);
+            $('#begin').append(resp['begin']));
+            $('#end').append(resp['end']));
         }
     });
 {% endblock %}
@@ -29,6 +31,8 @@
 	<tr><td><b>Total minutes:</b></td><td id="minutes"></td></tr>
 	<tr><td><b>Total rooms:</b></td><td id="rooms"></td></tr>
 	<tr><td><b>Total unique users:</b></td><td id="users"></td></tr>
+    <tr><td><b>Start time:</b></td><td id="begin"></td></tr>
+    <tr><td><b>End time:</b></td><td id="end"></td></tr>
 	<tr><td colspan="2" style="padding-top: 10px;"><a href="/stats">Look at your own statistics</a></td></tr>
 </table>
 </div>
