@@ -16,6 +16,11 @@ $.ajax({
     	$('#rooms').append(resp['rooms']);
 	}
 });
+$("#graph").ajaxStart(function() {
+        this.spin("large")
+}).ajaxStop(function() {
+        this.spin(false)
+});
 {% endblock %}
 {% block content %}
 <h1>Meeting statistics for {{username}}</h1>
