@@ -71,9 +71,9 @@ def user_minutes_api(request,username=None):
         end = form.cleaned_data['end']
         
         if begin is not None:
-            p['filter-gte-date-created'] = begin
+            p['filter-gte-date-created'] = begin.isoformat()
         if end is not None:
-            p['filter-lt-date-created'] = end
+            p['filter-lt-date-created'] = end.isoformat()
         r = api.request('report-bulk-consolidated-transactions',p)
         
         series = []
@@ -150,9 +150,9 @@ def domain_minutes_api(request,domain):
             begin = begin.replace(microsecond=0)
         
         if begin is not None:
-            p['filter-gte-date-created'] = begin
+            p['filter-gte-date-created'] = begin.isoformat()
         if end is not None:
-            p['filter-lt-date-created'] = end
+            p['filter-lt-date-created'] = end.isoformat()
         else:
             end = datetime.now().replace(microsecond=0) # for display only
 
@@ -234,9 +234,9 @@ def room_minutes_api(request,rid):
         end = form.cleaned_data['end']
         
         if begin is not None:
-            p['filter-gte-date-created'] = begin
+            p['filter-gte-date-created'] = begin.isoformat()
         if end is not None:
-            p['filter-lt-date-created'] = end
+            p['filter-lt-date-created'] = end.isoformat()
         r = api.request('report-bulk-consolidated-transactions',p)
         
         series = []
