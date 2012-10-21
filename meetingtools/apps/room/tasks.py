@@ -139,8 +139,8 @@ def _import_one_room(acc,api,row):
                 room.trylock()
         else:
             if folder_sco_id:
-                room.folder_sco_id = folder_sco_id
-            room.source_sco_id = source_sco_id
+                room.folder_sco = get_sco(acc,folder_sco_id)
+            room.source_sco = get_sco(acc,source_sco_id)
             room.description = description
             room.urlpath = urlpath
             if date_created is not None:
@@ -212,7 +212,7 @@ def import_sessions():
             r = api.request('report-meeting-sessions',p)
             for row in r.et.xpath("//row"):
                 date_created = iso8601.parse_date(row.findtext("date-created"))
-                logging.debug("sco_id=%d lastvisited: %s" % (room.sco_id,date_created))
+                logging.debug("sco_id=%d lastvisited: %s" % (room.sco.sco_id,date_created))
                 room.lastvisited = date_created
                 room.save()
                 break
