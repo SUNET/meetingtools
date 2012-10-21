@@ -16,7 +16,8 @@ $("#el").spin(false); // Kills the spinner.
 			"custom": { lines: 7, length: 2, width: 2, radius: 2},
 			"tiny": { lines: 8, length: 2, width: 2, radius: 3 },
 			"small": { lines: 8, length: 4, width: 3, radius: 5 },
-			"large": { lines: 10, length: 8, width: 4, radius: 8 }
+			"large": { lines: 10, length: 8, width: 4, radius: 8 },
+            "flotload": { lines: 13, length: 7, width: 7, radius: 33 }
 		};
 		if (Spinner) {
 			return this.each(function() {
