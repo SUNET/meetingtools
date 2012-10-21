@@ -203,8 +203,8 @@ def import_recent_user_counts():
 @periodic_task(run_every=crontab(hour="*", minute="*", day_of_week="*"))
 def import_sessions():
     for room in Room.objects.all():
-        with ac_api_client(room.acc) as api:
-            p = {'sco-id': room.sco_id,'sort-date-created': 'asc'}
+        with ac_api_client(room.sco.acc) as api:
+            p = {'sco-id': room.sco.sco_id,'sort-date-created': 'asc'}
             if room.lastvisited is not None:
                 last = room.lastvisited
                 last.replace(microsecond=0)
