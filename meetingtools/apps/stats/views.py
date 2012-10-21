@@ -210,7 +210,7 @@ def room_minutes_api(request,rid):
         return HttpResponseForbidden("You can only look at statistics for your own rooms!")
     
     with ac_api_client(request) as api:
-        p = {'sort': 'asc','sort1': 'date-created','filter-type': 'meeting','filter-sco-id': room.sco_id}
+        p = {'sort': 'asc','sort1': 'date-created','filter-type': 'meeting','filter-sco-id': room.sco.sco_id}
         
         form = StatCaledarForm(request.GET)
         if not form.is_valid():
