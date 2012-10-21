@@ -146,7 +146,7 @@ def domain_minutes_api(request,domain):
 
         if begin is None:
             from datetime import datetime,timedelta
-            begin = datetime.now()-timedelta(seconds=48*3600)
+            begin = datetime.now()-timedelta(seconds=72*3600)
             begin = begin.replace(microsecond=0)
         
         if begin is not None:
