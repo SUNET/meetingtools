@@ -4,6 +4,8 @@
 $.ajax({
 	url: '/api/stats/user/{{username}}',
 	method: 'GET',
+    start: $(this).spin("large"),
+    stop: $(this).spin(false),
 	success: function (resp) {
 	    var graph = $('#graph');
 	    series = [{label: 'Meeting minutes for {{username}}',data: resp['data']}];
@@ -15,11 +17,6 @@ $.ajax({
     	$('#minutes').append(resp['minutes']);
     	$('#rooms').append(resp['rooms']);
 	}
-});
-$("#graph").ajaxStart(function() {
-        $(this).spin("large")
-}).ajaxStop(function() {
-        $(this).spin(false)
 });
 {% endblock %}
 {% block content %}
