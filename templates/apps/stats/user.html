@@ -17,9 +17,9 @@ $.ajax({
 	}
 });
 $("#graph").ajaxStart(function() {
-        this.spin("large")
+        $(this).spin("large")
 }).ajaxStop(function() {
-        this.spin(false)
+        $(this).spin(false)
 });
 {% endblock %}
 {% block content %}
