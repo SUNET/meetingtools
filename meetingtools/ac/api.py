@@ -145,7 +145,7 @@ class ACPClient():
         if r.is_error() and raise_error:
             raise r.exception()
         
-        return r;
+        return r
     
     def redirect_to(self,url):
         if self.session:
