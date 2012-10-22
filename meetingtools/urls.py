@@ -8,7 +8,10 @@ from meetingtools.apps.room.feeds import RoomAtomTagFeed,RoomRSSTagField,\
 admin.autodiscover()
 
 def welcome(request):
-    return redirect_to('/rooms')
+    if request.is_authenticated():
+        return redirect_to('/rooms')
+    else:
+        return redirect_to('/accounts/login')
 
 def crap(request):
     raise ValueError("Bad crab!")
@@ -16,7 +19,7 @@ def crap(request):
 handler500 = "meetingtools.multiresponse.render500"
 
 urlpatterns = patterns('',
-    (r'^$',welcome),
+    (r'^/?$',welcome),
     (r'^saml2/sp/',include('djangosaml2.urls')),
     (r'^admin/', include(admin.site.urls)),
     (r'^static/(?P<path>.*)$','django.views.static.serve',{'document_root': STATIC_ROOT}),
