@@ -4,8 +4,7 @@ Created on Jan 31, 2011
 @author: leifj
 '''
 from StringIO import StringIO
-from django.core import cache
-
+from django.core.cache import get_cache
 import httplib2
 from urllib import quote_plus
 import logging
@@ -125,7 +124,7 @@ class ACPClient():
             u.append('%s=%s' % (k,quote_plus(value.encode("utf-8"))))
         
         url = self.url + '?' + '&'.join(u)
-    
+        cache = get_cache('default')
         h = httplib2.Http(cache,disable_ssl_certificate_validation=True);
         logging.debug(url)
         resp, content = h.request(url, "GET")
