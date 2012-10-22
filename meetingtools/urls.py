@@ -8,7 +8,7 @@ from meetingtools.apps.room.feeds import RoomAtomTagFeed,RoomRSSTagField,\
 admin.autodiscover()
 
 def welcome(request):
-    if request.is_authenticated():
+    if request.user.is_authenticated():
         return redirect_to('/rooms')
     else:
         return redirect_to('/accounts/login')
