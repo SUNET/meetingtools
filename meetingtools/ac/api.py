@@ -143,7 +143,8 @@ class ACPClient():
             u.append('%s=%s' % (k,quote_plus(value.encode("utf-8"))))
         
         url = self.url + '?' + '&'.join(u)
-        cache = ACPClient.CacheWrapper(get_cache('default'))
+        #cache = ACPClient.CacheWrapper(get_cache('default'))
+        cache = None
         h = httplib2.Http(cache,disable_ssl_certificate_validation=True);
         logging.debug(url)
         resp, content = h.request(url, "GET")
