@@ -221,7 +221,6 @@ def myroom(request):
         raise ValueError("Oops - there seem to be multiple rooms with name '%s'" % request.user.username)
     except ObjectDoesNotExist:
         room = Room(creator=request.user,
-                    acc=acc,
                     folder_sco=my_meetings_sco,
                     name=request.user.username,
                     source_sco=template_sco)
