@@ -8,7 +8,7 @@ from meetingtools.apps.room.feeds import RoomAtomTagFeed,RoomRSSTagField,\
 admin.autodiscover()
 
 def welcome(request):
-    if request.user.is_authenticated():
+    if not request.user.is_anonymous():
         return redirect_to('/rooms')
     else:
         return redirect_to('/accounts/login')
@@ -24,9 +24,9 @@ urlpatterns = patterns('',
     (r'^admin/', include(admin.site.urls)),
     (r'^static/(?P<path>.*)$','django.views.static.serve',{'document_root': STATIC_ROOT}),
     # Login/Logout
-    (r'^accounts/login?$','meetingtools.apps.auth.views.login'),
-    (r'^accounts/login-federated$','meetingtools.apps.auth.views.accounts_login_federated'),
-    (r'^accounts/logout$','meetingtools.apps.auth.views.logout'),
+    (r'^accounts/login/?$','meetingtools.apps.auth.views.login'),
+    (r'^accounts/login-federated/?$','meetingtools.apps.auth.views.accounts_login_federated'),
+    (r'^accounts/logout/?$','meetingtools.apps.auth.views.logout'),
     (r'^user/?(.*)$','meetingtools.apps.room.views.list_rooms'),
     (r'^crab/',crap),
     ('^myroom/?','meetingtools.apps.room.views.myroom'),
