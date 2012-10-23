@@ -4,6 +4,7 @@ Created on Jan 31, 2011
 @author: leifj
 '''
 from StringIO import StringIO
+import hashlib
 from django.core.cache import get_cache
 import httplib2
 from urllib import quote_plus
@@ -109,7 +110,25 @@ class ACPClient():
     def __enter__(self):
         return self
 
-    
+    class CacheWrapper():
+
+        def __init__(self,cache):
+            self._cache = cache
+
+        def _shorten(self,key):
+            h = hashlib.sha1()
+            h.update(key)
+            return h.hexdigest()
+
+        def add(self, key, value, timeout=0):
+            return self._cache.add(self._shorten(key),value)
+
+        def get(self, key, default=None):
+            return self._cache.get(self._shorten(key),default)
+
+        def set(self, key, value, timeout=0):
+            return self._cache.set(self._shorten(key),value)
+
     def request(self,method,p={},raise_error=False):
         self.age += 1
         self.lastused = time.time()
@@ -124,7 +143,7 @@ class ACPClient():
             u.append('%s=%s' % (k,quote_plus(value.encode("utf-8"))))
         
         url = self.url + '?' + '&'.join(u)
-        cache = get_cache('default')
+        cache = ACPClient.CacheWrapper(get_cache('default'))
         h = httplib2.Http(cache,disable_ssl_certificate_validation=True);
         logging.debug(url)
         resp, content = h.request(url, "GET")
