@@ -449,14 +449,14 @@ def _goto(request,room,clean=True,promote=False):
     
 ## Tagging
 
-def _room2dict(room):
+def _room2dict(request,room):
     return {'name':room.name,
             'description':room.description,
             'user_count':room.nusers(),
             'host_count':room.nhosts(),
             'updated': rfc3339_date(room.lastupdated),
             'self_cleaning': room.self_cleaning,
-            'url': room.go_url()}
+            'url': base_url(request,room.go_url())}
 
 # should not require login
 def list_by_tag(request,tn):
@@ -465,7 +465,7 @@ def list_by_tag(request,tn):
     title = 'Rooms tagged with %s' % " and ".join(tags)
     return respond_to(request,
                       {'text/html':'apps/room/list.html',
-                       'application/json': json_response([_room2dict(room) for room in rooms],request)},
+                       'application/json': json_response([_room2dict(request,room) for room in rooms],request)},
                       {'title':title,
                        'description':title ,
                        'edit':False,

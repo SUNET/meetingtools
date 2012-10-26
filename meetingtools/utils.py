@@ -16,5 +16,5 @@ def session(request,key=None,val=None):
     else:
         return request.session
 
-def base_url(request):
-    return "%s://%s/" % ({True: 'https',False:'http'}[request.is_secure()],request.get_host())
+def base_url(request,path="/"):
+    return "%s://%s%s" % ({True: 'https',False:'http'}[request.is_secure()],request.get_host(),path)
