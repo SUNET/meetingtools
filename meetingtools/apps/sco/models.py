@@ -1,6 +1,7 @@
 """
 Abstract sco objects and utility methods
 """
+import logging
 
 __author__ = 'leifj'
 
@@ -53,7 +54,7 @@ def get_sco(acc,sco_id):
     if sco is None:
         sco,created = ACObject.objects.get_or_create(acc=acc,sco_id=sco_id)
         assert sco is not None
-        cache.set(key,sco)
+        cache.set(key,sco,30)
     return sco
 
 def get_sco_shortcuts(acc,shortcut_id):

@@ -23,3 +23,6 @@ def theme(request):
 
 def misc_urls(request):
     return {'LOGIN_URL': settings.LOGIN_URL,'BASE_URL':base_url(request)}
+
+def request(request):
+    return {'request': request}

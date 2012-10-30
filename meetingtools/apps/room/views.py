@@ -319,7 +319,7 @@ def list_rooms(request,username=None):
             
     rooms = []
     if user:
-        rooms = Room.objects.filter(creator=user).order_by('name').all()
+        rooms = Room.objects.filter(creator=user).order_by('name').all().prefetch_related("creator","sco","folder_sco","source_sco","deleted_sco")
     
     return respond_to(request,
                       {'text/html':'apps/room/list.html'},
@@ -461,7 +461,7 @@ def _room2dict(request,room):
 # should not require login
 def list_by_tag(request,tn):
     tags = tn.split('+')
-    rooms = TaggedItem.objects.get_by_model(Room, tags).order_by('name').all()
+    rooms = TaggedItem.objects.get_by_model(Room, tags).order_by('name').all().prefetch_related("creator","sco","folder_sco","source_sco","deleted_sco")
     title = 'Rooms tagged with %s' % " and ".join(tags)
     return respond_to(request,
                       {'text/html':'apps/room/list.html',
@@ -547,7 +547,7 @@ def room_recordings(request,room):
              'url': room.sco.acc.make_url(ar.urlpath),
              'dl': room.sco.acc.make_url(ar.urlpath),
              'date_created': ar.timecreated,
-             'date_modified': ar.lastupdated} for ar in room.archives.all()
+             'date_modified': ar.lastupdated} for ar in room.archives.all().prefetch_related("creator","sco","folder_sco","source_sco","deleted_sco")
         ]
 @login_required
 def recordings(request,rid):

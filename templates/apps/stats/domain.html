@@ -2,7 +2,7 @@
 {% load datehumanize %}
 {% block widgets %}
     $.ajax({
-        url: '/api/stats/domain/{{domain}}',
+        url: '/api/stats/?tags=domain:{{domain}}',
         method: 'GET',
         beforeSend: function() { $('#graph').spin("flotload"); },
         success: function (resp) {

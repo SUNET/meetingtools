@@ -56,6 +56,7 @@ USE_I18N = True
 # If you set this to False, Django will not format dates, numbers and
 # calendars according to the current locale
 USE_L10N = True
+USE_TZ = True
 
 STATIC_ROOT = "%s/static" % BASE_DIR
 STATIC_URL = "/static/"
@@ -149,18 +150,15 @@ djcelery.setup_loader()
 NOREPLY = "no-reply@sunet.se"
 AUTH_PROFILE_MODULE = "userprofile.UserProfile"
 
-from django.conf import settings
-from saml2 import BINDING_HTTP_POST, BINDING_HTTP_REDIRECT
-
 LOGIN_URL = '/saml2/sp/login/'
 LOGIN_REDIRECT_URL = "/rooms"
-
-AUTHENTICATION_BACKENDS += ('asgard.saml.Saml2Backend',)
 
 AUTO_REMOTE_SUPERUSERS = ['leifj@nordu.net']
 
 try:
     from asgard.loader import *
     DEBUG=True
+
+    AUTHENTICATION_BACKENDS += ('asgard.saml.Saml2Backend',)
 except ImportError,ex:
     print ex
