@@ -21,12 +21,13 @@ from django.contrib.humanize.templatetags import humanize
 from django.conf import settings
 from django.core.mail import send_mail
 
-def _owner_username(api,sco):
+def _owner_username(api,acc,sco):
     logging.debug(sco)
-    key = '_sco_owner_%s' % sco.get('sco-id')
+    key = 'ac:owner:%s/%s' % (acc,sco.get('sco-id'))
     logging.debug(key)
     try:
-        if cache.get(key) is None:
+        name = cache.get(key)
+        if name is None:
             fid = sco.get('folder-id')
             if not fid:
                 logging.debug("No folder-id")
@@ -40,26 +41,26 @@ def _owner_username(api,sco):
             parent = r.et.xpath("//sco")[0]
             logging.debug("p %s",repr(parent))
             logging.debug("r %s",etree.tostring(parent))
-            name = None
             if parent:
                 logging.debug("parent: %s" % parent)
                 if parent.findtext('name') == 'User Meetings':
                     name = sco.findtext('name')
                 else:
                     name = _owner_username(api,parent)
+
+                if name is not None:
+                    cache.set(key,name,30)
                 
-                cache.set(key,name)
-                
-        return cache.get(key)
+        return name
     except Exception,e:
         logging.debug(e)
         return None
 
-def _extended_info(api,sco_id):
+def _extended_info(api,acc,sco_id):
     r = api.request('sco-info',{'sco-id':sco_id},False)
     if r.status_code == 'no-data':
         return None
-    return r.et,_owner_username(api,r.et.xpath('//sco')[0])
+    return r.et,_owner_username(api,acc,r.et.xpath('//sco')[0])
     
 def _import_one_room(acc,api,row):
     sco_id = int(row.get('sco-id'))
@@ -93,7 +94,7 @@ def _import_one_room(acc,api,row):
     #logging.debug("last %s" % last)
     #logging.debug("lastupdated %s" % lastupdated)
     if not room or lastupdated < last:
-        (r,username) = _extended_info(api, sco_id)
+        (r,username) = _extended_info(api, acc, sco_id)
         logging.debug("found room owned by %s. Time for an update" % username)
         if username is None:
             logging.warning("username not found for sco-id=%s while importing" % sco_id)

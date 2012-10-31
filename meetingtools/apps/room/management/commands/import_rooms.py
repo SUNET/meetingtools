@@ -13,8 +13,16 @@ class Command(BaseCommand):
             dest='since',
             default=0,
             help='Import all rooms modified <since> seconds ago'),
+        make_option('--cluster',
+            type='int',
+            dest='cluster',
+            default=0,
+            help='Import rooms from cluster <cluster> (id)'),
         )
 
     def handle(self, *args, **options):
-        for acc in ACCluster.objects.all():
+        qs = ACCluster.objects
+        if options['cluster'] > 0:
+            qs = qs.filter(pk=options['cluster'])
+        for acc in qs.all():
             import_acc(acc,since=options['since'])
