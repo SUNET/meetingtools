@@ -46,7 +46,7 @@ def _owner_username(api,acc,sco):
                 if parent.findtext('name') == 'User Meetings':
                     name = sco.findtext('name')
                 else:
-                    name = _owner_username(api,parent)
+                    name = _owner_username(api,acc,parent)
 
                 if name is not None:
                     cache.set(key,name,30)
