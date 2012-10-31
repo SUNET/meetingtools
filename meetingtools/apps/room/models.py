@@ -48,7 +48,7 @@ class Room(models.Model):
     folder_sco = ForeignKey(ACObject,null=True,related_name="folders")
     source_sco = ForeignKey(ACObject,null=True,related_name="sources")
     deleted_sco = ForeignKey(ACObject,null=True,related_name="deleted")
-    urlpath = CharField(verbose_name="Custom URL",max_length=128,unique=True)
+    urlpath = CharField(verbose_name="Custom URL",max_length=128)
     self_cleaning = BooleanField(verbose_name="Clean-up when empty?")
     allow_host = BooleanField(verbose_name="Allow first participant to become host?",default=True)
     description = TextField(blank=True,null=True)
