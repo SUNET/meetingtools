@@ -5,7 +5,7 @@ Created on Feb 3, 2011
 '''
 
 from django.db import models
-from django.db.models.fields import CharField, URLField, TextField, IntegerField
+from django.db.models.fields import CharField, URLField, TextField, IntegerField, BooleanField
 import re
 
 class ACCluster(models.Model):
