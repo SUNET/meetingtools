@@ -40,6 +40,7 @@ def publish_archive(room,sco_id,tags=None):
         ar.save()
         try:
             r = api.request('sco-move',{'sco-id':sco_id,'folder-id':folder_sco.sco_id},True)
+            r = api.request('permissions-update',{'acl-id':sco_id,'permission-id': 'view','principal-id':'public-access'})
         except Exception,ex:
             ar.delete()
             raise ex
