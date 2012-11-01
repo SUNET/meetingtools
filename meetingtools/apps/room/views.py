@@ -391,7 +391,7 @@ def go_by_path(request,path):
                         {'text/html': 'apps/room/choose.html',
                          'application/json': json_response([base_url(request,room.go_url()) for room in rooms])},
                         {'rooms': rooms})
-        
+
 @login_required
 def promote_and_launch(request,rid):
     room = get_object_or_404(Room,pk=rid)
@@ -408,6 +408,8 @@ def _random_key(length=20):
     rg = random.SystemRandom()
     alphabet = string.letters + string.digits
     return str().join(rg.choice(alphabet) for _ in range(length))
+
+
 
 def _goto(request,room,clean=True,promote=False):
     if room.is_locked():
@@ -435,7 +437,7 @@ def _goto(request,room,clean=True,promote=False):
         room.save()
     
     key = None
-    if request.user.is_authenticated():
+    if request.user.is_authenticated() and room.sco.acc.cross_domain_sso:
         key = _random_key(20)
         user_principal = api.find_user(request.user.username)
         principal_id =  user_principal.get('principal-id')

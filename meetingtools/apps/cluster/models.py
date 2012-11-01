@@ -16,6 +16,7 @@ class ACCluster(models.Model):
     name = CharField(max_length=128,blank=True,unique=True)
     default_template_sco_id = IntegerField(blank=True,unique=True)
     domain_match = TextField()
+    cross_domain_sso = BooleanField(default=True)
 
     def __unicode__(self):
         return self.url
