@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="page-header">
+    <h1>Choose which room to visit</h1>
+</div>
+<div class="alert">
+    <i class="icon-info-sign"> </i>
+    Multiple rooms match your search. Please select which one to visit from the list below:
+</div>
+   <ul class="unstyled">
+   {% for room in rooms %}
+        <li><a href="{{BASE_URL}}go/{{room.id}}">{{room}} hosted on {{room.sco.acc.name}}</a></li>
+   {% endfor %}
+   </ul>
+{% endblock %}

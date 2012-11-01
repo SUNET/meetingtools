@@ -19,7 +19,7 @@ from meetingtools.utils import session, base_url
 import time
 from django.conf import settings
 from django.utils.datetime_safe import datetime
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, HttpResponseNotFound
 from django.core.exceptions import ObjectDoesNotExist, MultipleObjectsReturned
 from django_co_acls.models import allow, acl, clear_acl
 from meetingtools.ac.api import ACPClient
@@ -380,8 +380,17 @@ def go_by_id(request,id):
     return goto(request,room)
 
 def go_by_path(request,path):
-    room = get_object_or_404(Room,urlpath=path)
-    return goto(request,room)
+    rooms = Room.objects.filter(urlpath=path)
+    if len(rooms) == 1:
+        return goto(request,rooms[0])
+
+    if len(rooms) == 0:
+        return HttpResponseNotFound()
+
+    return respond_to(request,
+                        {'text/html': 'apps/room/choose.html',
+                         'application/json': json_response([base_url(request,room.go_url()) for room in rooms])},
+                        {'rooms': rooms})
         
 @login_required
 def promote_and_launch(request,rid):
