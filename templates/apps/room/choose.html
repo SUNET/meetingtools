@@ -9,7 +9,7 @@
 </div>
    <dl>
    {% for room in rooms %}
-        <dt><a href="{{BASE_URL}}go/{{room.id}}">{{room.name}}</a><dt>
+        <dt><a href="{{BASE_URL}}go/{{room.id}}">{{room.name}}</a> - <a href="{{BASE_URL}}go/{{room.id}}">{{BASE_URL}}go/{{room.id}}</a><dt>
         <dd>
             Hosted on {{room.sco.acc.name}}
 
