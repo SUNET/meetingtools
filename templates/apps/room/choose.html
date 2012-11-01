@@ -9,7 +9,7 @@
 </div>
    <ul class="unstyled">
    {% for room in rooms %}
-        <li><a href="{{BASE_URL}}go/{{room.id}}">{{room.name}} hosted on {{room.sco.acc.name}}</a></li>
+        <li><a class="btn btn-mini btn-success" href="{{BASE_URL}}go/{{room.id}}">{{room.name}}</a> hosted on {{room.sco.acc.name}}</li>
    {% endfor %}
    </ul>
 {% endblock %}
