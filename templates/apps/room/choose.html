@@ -7,9 +7,19 @@
     <i class="icon-info-sign"> </i>
     Multiple rooms match your search. Please select which one to visit from the list below:
 </div>
-   <ul class="unstyled">
+   <dl>
    {% for room in rooms %}
-        <li><a class="btn btn-mini btn-success" href="{{BASE_URL}}go/{{room.id}}">{{room.name}}</a> hosted on {{room.sco.acc.name}}</li>
+        <dt><a href="{{BASE_URL}}go/{{room.id}}">{{room.name}}</a><dt>
+        <dd>
+            Hosted on {{room.sco.acc.name}}
+
+        </dd>
+        {% if room.description %}
+        <dd>
+            {{room.description}}
+        </dd>
+        <dd><a class="btn btn-success" href="{{BASE_URL}}go/{{room.id}}">Enter Room</a></dd>
+        {% endif %}
    {% endfor %}
-   </ul>
+   </dl>
 {% endblock %}
