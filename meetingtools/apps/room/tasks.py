@@ -164,16 +164,22 @@ def import_acc(acc,since=0):
         else:
             r = api.request('report-bulk-objects',{'filter-type': 'meeting'})
 
+        nr = 0
+        ne = 0
         for row in r.et.xpath("//row"):
             try:
                 _import_one_room(acc,api,row)
+                nr += 1
             except Exception,ex:
                 logging.error(ex)
+                ne += 1
+
+        logging.info("%s: Imported %d rooms and got %d errors" % (acc,nr,ne))
 
 @periodic_task(run_every=crontab(hour="*", minute="*", day_of_week="*"))
 def import_all_rooms():
     for acc in ACCluster.objects.all():
-        import_acc(acc,since=3600)
+        import_acc(acc,since=3700)
   
 def start_user_counts_poll(room,niter):
     poll_user_counts.apply_async(args=[room],kwargs={'niter': niter})
@@ -196,12 +202,15 @@ def poll_user_counts(room,niter=0):
 def import_recent_user_counts():
     for acc in ACCluster.objects.all():
         with ac_api_client(acc) as api:
+            nr = 0
             then = datetime.now()-timedelta(seconds=600)
             for room in Room.objects.filter((Q(lastupdated__gt=then) | Q(lastvisited__gt=then)) & Q(sco__acc=acc)):
                 api.poll_user_counts(room)
-        
+                nr += 1
+            logging.info("%s: Checked usage for %d rooms since %s" % (acc,nr,then))
+
 # look for sessions that are newer than the one we know about for a room
-@periodic_task(run_every=crontab(hour="*", minute="*/5", day_of_week="*"))
+#@periodic_task(run_every=crontab(hour="*", minute="*/5", day_of_week="*"))
 def import_sessions():
     for room in Room.objects.all():
         with ac_api_client(room.sco.acc) as api:
