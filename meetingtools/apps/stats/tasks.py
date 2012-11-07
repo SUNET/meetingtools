@@ -1,7 +1,7 @@
 import logging
 from celery.schedules import crontab
 from celery.task import periodic_task
-from apps.room.models import Room
+from meetingtools.apps.room.models import Room
 from meetingtools.ac import ac_api_client
 from meetingtools.apps.cluster.models import ACCluster
 from datetime import datetime,timedelta
