@@ -340,11 +340,11 @@ def delete(request,id):
             with ac_api_client(room.sco.acc) as api:
                 api.request('sco-delete',{'sco-id':room.sco.sco_id},raise_error=True)
             clear_acl(room)
-            del room.sco
+            room.sco.delete()
             if room.folder_sco is not None:
-                del room.folder_sco
+                room.folder_sco.delete()
             if room.deleted_sco is not None:
-                del room.deleted_sco
+                room.deleted_sco.delete()
             room.delete()
             return redirect_to("/rooms")
     else:
