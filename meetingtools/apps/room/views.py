@@ -338,7 +338,7 @@ def delete(request,id):
         form = DeleteRoomForm(request.POST)
         if form.is_valid():
             with ac_api_client(room.sco.acc) as api:
-                api.request('sco-delete',{'sco-id':room.sco.sco_id},raise_error=True)
+                api.request('sco-delete',{'sco-id':room.sco.sco_id},raise_error=False)
             clear_acl(room)
             room.sco.delete()
             if room.folder_sco is not None:
