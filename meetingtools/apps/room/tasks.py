@@ -169,7 +169,7 @@ def _user_meeting_folder(user,api):
 def import_user_rooms(acc, api, user):
     mf_sco_id = _user_meeting_folder(user, api)
     if mf_sco_id > 0:
-        r = api.request('sco-contents', {'filter-type': 'meeting', 'sco_id': mf_sco_id})
+        r = api.request('sco-contents', {'filter-type': 'meeting', 'sco-id': mf_sco_id})
         nr = 0
         ne = 0
         for row in r.et.xpath("//sco"):
