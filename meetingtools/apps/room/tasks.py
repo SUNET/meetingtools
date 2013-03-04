@@ -3,6 +3,7 @@ Created on Jan 18, 2012
 
 @author: leifj
 '''
+from pprint import pformat
 from celery.task import periodic_task,task
 from celery.schedules import crontab
 from meetingtools.apps.sco.models import get_sco
