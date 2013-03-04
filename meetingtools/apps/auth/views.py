@@ -8,14 +8,13 @@ from django.contrib.auth.models import User, Group
 import datetime
 from django.views.decorators.cache import never_cache
 import logging
-from apps.room.tasks import import_user_rooms
-from apps.room.views import user_meeting_folder
+from meetingtools.apps.room.tasks import import_user_rooms
 from meetingtools.apps.userprofile.models import UserProfile
 from meetingtools.multiresponse import redirect_to, make_response_dict
 from meetingtools.ac import ac_api_client
 from django.shortcuts import render_to_response
 from django.contrib import auth
-from django_co_connector.models import co_import_from_request, add_member,remove_member
+from django_co_connector.models import co_import_from_request, add_member, remove_member
 from meetingtools.apps.cluster.models import acc_for_user
 from django.conf import settings
 

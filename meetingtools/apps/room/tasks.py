@@ -5,7 +5,7 @@ Created on Jan 18, 2012
 '''
 from celery.task import periodic_task,task
 from celery.schedules import crontab
-from apps.room.views import user_meeting_folder
+from meetingtools.apps.room.views import user_meeting_folder
 from meetingtools.apps.sco.models import get_sco
 from meetingtools.apps.cluster.models import ACCluster
 from meetingtools.ac import ac_api_client
@@ -21,6 +21,7 @@ from django.db.models import Q
 from django.contrib.humanize.templatetags import humanize
 from django.conf import settings
 from django.core.mail import send_mail
+
 
 def _owner_username(api,acc,sco):
     logging.debug(sco)
