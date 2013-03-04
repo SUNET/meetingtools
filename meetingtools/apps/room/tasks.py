@@ -102,16 +102,16 @@ def _import_one_room(acc,api,row):
             logging.warning("username not found for sco-id=%s while importing" % sco_id)
             return
 
-        def _ft(t,*exprs):
+        def _ft(t,exprs):
             for e in exprs:
-                v = t.findtext(exprs)
+                v = t.findtext(e)
                 if v is not None:
                     return v
             return None
 
         logging.debug(etree.tostring(row))
         logging.debug(etree.tostring(r))
-        urlpath = _ft(row, "url[0]", "url-path[0]").strip("/")
+        urlpath = _ft(row, ["url[0]", "url-path[0]"]).strip("/")
 
         name = row.findtext('name[0]')
         description = row.findtext('description[0]')
