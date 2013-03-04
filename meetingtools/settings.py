@@ -72,6 +72,7 @@ SESSION_ENGINE = "django.contrib.sessions.backends.file"
 #SESSION_ENGINE = "django.contrib.sessions.backends.cache"
 SESSION_FILE_PATH = "/tmp"
 SESSION_EXPIRE_AT_BROWSER_CLOSE = True
+SESSION_COOKIE_AGE=36000
 
 CACHES = {
     'default': {
