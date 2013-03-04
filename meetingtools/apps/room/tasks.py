@@ -210,10 +210,11 @@ def import_acc(acc,since=0):
 def import_all_rooms():
     for acc in ACCluster.objects.all():
         import_acc(acc,since=3700)
-  
+
+
 def start_user_counts_poll(room,niter):
     poll_user_counts.apply_async(args=[room],kwargs={'niter': niter})
-  
+
 @task(name='meetingtools.apps.room.tasks.poll_user_counts',rate_limit="10/s")
 def poll_user_counts(room,niter=0):
     logging.debug("polling user_counts for room %s" % room.name)
@@ -240,7 +241,7 @@ def import_recent_user_counts():
             logging.info("%s: Checked usage for %d rooms since %s" % (acc,nr,then))
 
 # look for sessions that are newer than the one we know about for a room
-@periodic_task(run_every=crontab(hour="*", minute="*/5", day_of_week="*"))
+@periodic_task(run_every=crontab(hour="*", minute="*/15", day_of_week="*"))
 def import_sessions():
     for room in Room.objects.all():
         with ac_api_client(room.sco.acc) as api:
@@ -257,7 +258,7 @@ def import_sessions():
                 room.save()
                 break
 
-@periodic_task(run_every=crontab(hour="*", minutes="*/5", day_of_week="*"))
+@periodic_task(run_every=crontab(hour="*", minute="*/15", day_of_week="*"))
 def import_transactions():
     for acc in ACCluster.objects.all():
         then = datetime.now() - timedelta(seconds=600)
