@@ -165,7 +165,8 @@ def _user_meeting_folder(user,api):
     #folder = next((f for f in folders if f.findtext('.//folder-name') == 'User Meetings'), None)
     return folders[0].get('sco-id')
 
-def import_user_rooms(api, user):
+
+def import_user_rooms(acc, api, user):
     mf_sco_id = _user_meeting_folder(user, api)
     if mf_sco_id > 0:
         r = api.request('sco_contents', {'filter-type': 'meeting', 'sco_id': mf_sco_id})

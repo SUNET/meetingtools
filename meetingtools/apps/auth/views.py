@@ -146,7 +146,7 @@ def accounts_login_federated(request):
                                                               'ext-login':request.user.username})
 
             #co_import_from_request(request)
-            import_user_rooms(api, request.user)
+            import_user_rooms(acc, api, request.user)
             
             member_or_employee = _is_member_or_employee(request.user)
             for gn in ('live-admins','seminar-admins'):
