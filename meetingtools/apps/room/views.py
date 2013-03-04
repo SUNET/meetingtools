@@ -92,12 +92,14 @@ def view(request,id):
                        'active': True,
                        })
 
+
 def _init_update_form(request,form,acc,folder_sco):
     if form.fields.has_key('urlpath'):
         url = base_url(request)
         form.fields['urlpath'].widget.prefix = url
     if form.fields.has_key('source_sco'):
         form.fields['source_sco'].widget.choices = [('','-- select template --')]+[r for r in _user_templates(request,acc,folder_sco)]
+
 
 def _update_room(request, room, data=dict(), acc=None):
     params = {'type':'meeting'}
@@ -321,7 +323,7 @@ def list_rooms(request,username=None):
             
     rooms = []
     if user:
-        rooms = Room.objects.filter(creator=user).order_by('name').all().prefetch_related("creator","sco","folder_sco","source_sco","deleted_sco")
+        rooms = Room.objects.filter(creator=user).order_by('name').all().prefetch_related("creator","sco","folder_sco","source_sco","deleted_sco","tags")
     
     return respond_to(request,
                       {'text/html':'apps/room/list.html'},

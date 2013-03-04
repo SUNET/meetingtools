@@ -35,11 +35,13 @@ class FileLock(object):
     def __delete__(self):
         raise AttributeError
 
+
 class RoomLockedException(Exception):
     def __init__(self, value):
         self.value = value
     def __str__(self):
         return repr(self.value)
+
 
 class Room(models.Model):
     creator = ForeignKey(User,editable=False)
