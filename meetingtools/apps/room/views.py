@@ -323,7 +323,7 @@ def list_rooms(request,username=None):
             
     rooms = []
     if user:
-        rooms = Room.objects.filter(creator=user).order_by('name').all().prefetch_related("creator","sco","folder_sco","source_sco","deleted_sco","tags")
+        rooms = Room.objects.filter(creator=user).order_by('name').all().prefetch_related("creator","sco","folder_sco","source_sco","deleted_sco")
     
     return respond_to(request,
                       {'text/html':'apps/room/list.html'},
