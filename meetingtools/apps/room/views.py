@@ -46,15 +46,6 @@ def _user_meeting_folder(request,acc):
     
     return session(request,'my_meetings_sco_id')
 
-
-def user_meeting_folder(user,api):
-    userid = user.username
-    folders = api.request('sco-search-by-field',
-                          {'filter-type': 'folder', 'field': 'name', 'query': userid}).et.xpath('//sco[folder-name="User Meetings"]')
-    logging.debug("user meetings folder: "+pformat(folders))
-    #folder = next((f for f in folders if f.findtext('.//folder-name') == 'User Meetings'), None)
-    return folders[0].get('sco-id')
-
 def _user_templates(request,acc,folder_sco):
     templates = []
     with ac_api_client(acc) as api:

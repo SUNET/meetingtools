@@ -5,7 +5,6 @@ Created on Jan 18, 2012
 '''
 from celery.task import periodic_task,task
 from celery.schedules import crontab
-from meetingtools.apps.room.views import user_meeting_folder
 from meetingtools.apps.sco.models import get_sco
 from meetingtools.apps.cluster.models import ACCluster
 from meetingtools.ac import ac_api_client
@@ -157,8 +156,16 @@ def _import_one_room(acc,api,row):
             room.unlock()
 
 
+def _user_meeting_folder(user,api):
+    userid = user.username
+    folders = api.request('sco-search-by-field',
+                          {'filter-type': 'folder', 'field': 'name', 'query': userid}).et.xpath('//sco[folder-name="User Meetings"]')
+    logging.debug("user meetings folder: "+pformat(folders))
+    #folder = next((f for f in folders if f.findtext('.//folder-name') == 'User Meetings'), None)
+    return folders[0].get('sco-id')
+
 def import_user_rooms(api, user):
-    mf_sco_id = user_meeting_folder(user, api)
+    mf_sco_id = _user_meeting_folder(user, api)
     if mf_sco_id > 0:
         r = api.request('sco_contents', {'filter-type': 'meeting', 'sco_id': mf_sco_id})
         nr = 0
