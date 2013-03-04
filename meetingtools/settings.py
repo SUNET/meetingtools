@@ -155,10 +155,10 @@ LOGIN_REDIRECT_URL = "/rooms"
 
 AUTO_REMOTE_SUPERUSERS = ['leifj@nordu.net']
 
-try:
-    from asgard.loader import *
-    DEBUG=True
-
-    AUTHENTICATION_BACKENDS += ('asgard.saml.Saml2Backend',)
-except ImportError,ex:
-    print ex
+#try:
+#    from asgard.loader import *
+#    DEBUG=True
+#
+#    AUTHENTICATION_BACKENDS += ('asgard.saml.Saml2Backend',)
+#except ImportError,ex:
+#    print ex

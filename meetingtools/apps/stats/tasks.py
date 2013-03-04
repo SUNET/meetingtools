@@ -1,6 +1,6 @@
 import logging
 from celery.schedules import crontab
-from celery.task import periodic_task
+from celery.task import periodic_task, task
 from meetingtools.apps.room.models import Room
 from meetingtools.ac import ac_api_client
 from meetingtools.apps.cluster.models import ACCluster
@@ -8,6 +8,7 @@ from datetime import datetime,timedelta
 from meetingtools.apps.stats.models import UserMeetingTransaction
 
 __author__ = 'leifj'
+
 
 def import_acc_sessions(acc,since=0,room_last_visited=False):
     with ac_api_client(acc) as api:
@@ -40,6 +41,7 @@ def import_acc_sessions(acc,since=0,room_last_visited=False):
                 ne += 1
         logging.info("%s: Imported %d transactions with %d errors" % (acc,nr,ne))
 
+@task
 def import_sessions(since,room_last_visited=False):
     for acc in ACCluster.objects.all():
         import_acc_sessions(acc,since,room_last_visited)

@@ -8,6 +8,8 @@ from django.contrib.auth.models import User, Group
 import datetime
 from django.views.decorators.cache import never_cache
 import logging
+from apps.room.tasks import import_user_rooms
+from apps.room.views import user_meeting_folder
 from meetingtools.apps.userprofile.models import UserProfile
 from meetingtools.multiresponse import redirect_to, make_response_dict
 from meetingtools.ac import ac_api_client
@@ -83,9 +85,10 @@ def leave_group(group,**kwargs):
 add_member.connect(join_group,sender=Group)
 remove_member.connect(leave_group,sender=Group)
 
+
 def accounts_login_federated(request):
     if request.user.is_authenticated():
-        profile,created = UserProfile.objects.get_or_create(user=request.user)
+        profile, created = UserProfile.objects.get_or_create(user=request.user)
         if created:
             profile.identifier = request.user.username
             profile.user = request.user
@@ -142,10 +145,9 @@ def accounts_login_federated(request):
                                                               'send-email': 0,
                                                               'login':request.user.username,
                                                               'ext-login':request.user.username})
-            
-            
-            
-            co_import_from_request(request)
+
+            #co_import_from_request(request)
+            import_user_rooms(api, request.user)
             
             member_or_employee = _is_member_or_employee(request.user)
             for gn in ('live-admins','seminar-admins'):

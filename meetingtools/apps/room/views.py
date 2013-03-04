@@ -33,6 +33,7 @@ import iso8601
 from celery.execute import send_task
 from meetingtools.apps.room.tasks import start_user_counts_poll
 
+
 def _user_meeting_folder(request,acc):
     if not session(request,'my_meetings_sco_id'):
         with ac_api_client(acc) as api:
@@ -44,6 +45,15 @@ def _user_meeting_folder(request,acc):
                 session(request,'my_meetings_sco_id',folders[0].get('sco-id'))
     
     return session(request,'my_meetings_sco_id')
+
+
+def user_meeting_folder(user,api):
+    userid = user.username
+    folders = api.request('sco-search-by-field',
+                          {'filter-type': 'folder', 'field': 'name', 'query': userid}).et.xpath('//sco[folder-name="User Meetings"]')
+    logging.debug("user meetings folder: "+pformat(folders))
+    #folder = next((f for f in folders if f.findtext('.//folder-name') == 'User Meetings'), None)
+    return folders[0].get('sco-id')
 
 def _user_templates(request,acc,folder_sco):
     templates = []
@@ -62,6 +72,7 @@ def _user_templates(request,acc,folder_sco):
             templates += [(get_sco(acc,r.get('sco-id')).id,r.findtext('name')) for r in shared_templates.et.findall('.//sco')]
             
     return templates
+
 
 def _find_current_session(session_info):
     for r in session_info.et.xpath('//row'):

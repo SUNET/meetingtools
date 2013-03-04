@@ -5,6 +5,7 @@ Created on Jan 18, 2012
 '''
 from celery.task import periodic_task,task
 from celery.schedules import crontab
+from apps.room.views import user_meeting_folder
 from meetingtools.apps.sco.models import get_sco
 from meetingtools.apps.cluster.models import ACCluster
 from meetingtools.ac import ac_api_client
@@ -153,7 +154,26 @@ def _import_one_room(acc,api,row):
     else:
         if room is not None:
             room.unlock()
-    
+
+
+def import_user_rooms(api, user):
+    mf_sco_id = user_meeting_folder(user, api)
+    if mf_sco_id > 0:
+        r = api.request('sco_contents', {'filter-type': 'meeting', 'sco_id': mf_sco_id})
+        nr = 0
+        ne = 0
+        for row in r.et.xpath("//sco"):
+            try:
+                _import_one_room(acc, api, row)
+                nr += 1
+            except Exception, ex:
+                logging.error(ex)
+                ne += 1
+
+        logging.info("%s: Imported %d rooms and got %d errors" % (acc, nr, ne))
+    else:
+        logging.warning("No user meetings folder found for %s" % user.username)
+
 def import_acc(acc,since=0):
     with ac_api_client(acc) as api:
         r = None
