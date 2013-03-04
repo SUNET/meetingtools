@@ -96,15 +96,23 @@ def _import_one_room(acc,api,row):
     #logging.debug("last %s" % last)
     #logging.debug("lastupdated %s" % lastupdated)
     if not room or lastupdated < last:
-        (r,username) = _extended_info(api, acc, sco_id)
+        (r, username) = _extended_info(api, acc, sco_id)
         logging.debug("found room owned by %s. Time for an update" % username)
         if username is None:
             logging.warning("username not found for sco-id=%s while importing" % sco_id)
             return
 
+        def _ft(t,*exprs):
+            for e in exprs:
+                v = t.findtext(exprs)
+                if v is not None:
+                    return v
+            return None
+
         logging.debug(etree.tostring(row))
         logging.debug(etree.tostring(r))
-        urlpath = row.findtext("url[0]").strip("/")
+        urlpath = _ft(row, "url[0]", "url-path[0]").strip("/")
+
         name = row.findtext('name[0]')
         description = row.findtext('description[0]')
         date_created = None
@@ -130,7 +138,7 @@ def _import_one_room(acc,api,row):
 
         if room is None:
             if folder_sco_id:
-                user,created = User.objects.get_or_create(username=username)
+                user, created = User.objects.get_or_create(username=username)
                 if created:
                     user.set_unusable_password()
                 room = Room.objects.create(sco=get_sco(acc,sco_id),
