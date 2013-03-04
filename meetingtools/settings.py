@@ -153,6 +153,8 @@ AUTH_PROFILE_MODULE = "userprofile.UserProfile"
 LOGIN_URL = '/saml2/sp/login/'
 LOGIN_REDIRECT_URL = "/rooms"
 
+POST_LOGOUT = '/Shibboleth.sso/Logout'
+
 AUTO_REMOTE_SUPERUSERS = ['leifj@nordu.net']
 
 #try:

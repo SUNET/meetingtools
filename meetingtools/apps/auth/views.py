@@ -52,7 +52,7 @@ def _is_member_or_employee(user):
 def logout(request):
     auth.logout(request)
     post_logout= "/"
-    if hasattr(settings,'POST_LOGOUT'):
+    if hasattr(settings, 'POST_LOGOUT'):
         post_logout = settings.POST_LOGOUT
 
     return HttpResponseRedirect(post_logout)
