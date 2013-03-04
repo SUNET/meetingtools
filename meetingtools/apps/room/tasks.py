@@ -169,7 +169,7 @@ def _user_meeting_folder(user,api):
 def import_user_rooms(acc, api, user):
     mf_sco_id = _user_meeting_folder(user, api)
     if mf_sco_id > 0:
-        r = api.request('sco_contents', {'filter-type': 'meeting', 'sco_id': mf_sco_id})
+        r = api.request('sco-contents', {'filter-type': 'meeting', 'sco_id': mf_sco_id})
         nr = 0
         ne = 0
         for row in r.et.xpath("//sco"):
@@ -240,7 +240,7 @@ def import_recent_user_counts():
             logging.info("%s: Checked usage for %d rooms since %s" % (acc,nr,then))
 
 # look for sessions that are newer than the one we know about for a room
-#@periodic_task(run_every=crontab(hour="*", minute="*/5", day_of_week="*"))
+@periodic_task(run_every=crontab(hour="*", minute="*/5", day_of_week="*"))
 def import_sessions():
     for room in Room.objects.all():
         with ac_api_client(room.sco.acc) as api:
@@ -257,7 +257,7 @@ def import_sessions():
                 room.save()
                 break
 
-#@periodic_task(run_every=crontab(hour="*", minutes="*/5", day_of_week="*"))
+@periodic_task(run_every=crontab(hour="*", minutes="*/5", day_of_week="*"))
 def import_transactions():
     for acc in ACCluster.objects.all():
         then = datetime.now() - timedelta(seconds=600)
