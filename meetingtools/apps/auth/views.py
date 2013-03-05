@@ -25,12 +25,12 @@ def meta(request,attr):
     values = filter(lambda x: x != "(null)",v.split(";"))
     return values;
 
-def meta1(request,attr):
+def meta1(request,attr,dflt=None):
     v = meta(request,attr)
-    if v:
+    if v is not None and len(v) > 0:
         return str(v[0]).decode('utf-8')
     else:
-        return None
+        return dflt
 
 def _localpart(a):
     if hasattr(a,'name'):
