@@ -33,9 +33,9 @@ def publish_archive(room,sco_id,tags=None):
     with ac_api_client(acc) as api:
         ar,create = Archive.objects.get_or_create(sco=sco,folder_sco=folder_sco,room=room)
         ar.timecreated=info['timecreated']
-        if info['description']:
+        if 'description' in info:
             ar.description = info['description']
-        if info['name']:
+        if 'name' in info:
             ar.name = info['name']
         ar.save()
         try:
