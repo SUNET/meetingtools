@@ -21,7 +21,12 @@ class UserMeetingTransaction(models.Model):
 
     def seconds(self):
         delta = self.date_closed - self.date_created
-        return delta.total_seconds()
+        if hasattr(delta, 'total_seconds'):
+            # Python 2.7
+            return delta.total_seconds()
+        else:
+            # Python 2.6
+            return (delta.microseconds + (delta.seconds + delta.days * 24 * 3600) * 10 ** 6) / 10 ** 6
 
     def __unicode__(self):
         return "(%d) %d seconds in %s" % (self.txid,self.seconds(),self.sco)
