@@ -75,6 +75,9 @@ class ACPResult():
         logger.debug(lxml.etree.tostring(self.et))
         return _first_or_none(self.et.xpath('//principal'))
 
+    def pretty_print(self):
+        return lxml.etree.tostring(self.et, pretty_print=True)
+
 
 def _enc(v):
     ev = v
