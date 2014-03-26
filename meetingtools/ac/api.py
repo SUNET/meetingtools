@@ -260,3 +260,45 @@ class ACPClient():
         (room.user_count, room.host_count) = self.user_counts(room.sco_id)
         room.save()
         return (room.user_count, room.host_count)
+
+    def get_byte_count(self, sco_id):
+        sco_sizes = self.request('sco-sizes', {'filter-sco-id': sco_id}, False)
+        if sco_sizes.status_code() == 'ok':
+            byte_count = sco_sizes.et.xpath('.//sco[@byte-count]')
+            if byte_count:
+                try:
+                    return int(byte_count[0].get('byte-count'))
+                except ValueError:
+                    pass
+        return None
+
+    def get_sco_info(self, sco_id):
+        sco_info = self.request('sco-info', {'sco-id': sco_id}, False)
+        if sco_info.status_code() == 'ok':
+            info = sco_info.et.xpath('//sco')
+            if info:
+                return info[0]
+        return None
+
+    def get_permissions(self, acl_id, principal_id=None):
+        """
+        acl-id is an ID of a SCO, principal, or account.
+        """
+        principals = []
+        p = {'acl-id': acl_id}
+        if principal_id:
+            p['principal-id'] = principal_id
+        permissions = self.request('permissions-info', p, False)
+        if permissions.status_code() == 'ok':
+            for principal in permissions.et.xpath('//principal'):
+                if principal.get('permission-id') != '':
+                    d = {
+                        'principal-id': principal.get('principal-id'),
+                        'permission-id': principal.get('permission-id'),
+                        'type': principal.get('type'),
+                        'login': principal.findtext('login')
+                    }
+                    principals.append(d)
+        return principals
+
+
