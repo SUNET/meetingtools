@@ -278,7 +278,7 @@ def import_transactions():
                              'filter-gt-date-created': then.isoformat()})
             for row in r.et.xpath("//row"):
                 sco_id = row.get('sco-id')
-                logging.debug("last session for sco_id=%d" % sco_id)
+                logging.debug("last session for sco_id=%s" % sco_id)
                 if not seen.get(sco_id,False): #pick the first session for each room - ie the one last created
                     seen[sco_id] = True
                     try:
