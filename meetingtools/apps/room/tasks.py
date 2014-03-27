@@ -273,7 +273,9 @@ def import_transactions():
         then = then.replace(microsecond=0)
         with ac_api_client(acc) as api:
             seen = {}
-            r  = api.request('report-bulk-consolidated-transactions',{'filter-type':'meeting','sort-date-created': 'asc','filter-gt-date-created': then.isformat()})
+            r = api.request('report-bulk-consolidated-transactions',
+                            {'filter-type': 'meeting', 'sort-date-created': 'asc',
+                             'filter-gt-date-created': then.isoformat()})
             for row in r.et.xpath("//row"):
                 sco_id = row.get('sco-id')
                 logging.debug("last session for sco_id=%d" % sco_id)
