@@ -16,6 +16,9 @@ class YearLastVisitedFilter(admin.SimpleListFilter):
     def lookups(self, request, model_admin):
         return (
             ('None', 'None'),
+            ('2009', '2009'),
+            ('2010', '2010'),
+            ('2011', '2011'),
             ('2012', '2012'),
             ('2013', '2013'),
             ('2014', '2014'),
