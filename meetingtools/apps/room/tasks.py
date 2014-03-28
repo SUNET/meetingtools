@@ -43,7 +43,7 @@ def _owner_username(api,acc,sco):
             parent = r.et.xpath("//sco")[0]
             logging.debug("p %s",repr(parent))
             logging.debug("r %s",etree.tostring(parent))
-            if parent:
+            if parent is not None:
                 logging.debug("parent: %s" % parent)
                 if parent.findtext('name') == 'User Meetings':
                     name = sco.findtext('name')

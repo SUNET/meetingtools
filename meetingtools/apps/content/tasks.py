@@ -23,7 +23,7 @@ def get_owner(api, acc, sco):
             return None
 
         parent = r.et.xpath("//sco")[0]
-        if parent:
+        if parent is not None:
             if parent.findtext('name') in default_folders:
                 owner = {
                     'name': sco.findtext('name'),
