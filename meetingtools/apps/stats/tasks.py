@@ -28,14 +28,15 @@ def import_acc_sessions(acc,since=0,room_last_visited=False):
         for tx in r.et.findall(".//row"):
             try:
                 tx = UserMeetingTransaction.create(acc,tx)
-                if room_last_visited:
-                    rooms = Room.objects.filter(sco=tx.sco)
-                    if len(rooms) == 1:
-                        room = rooms[0]
-                        if room.lastvisited is None or room.lastvisited < tx.date_closed:
-                            room.lastvisited = tx.date_created
-                            room.save()
-                nr += 1
+                if tx:
+                    if room_last_visited:
+                        rooms = Room.objects.filter(sco=tx.sco)
+                        if len(rooms) == 1:
+                            room = rooms[0]
+                            if room.lastvisited is None or room.lastvisited < tx.date_closed:
+                                room.lastvisited = tx.date_created
+                                room.save()
+                    nr += 1
             except Exception,ex:
                 logging.error(ex)
                 ne += 1
