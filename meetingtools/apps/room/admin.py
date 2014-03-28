@@ -38,6 +38,6 @@ class RoomAdmin(admin.ModelAdmin):
     date_hierarchy = 'timecreated'
     search_fields = ['creator__username', 'name', 'sco__sco_id']
     list_display = ('timecreated', 'creator', 'name', 'urlpath', 'sco', 'deleted_sco', 'lastupdated', 'lastvisited')
-    list_filter = (YearLastVisitedFilter,)
+    list_filter = (YearLastVisitedFilter, 'sco__acc',)
 
 admin.site.register(Room, RoomAdmin)
