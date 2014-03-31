@@ -26,11 +26,8 @@ def get_owner(api, acc, sco):
         if parent is not None:
             if parent.findtext('name') in default_folders:
                 owner = {
-                    'name': sco.findtext('name'),
+                    'login': sco.findtext('name'),  # To match api.get_owner
                     'sco_id': sco.get('sco-id'),
-                    # If the object is a child of a default_folder we need the parent to set as owner
-                    'parent_name': parent.findtext('name'),
-                    'parent_sco_id': parent.get('sco-id')
                 }
             else:
                 owner = get_owner(api, acc, parent)
@@ -59,19 +56,21 @@ def import_acc(acc, since=0):
                 if byte_count or byte_count == 0:
                     sco_element = api.get_sco_info(sco_id)
                     if not sco_element.get('source-sco-id'):  # Object is not a reference
-                        owner = get_owner(api, acc, sco_element)
-                        permissions = api.get_permissions(sco_id)
+                        owner = api.get_owner(sco_element.findtext('url-path'))
+                        if not owner:
+                            owner = get_owner(api, acc, sco_element)
+                        views = api.get_sco_views(sco_id)
                         item = {
-                            'byte_count': byte_count,
-                            'sco-id': row.get('sco-id'),
+                            'sco-id': sco_id,
+                            'folder-id': sco_element.get('folder-id'),
                             'type': row.get('icon'),
                             'name': row.findtext('name'),
+                            'byte_count': byte_count,
+                            'url-path': row.findtext('url'),
                             'created': row.findtext('date-created'),
                             'modified': row.findtext('date-modified'),
-                            'owner': owner['name'],
-                            'owner_sco_id': owner['sco_id'],
-                            'owner_parent': owner['parent_name'],
-                            'permissions': permissions
+                            'owner': owner,
+                            'views': views,
                         }
                         result.append(item)
                         nr += 1
