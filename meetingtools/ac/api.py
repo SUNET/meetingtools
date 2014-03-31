@@ -1,8 +1,10 @@
-'''
+# -*- coding: utf-8 -*-
+
+"""
 Created on Jan 31, 2011
 
 @author: leifj
-'''
+"""
 from StringIO import StringIO
 import hashlib
 from django.core.cache import get_cache
@@ -280,14 +282,50 @@ class ACPClient():
                 return info[0]
         return None
 
-    def get_permissions(self, acl_id, principal_id=None):
+    def get_owner(self, url_path):
+        sco_by_url = self.request('sco-by-url', {'url-path': url_path}, False)
+        if sco_by_url.status_code() == 'ok':
+            owner = sco_by_url.et.xpath('//owner-principal')
+            if owner:
+                d = {
+                    'principal-id': owner[0].get('principal-id'),
+                    'ext-login': owner[0].findtext('ext-login'),
+                    'login': owner[0].findtext('login'),
+                    'name': owner[0].findtext('name'),
+                    'email': owner[0].findtext('email')
+                }
+                return d
+        return None
+
+    def get_permissions(self, acl_id, principal_id=None, permission_id=None):
         """
         acl-id is an ID of a SCO, principal, or account.
+
+        permission_id can be:
+        view        The principal can view, but cannot modify, the SCO. The principal can take a course, attend a
+                    meeting as participant, or view a folders content.
+        host        Available for meetings only. The principal is host of a meeting and can create the meeting or act as
+                    presenter, even without view permission on the meeting’s parent folder.
+        mini-host   Available for meetings only. The principal is presenter of a meeting and can present content, share
+                    a screen, send text messages, moderate questions, create text notes, broadcast audio and video, and
+                    push content from web links.
+        remove      Available for meetings only. The principal does not have participant, presenter or host permission
+                    to attend the meeting. If a user is already attending a live meeting, the user is not removed from
+                    the meeting until the session times out.
+        publish     Available for SCOs other than meetings. The principal can publish or update the SCO. The publish
+                    permission includes view and allows the principal to view reports related to the SCO. On a folder,
+                    publish does not allow the principal to create new subfolders or set permissions.
+        manage      Available for SCOs other than meetings or courses. The principal can view, delete, move, edit, or
+                    set permissions on the SCO. On a folder, the principal can create subfolders or view reports on
+                    folder content.
+        denied      Available for SCOs other than meetings. The principal cannot view, access, or manage the SCO.
         """
         principals = []
         p = {'acl-id': acl_id}
         if principal_id:
             p['principal-id'] = principal_id
+        if permission_id:
+            p['filter-permission-id'] = permission_id
         permissions = self.request('permissions-info', p, False)
         if permissions.status_code() == 'ok':
             for principal in permissions.et.xpath('//principal'):
@@ -301,4 +339,14 @@ class ACPClient():
                     principals.append(d)
         return principals
 
-
+    def get_sco_views(self, sco_id):
+        report_views = self.request('report-sco-views', {'sco-id': sco_id}, False)
+        if report_views.status_code() == 'ok':
+            views = report_views.et.xpath('.//report-sco-views')
+            if views:
+                d = {
+                    'views': views[0].get('views'),
+                    'last-viewed-date': views[0].findtext('last-viewed-date')
+                }
+                return d
+        return None
