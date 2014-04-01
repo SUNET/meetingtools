@@ -220,6 +220,12 @@ def import_all_rooms():
         import_acc(acc,since=3700)
 
 
+#@periodic_task(run_every=crontab(hour="3", minute="0", day_of_week="*"))
+def timed_full_import():
+    for acc in ACCluster.objects.all():
+        import_acc(acc)
+
+
 def start_user_counts_poll(room,niter):
     poll_user_counts.apply_async(args=[room],kwargs={'niter': niter})
 

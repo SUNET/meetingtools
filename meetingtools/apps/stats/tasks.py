@@ -50,3 +50,9 @@ def import_sessions(since,room_last_visited=False):
 @periodic_task(run_every=crontab(hour="*", minute="*/5", day_of_week="*"))
 def _hourly_import():
     import_sessions(600,True)
+
+
+#@periodic_task(run_every=crontab(hour="5", minute="0", day_of_week="*"))
+def timed_full_import():
+    for acc in ACCluster.objects.all():
+        import_acc_sessions(acc, room_last_visited=True)
