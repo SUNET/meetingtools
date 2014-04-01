@@ -61,4 +61,5 @@ urlpatterns = patterns('',
     (r'^stats/user/(.+)$','meetingtools.apps.stats.views.user'),
     (r'^stats/domain/(.+)$','meetingtools.apps.stats.views.domain'),
     (r'^stats/room/(\d+)$','meetingtools.apps.stats.views.room'),
+    (r'^content$', 'meetingtools.apps.content.views.user'),
 )
