@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 __author__ = 'lundberg'
 
-from django.db import models
+from django.db import models, IntegrityError
 from django.db.models.fields import CharField, BigIntegerField, IntegerField
 from django.db.models.fields.related import ForeignKey
 from django.contrib.auth.models import User
@@ -71,20 +71,23 @@ class Content(models.Model):
                 datecreated = row.findtext('date-created')
                 if not datecreated:
                     datecreated = row.findtext('date-modified')
-
-                content, created = Content.objects.get_or_create(
-                    sco=get_sco(acc, sco_id),
-                    creator=user,
-                    name=row.findtext('name'),
-                    folder_sco=get_sco(acc, sco_element.get('folder-id')),
-                    type=row.get('icon'),
-                    urlpath=row.findtext('url'),
-                    bytecount=byte_count,
-                    created=datecreated,
-                    modified=row.findtext('date-modified'),
-                    views=views['views'],
-                    lastviewed=views['last-viewed-date']
-                )
+                try:
+                    content, created = Content.objects.get_or_create(
+                        sco=get_sco(acc, sco_id),
+                        creator=user,
+                        name=row.findtext('name'),
+                        folder_sco=get_sco(acc, sco_element.get('folder-id')),
+                        type=row.get('icon'),
+                        urlpath=row.findtext('url'),
+                        bytecount=byte_count,
+                        created=datecreated,
+                        modified=row.findtext('date-modified'),
+                        views=views['views'],
+                        lastviewed=views['last-viewed-date']
+                    )
+                except IntegrityError:
+                    content = Content.objects.get(sco=get_sco(acc, sco_id))
+                    created = False
                 if not created:
                     Content.objects.filter(sco=content.sco).update(
                         creator=user,
