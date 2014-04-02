@@ -35,5 +35,18 @@ def import_all_content():
 
 #@periodic_task(run_every=crontab(hour="1", minute="0", day_of_week="*"))
 def timed_full_import():
+    years = [2009, 2010, 2011, 2012, 2013, 2014]
     for acc in ACCluster.objects.all():
-        import_acc(acc)
+        for year in years:
+            begin = datetime(year=year, month=1, day=1)
+            end = datetime(year=year, month=12, day=31)
+            with ac_api_client(acc) as api:
+                r = api.request('report-bulk-objects', {'filter-out-type': 'meeting',
+                                                        'filter-gte-date-modified': begin.isoformat(),
+                                                        'filter-lte-date-modified': end.isoformat()})
+                if r:
+                    nr = 0
+                    for row in r.et.xpath("//row"):
+                        Content.create(acc, api, row)
+                        nr += 1
+                    logging.info("%s: Imported %d objects." % (acc, nr))

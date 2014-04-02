@@ -220,12 +220,6 @@ def import_all_rooms():
         import_acc(acc,since=3700)
 
 
-#@periodic_task(run_every=crontab(hour="3", minute="0", day_of_week="*"))
-def timed_full_import():
-    for acc in ACCluster.objects.all():
-        import_acc(acc)
-
-
 def start_user_counts_poll(room,niter):
     poll_user_counts.apply_async(args=[room],kwargs={'niter': niter})
 
@@ -318,3 +312,27 @@ def clean_old_rooms():
             for room in Room.objects.filter(lastvisited__lt=then):
                 logging.debug("room %s was last used %s" % (room.name,humanize.naturalday(room.lastvisited)))
                 send_message.apply_async([room.creator,"You have an unused meetingroom at %s" % acc.name ,"Do you still need %s (%s)?" % (room.name,room.permalink())])
+
+
+
+#@periodic_task(run_every=crontab(hour="3", minute="0", day_of_week="*"))
+def timed_full_import():
+    years = [2009, 2010, 2011, 2012, 2013, 2014]
+    for acc in ACCluster.objects.all():
+        for year in years:
+            begin = datetime(year=year, month=1, day=1)
+            end = datetime(year=year, month=12, day=31)
+            with ac_api_client(acc) as api:
+                r = api.request('report-bulk-objects', {'filter-type': 'meeting',
+                                                        'filter-gte-date-modified': begin.isoformat(),
+                                                        'filter-lte-date-modified': end.isoformat()})
+                nr = 0
+                ne = 0
+                for row in r.et.xpath("//row"):
+                    try:
+                        _import_one_room(acc, api, row)
+                        nr += 1
+                    except Exception, ex:
+                        logging.error(ex)
+                        ne += 1
+                logging.info("%s: Imported %d rooms and got %d errors" % (acc, nr, ne))
