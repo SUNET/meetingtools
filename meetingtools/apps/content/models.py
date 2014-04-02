@@ -43,9 +43,11 @@ class Content(models.Model):
     def by_name(acc, name):
         return Content.objects.get(sco__acc=acc, name=name)
 
+    def go_url(self):
+        return "%s%s" % (self.sco.acc.url, self.urlpath.strip("/"))
+
     def download_url(self):
-        url = self.sco.acc.url
-        return "%s%s" % (url, self.urlpath)
+        return "%s%s/output/%s.zip?download=zip" % (self.sco.acc.url, self.urlpath.strip("/"), self.urlpath.strip("/"))
 
     @staticmethod
     def create(acc, api, row):
