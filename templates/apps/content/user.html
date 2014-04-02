@@ -2,17 +2,28 @@
 {% block js %}
     <link href="{{STATIC_URL}}/css/jquery.dataTables.css" rel="stylesheet" type="text/css" />
     <script type="text/javascript" src="{{STATIC_URL}}/js/jquery.dataTables.min.js"></script>
+    <script type="text/javascript" src="{{STATIC_URL}}/js/dataTables.fileSize.js"></script>
+    <script type="text/javascript" src="{{STATIC_URL}}/js/dataTables.dateEuro.js"></script>
     <script>
         $(document).ready(function() {
-            $('#content').dataTable();
+            $('#content').dataTable({
+                "aoColumns": [
+                { "sType": "date-euro" },
+                null,
+                null,
+                { "sType": "file-size" },
+                { "sType": "date-euro" },
+                null,
+                { "sType": "date-euro" }
+            ]
+            });
         });
     </script>
 {% endblock %}
-{% load content_tags %}
 {% block content %}
 <h1>Content for {{username}}</h1>
 <div>
-    <strong>Number of files:</strong> {{ content|length }} | <strong>Total storage:</strong> {{ total_bytecount.bytecount__sum|humanize_bytes }}
+    <strong>Number of files:</strong> {{ content|length }} | <strong>Total storage:</strong> {{ total_bytecount.bytecount__sum|filesizeformat }}
 </div>
  <br>
  <br>
@@ -26,14 +37,14 @@
         <tbody>
         {% for item in content %}
             <tr>
-                <td>{{ item.created }}</td>
-                <td>{{ item.name }} <a href="{{ item.download_url }}"><i class="icon-download"></i></a></td>
+                <td>{{ item.created|date:"d/m/Y H:i:s" }}</td>
+                <td><a href="{{ item.go_url }}">{{ item.name }}</a> <a href="{{ item.download_url }}"><i class="icon-download"></i></a></td>
                 <td>{{ item.type }}</td>
 
-                <td>{{ item.bytecount|humanize_bytes }}</td>
-                <td>{{ item.modified }}</td>
+                <td>{{ item.bytecount|filesizeformat }}</td>
+                <td>{{ item.modified|date:"d/m/Y H:i:s" }}</td>
                 <td>{{ item.views }}</td>
-                <td>{{ item.lastviewed }}</td>
+                <td>{{ item.lastviewed|date:"d/m/Y H:i:s" }}</td>
             </tr>
         {% endfor %}
         </tbody>

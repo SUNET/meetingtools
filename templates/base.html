@@ -87,8 +87,12 @@
 			<div class="span3">
                 <ul class="unstyled">
                     <li><h3>Users</h3></li>
-                    <li><a class="tip" title="Your list of meeting resources.." href="/rooms">My Profile</a></li>
+                    <li><a class="tip" title="Your list of meeting resources..." href="/rooms">My Profile</a></li>
+                    <li><a class="tip" title="Your list of uploaded files and recordings..." href="/content">My Files</a></li>
                     <li><a class="tip" title="Find out how much you use e-meetings..." href="/stats">Usage Statistics</a></li>
+                    {% if user.is_staff %}
+                        <li><a class="tip" title="Find out how much data each cluster stores..." href="/content/cluster">Cluster Storage</a></li>
+                    {% endif %}
                     <li><a class="tip" title="Logout" id="logout" href="/accounts/logout">Logout</a></li>
                 </ul>
 	        </div>
