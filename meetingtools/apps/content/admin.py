@@ -7,7 +7,7 @@ from meetingtools.apps.content.models import Content
 
 
 class YearLastViewedFilter(admin.SimpleListFilter):
-    title = 'year last visited'
+    title = 'year last viewed'
     parameter_name = 'year'
 
     def lookups(self, request, model_admin):
@@ -34,7 +34,8 @@ class YearLastViewedFilter(admin.SimpleListFilter):
 class ContentAdmin(admin.ModelAdmin):
     date_hierarchy = 'created'
     search_fields = ['creator__username', 'name', 'sco__sco_id']
-    list_display = ('created', 'creator', 'name', 'type', 'urlpath', 'sco', 'bytecount', 'modified', 'views', 'lastviewed')
+    list_display = ('created', 'creator', 'name', 'type', 'urlpath', 'sco', 'bytecount', 'modified', 'views',
+                    'lastviewed')
     list_filter = (YearLastViewedFilter, 'sco__acc',)
 
 admin.site.register(Content, ContentAdmin)
