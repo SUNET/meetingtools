@@ -28,7 +28,10 @@ class ACPException(Exception):
         Exception.__init__(self, value)
 
     def __str__(self):
-        return etree.tostring(self.value)
+        try:
+            return etree.tostring(self.value)
+        except TypeError:
+            return str(self.value)
 
 
 def _first_or_none(x):
@@ -160,7 +163,7 @@ class ACPClient():
         logging.debug(pformat(resp))
         logging.debug(pformat(content))
         if resp.status != 200:
-            raise ACPException, resp.reason
+            raise ACPException(resp.reason)
 
         if resp.has_key('set-cookie'):
             cookie = resp['set-cookie']
