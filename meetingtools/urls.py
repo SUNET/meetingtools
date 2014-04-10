@@ -64,5 +64,5 @@ urlpatterns = patterns('',
     (r'^content$', 'meetingtools.apps.content.views.user'),
     (r'^content/cluster/$', 'meetingtools.apps.content.views.cluster'),
     (r'^content/cluster/(?P<cluster_name>[\w ]+)$', 'meetingtools.apps.content.views.cluster'),
-    (r'^content/domain/(?P<domain_name>[\w\.]+)$', 'meetingtools.apps.content.views.domain')
+    (r'^content/domain/(?P<domain_name>[\w\.;]+)$', 'meetingtools.apps.content.views.domain')
 )
