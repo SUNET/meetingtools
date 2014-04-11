@@ -106,7 +106,7 @@ def timed_full_import():
                                         {'filter-out-type': 'meeting',
                                          'filter-gte-date-modified': begin.isoformat(),
                                          'filter-lte-date-modified': end.isoformat()},
-                                        raise_error=True)
+                                        raise_error=False)
                         if r:
                             nr = 0
                             for row in r.et.xpath("//row"):

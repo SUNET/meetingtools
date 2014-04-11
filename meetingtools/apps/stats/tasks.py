@@ -62,7 +62,7 @@ def timed_full_import():
             with ac_api_client(acc) as api:
                 p = {'sort': 'asc', 'sort1': 'date-created', 'filter-type': 'meeting',
                      'filter-gte-date-created': begin.isoformat(), 'filter-lte-date-created': end.isoformat()}
-                r = api.request('report-bulk-consolidated-transactions', p, True)
+                r = api.request('report-bulk-consolidated-transactions', p, False)
                 nr = 0
                 ne = 0
                 for tx in r.et.findall(".//row"):
