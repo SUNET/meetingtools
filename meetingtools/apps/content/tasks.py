@@ -28,6 +28,12 @@ def cache_cluster_content():
         get_cluster_content(acc)
 
 
+@periodic_task(run_every=crontab(hour="*", minute="*/15", day_of_week="*"))
+def cache_domain_content():
+    for domain_tag in Tag.objects.filter(name__startswith='domain:'):
+        get_domain_content(domain_tag)
+
+
 def import_acc(acc, since=0):
     with ac_api_client(acc) as api:
         if since > 0:
