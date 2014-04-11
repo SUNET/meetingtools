@@ -22,13 +22,13 @@ def import_all_content():
         import_acc(acc, since=900)
 
 
-@periodic_task(run_every=crontab(hour="*", minute="*/15", day_of_week="*"))
+@periodic_task(run_every=crontab(hour="*", minute="5", day_of_week="*"))
 def cache_cluster_content():
     for acc in ACCluster.objects.all():
         get_cluster_content(acc)
 
 
-@periodic_task(run_every=crontab(hour="*", minute="*/15", day_of_week="*"))
+@periodic_task(run_every=crontab(hour="*", minute="10", day_of_week="*"))
 def cache_domain_content():
     for domain_tag in Tag.objects.filter(name__startswith='domain:'):
         get_domain_content(domain_tag)
@@ -65,8 +65,8 @@ def get_cluster_content(acc):
             }
             total_bytecount += d['domain_bytes']
             domains.append(d)
-    cache.set('%s-domains' % acc, domains, 900)
-    cache.set('%s-bytecount' % acc, total_bytecount, 900)
+    cache.set('%s-domains' % acc, domains, 3600)
+    cache.set('%s-bytecount' % acc, total_bytecount, 3600)
     return domains, total_bytecount
 
 
@@ -84,9 +84,9 @@ def get_domain_content(domain_tag):
             'bytecount': Content.objects.filter(creator=domain_user).aggregate(Sum('bytecount'))['bytecount__sum']
         }
         users.append(d)
-    cache.set('%s-users' % domain_tag, users, 900)
-    cache.set('%s-files' % domain_tag, total_files, 900)
-    cache.set('%s-bytecount' % domain_tag, total_bytecount, 900)
+    cache.set('%s-users' % domain_tag, users, 3600)
+    cache.set('%s-files' % domain_tag, total_files, 3600)
+    cache.set('%s-bytecount' % domain_tag, total_bytecount, 3600)
     return users, total_files, total_bytecount
 
 
