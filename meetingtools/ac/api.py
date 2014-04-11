@@ -78,7 +78,7 @@ class ACPResult():
         raise ACPException, self.status
 
     def get_principal(self):
-        logger.debug(lxml.etree.tostring(self.et))
+        #logger.debug(lxml.etree.tostring(self.et))
         return _first_or_none(self.et.xpath('//principal'))
 
     def pretty_print(self):
@@ -158,11 +158,13 @@ class ACPClient():
         #cache = ACPClient.CacheWrapper(get_cache('default'))
         cache = None
         h = httplib2.Http(cache, disable_ssl_certificate_validation=True)
-        logging.debug(url)
+
         resp, content = h.request(url, "GET")
-        logging.debug(pformat(resp))
-        logging.debug(pformat(content))
+
         if resp.status != 200:
+            logging.error(url)
+            logging.error(pformat(resp))
+            logging.error(pformat(content))
             raise ACPException(resp.reason)
 
         if resp.has_key('set-cookie'):
