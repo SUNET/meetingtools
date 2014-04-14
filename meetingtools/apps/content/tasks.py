@@ -14,6 +14,7 @@ from celery.schedules import crontab
 from tagging.models import Tag, TaggedItem
 from datetime import datetime, timedelta
 import logging
+import traceback
 
 
 @periodic_task(run_every=crontab(hour="*", minute="*/10", day_of_week="*"))
@@ -116,9 +117,12 @@ def timed_full_import():
                         logging.error('ACPException in content.timed_full_import')
                         logging.error('Period %s %s-%s failed for cluster %s.' % (year, month[0], month[1], acc))
                         logging.error(e)
+                        logging.error(traceback.format_exc())
                         pass
                     except Exception as e:
                         logging.error('Exception in content.timed_full_import')
+                        logging.error('Period %s %s-%s failed for cluster %s.' % (year, month[0], month[1], acc))
                         logging.error(e)
+                        logging.error(traceback.format_exc())
                         pass
                     logging.info("%s: Imported %d content objects." % (acc, nr))
