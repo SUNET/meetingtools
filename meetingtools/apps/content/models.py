@@ -55,9 +55,8 @@ class Content(models.Model):
         byte_count = api.get_byte_count(sco_id)
         if byte_count or byte_count == 0:
             sco_element = api.get_sco_info(sco_id)
-            if not sco_element.get('source-sco-id'):  # Object is not a reference
+            if sco_element and not sco_element.get('source-sco-id'):  # Object is not a reference
                 views = api.get_sco_views(sco_id)
-
                 owner = api.get_owner(sco_element.findtext('url-path'))
                 if not owner:
                     owner = get_owner_by_folder(api, acc, sco_element)
