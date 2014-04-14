@@ -66,7 +66,7 @@ LOGOUT_URL = "/accounts/logout"
 DEFAULT_URL = "/"
 
 # Make this unique, and don't share it with anybody.
-SECRET_KEY = 'tz78l!c=cl2=jic5$2#(bq)7-4s1ivtm*a+q0w1yi0$)hrmc7l'
+SECRET_KEY = ''
 
 SESSION_ENGINE = "django.contrib.sessions.backends.file"
 #SESSION_ENGINE = "django.contrib.sessions.backends.cache"
@@ -126,9 +126,6 @@ INSTALLED_APPS = (
     'django.contrib.humanize',
     'django_extensions',
     'south',
-    'djcelery',
-    'ghettoq',
-    'djkombu',
     'django_co_connector',
     'django_co_acls',
     'tagging',
@@ -140,13 +137,11 @@ INSTALLED_APPS = (
     'meetingtools.apps.userprofile',
     'meetingtools.apps.stats',
     'meetingtools.apps.sco',
-    'meetingtools.apps.archive'
+    'meetingtools.apps.archive',
+    'meetingtools.apps.content'
 )
 
 CARROT_BACKEND = "django"
-
-import djcelery 
-djcelery.setup_loader()
 
 NOREPLY = "no-reply@sunet.se"
 AUTH_PROFILE_MODULE = "userprofile.UserProfile"
