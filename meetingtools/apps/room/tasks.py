@@ -314,25 +314,26 @@ def clean_old_rooms():
                 send_message.apply_async([room.creator,"You have an unused meetingroom at %s" % acc.name ,"Do you still need %s (%s)?" % (room.name,room.permalink())])
 
 
-
 #@periodic_task(run_every=crontab(hour="3", minute="0", day_of_week="*"))
 def timed_full_import():
     years = [2009, 2010, 2011, 2012, 2013, 2014]
+    months = [(1, 3), (4, 7), (8, 10), (9, 12)]
     for acc in ACCluster.objects.all():
         for year in years:
-            begin = datetime(year=year, month=1, day=1)
-            end = datetime(year=year, month=12, day=31)
-            with ac_api_client(acc) as api:
-                r = api.request('report-bulk-objects', {'filter-type': 'meeting',
-                                                        'filter-gte-date-modified': begin.isoformat(),
-                                                        'filter-lte-date-modified': end.isoformat()})
-                nr = 0
-                ne = 0
-                for row in r.et.xpath("//row"):
-                    try:
-                        _import_one_room(acc, api, row)
-                        nr += 1
-                    except Exception, ex:
-                        logging.error(ex)
-                        ne += 1
-                logging.info("%s: Imported %d rooms and got %d errors" % (acc, nr, ne))
+            for month in months:
+                begin = datetime(year=year, month=month[0], day=1)
+                end = datetime(year=year, month=month[1], day=31)
+                with ac_api_client(acc) as api:
+                    r = api.request('report-bulk-objects', {'filter-type': 'meeting',
+                                                            'filter-gte-date-modified': begin.isoformat(),
+                                                            'filter-lte-date-modified': end.isoformat()})
+                    nr = 0
+                    ne = 0
+                    for row in r.et.xpath("//row"):
+                        try:
+                            _import_one_room(acc, api, row)
+                            nr += 1
+                        except Exception, ex:
+                            logging.error(ex)
+                            ne += 1
+                    logging.info("%s: Imported %d rooms and got %d errors" % (acc, nr, ne))

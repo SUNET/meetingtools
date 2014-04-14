@@ -93,7 +93,7 @@ def get_domain_content(domain_tag):
 #@periodic_task(run_every=crontab(hour="1", minute="0", day_of_week="*"))
 def timed_full_import():
     years = [2009, 2010, 2011, 2012, 2013, 2014]
-    months = [(1, 7), (8, 12)]  # Ugly hack as June does not have 31 days
+    months = [(1, 3), (4, 7), (8, 10), (9, 12)]
     for acc in ACCluster.objects.all():
         nr = 0
         for year in years:
