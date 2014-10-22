@@ -1,6 +1,9 @@
 from meetingtools import context_processors
 import meetingtools.mimeparse as mimeparse
 import re
+import csv
+import codecs
+import cStringIO
 import rfc822
 from django.conf import settings
 from django.shortcuts import render_to_response
@@ -14,6 +17,37 @@ default_suffix_mapping = {"\.htm(l?)$": "text/html",
                           "\.rss$": "application/rss+xml",
                           "\.atom$": "application/atom+xml",
                           "\.torrent$": "application/x-bittorrent"}
+
+
+class UnicodeCSVWriter:
+    """
+    A CSV writer which will write rows to CSV file "f",
+    which is encoded in the given encoding.
+    """
+
+    def __init__(self, f, dialect=csv.excel, encoding="utf-8", **kwds):
+        # Redirect output to a queue
+        self.queue = cStringIO.StringIO()
+        self.writer = csv.writer(self.queue, dialect=dialect, **kwds)
+        self.stream = f
+        self.encoder = codecs.getincrementalencoder(encoding)()
+
+    def writerow(self, row):
+        self.writer.writerow([s.encode("utf-8") for s in row])
+        # Fetch UTF-8 output from the queue ...
+        data = self.queue.getvalue()
+        data = data.decode("utf-8")
+        # ... and reencode it into the target encoding
+        data = self.encoder.encode(data)
+        # write to the target stream
+        self.stream.write(data)
+        # empty queue
+        self.queue.truncate(0)
+
+    def writerows(self, rows):
+        for row in rows:
+            self.writerow(row)
+
 
 def _accept_types(request, suffix):
     for r in suffix.keys():
@@ -45,8 +79,36 @@ def json_response(data,request=None):
     r = HttpResponse(response_data,content_type='application/json')
     r['Cache-Control'] = 'no-cache, must-revalidate'
     r['Pragma'] = 'no-cache'
-    
     return r
+
+
+def dicts_to_csv_response(dict_list, header=None):
+    """
+    Takes a list of dicts and returns a comma separated file with all dict keys
+    and their values.
+    """
+    # Create the HttpResponse object with the appropriate CSV header.
+    response = HttpResponse(mimetype='text/csv')
+    response['Content-Disposition'] = 'attachment; filename=result.csv; charset=utf-8;'
+    writer = UnicodeCSVWriter(response, delimiter=',', quoting=csv.QUOTE_NONNUMERIC)
+    if not header:
+        key_set = set()
+        for item in dict_list:
+            key_set.update(item.keys())
+        key_set = sorted(key_set)
+    else:
+        key_set = header
+    writer.writerow(key_set)  # Line collection with header
+    for item in dict_list:
+        line = []
+        for key in key_set:
+            try:
+                line.append('%s' % item[key])
+            except KeyError:
+                line.append('')  # Node did not have that key, add a blank item.
+        writer.writerow(line)
+    return response
+
 
 def render500(request):
     return render_to_response("500.html",RequestContext(request,{},[context_processors.misc_urls]))

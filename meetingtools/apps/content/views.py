@@ -5,12 +5,14 @@ from django.contrib.auth.decorators import login_required
 from django.db.models import Sum
 from django.http import HttpResponseForbidden
 from django.core.cache import cache
-from meetingtools.multiresponse import respond_to
+from django.template.defaultfilters import filesizeformat
 from django.shortcuts import get_object_or_404
 from tagging.models import Tag
+from meetingtools.multiresponse import respond_to, dicts_to_csv_response
 from meetingtools.apps.content.models import Content
 from meetingtools.apps.cluster.models import ACCluster
 from meetingtools.apps.content import tasks
+from meetingtools.apps.auth.utils import report_auth
 
 
 @login_required
@@ -66,3 +68,43 @@ def domain(request, domain_name):
     return respond_to(request, {'text/html': 'apps/content/domain.html'},
                       {'domain': domain_name, 'total_bytecount': total_bytecount, 'total_files': total_files,
                        'users': users})
+
+
+def cluster_report(request, cluster_name):
+    requester = report_auth(request)
+    if requester and cluster_name in requester['clusters']:
+        data = []
+        acc = get_object_or_404(ACCluster, name=cluster_name)
+        domains, total_bytecount = tasks.get_cluster_content(acc)
+        for item in domains:
+            value = float(item['domain_bytes'])
+            max_value = float(total_bytecount)
+            percent = (value / max_value) * 100
+            data.append({
+                'domain': item['domain'],
+                'number_of_files': item['number_of_files'],
+                'storage_used': filesizeformat(item['domain_bytes']),
+                'percent': '{:0.2g}%'.format(percent)
+            })
+        return dicts_to_csv_response(data, header=['domain', 'number_of_files', 'storage_used', 'percent'])
+    return HttpResponseForbidden()
+
+
+def domain_report(request, domain_name):
+    requester = report_auth(request)
+    if requester and (domain_name in requester['domains'] or '*' in requester['domains']):
+        data = []
+        domain_tag = get_object_or_404(Tag, name='domain:%s' % domain_name)
+        users, total_files, total_bytecount = tasks.get_domain_content(domain_tag)
+        for item in users:
+            value = float(item['bytecount'])
+            max_value = float(total_bytecount)
+            percent = (value / max_value) * 100
+            data.append({
+                'username': item['username'],
+                'number_of_files': item['number_of_files'],
+                'storage_used': filesizeformat(item['bytecount']),
+                'percent': '{:0.2g}%'.format(percent)
+            })
+        return dicts_to_csv_response(data, header=['username', 'number_of_files', 'storage_used', 'percent'])
+    return HttpResponseForbidden()
