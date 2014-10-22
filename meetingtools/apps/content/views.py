@@ -84,7 +84,7 @@ def cluster_report(request, cluster_name):
                 'domain': item['domain'],
                 'number_of_files': item['number_of_files'],
                 'storage_used': filesizeformat(item['domain_bytes']),
-                'percent': '{:0.2g}%'.format(percent)
+                'percent': '{0:0.2g}%'.format(int(round(percent)))
             })
         return dicts_to_csv_response(data, header=['domain', 'number_of_files', 'storage_used', 'percent'])
     return HttpResponseForbidden()
@@ -104,7 +104,7 @@ def domain_report(request, domain_name):
                 'username': item['username'],
                 'number_of_files': item['number_of_files'],
                 'storage_used': filesizeformat(item['bytecount']),
-                'percent': '{:0.2g}%'.format(percent)
+                'percent': '{0:0.2g}%'.format(int(round(percent)))
             })
         return dicts_to_csv_response(data, header=['username', 'number_of_files', 'storage_used', 'percent'])
     return HttpResponseForbidden()
