@@ -61,7 +61,7 @@ class Content(models.Model):
                 if not owner:
                     owner = get_owner_by_folder(api, acc, sco_element)
                 try:
-                    domain = owner['login'].split('@')[1]
+                    domain = owner['login'].split('@')[1].split(';')[0]
                     user, created = User.objects.get_or_create(username=owner['login'])
                     if created:
                         user.set_unusable_password()
