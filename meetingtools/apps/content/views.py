@@ -32,7 +32,7 @@ def user(request, username=None):
 def cluster(request, cluster_name=None):
 
     if not request.user.is_staff:
-        return HttpResponseForbidden
+        return HttpResponseForbidden()
 
     clusters = ACCluster.objects.all().values('name')
     if cluster_name:
@@ -54,7 +54,7 @@ def cluster(request, cluster_name=None):
 def domain(request, domain_name):
 
     if not request.user.is_staff:
-        return HttpResponseForbidden
+        return HttpResponseForbidden()
 
     domain_tag = get_object_or_404(Tag, name='domain:%s' % domain_name)
     users = cache.get('%s-users' % domain_tag)

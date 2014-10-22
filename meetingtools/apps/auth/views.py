@@ -23,7 +23,7 @@ def meta(request,attr):
     if not v:
         return None
     values = filter(lambda x: x != "(null)",v.split(";"))
-    return values;
+    return values
 
 def meta1(request,attr,dflt=None):
     v = meta(request,attr)
