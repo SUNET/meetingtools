@@ -27,8 +27,11 @@ def groups(request):
 def report_auth(request):
     auth_data = request.META.get('HTTP_X_REPORT_AUTH', None)
     if auth_data and ':' in auth_data:
-        report_users = getattr(django_settings, 'REPORT_USERS')
-        requester, key = auth_data.split(':')
-        if report_users[requester]['key'] == key:
-            return report_users[requester]
+        try:
+            report_users = getattr(django_settings, 'REPORT_USERS')
+            requester, key = auth_data.split(':')
+            if report_users[requester]['key'] == key:
+                return report_users[requester]
+        except (AttributeError, KeyError):
+            pass
     return False
