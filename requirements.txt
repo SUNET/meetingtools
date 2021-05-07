@@ -1,4 +1,4 @@
-Django==1.4.2
+Django==2.2.22
 Paste==1.7.5.1
 South==0.7.6
 amqp==1.4.4
