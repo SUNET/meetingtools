@@ -16,7 +16,7 @@ httplib2==0.8
 iso8601==0.1.4
 kombu==3.0.14
 librabbitmq==1.0.3
-lxml==3.0.1
+lxml==4.9.1
 psycopg2==2.4.5
 pysaml2==0.4.2
 python-memcached==1.48
