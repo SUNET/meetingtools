@@ -25,3 +25,4 @@ repoze.who==1.0.18
 wsgiref==0.1.2
 zope.interface==4.1.1
 
+setuptools>=65.5.1 # not directly required, pinned by Snyk to avoid a vulnerability
